@@ -7,16 +7,28 @@ inputs:
   build-dir:
     description: "Staging/build directory name"
     required: true
+  script-path:
+    description: "Path to setup_ci.sh (default: <project-path>/scripts/setup_ci.sh)"
+    required: false
 runs:
   using: "composite"
   steps:
     - name: Make setup script executable
       shell: bash
-      run: chmod +x "${{ inputs.project-path }}/scripts/setup_ci.sh"
+      run: |
+        SCRIPT_PATH="${{ inputs.script-path }}"
+        if [ -z "$SCRIPT_PATH" ]; then
+          SCRIPT_PATH="${{ inputs.project-path }}/scripts/setup_ci.sh"
+        fi
+        chmod +x "$SCRIPT_PATH"
 
     - name: Run setup_ci.sh
       shell: bash
       run: |
         set -e
-        "${{ inputs.project-path }}/scripts/setup_ci.sh" "${{ inputs.build-dir }}"
+        SCRIPT_PATH="${{ inputs.script-path }}"
+        if [ -z "$SCRIPT_PATH" ]; then
+          SCRIPT_PATH="${{ inputs.project-path }}/scripts/setup_ci.sh"
+        fi
+        "$SCRIPT_PATH" "${{ inputs.build-dir }}"
         test -d "${{ inputs.build-dir }}" || { echo "Missing build dir"; exit 1; }

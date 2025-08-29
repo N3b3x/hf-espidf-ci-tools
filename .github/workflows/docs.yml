@@ -7,6 +7,10 @@ on:
         description: "Path containing Doxyfile and sources"
         type: string
         required: true
+      tools_dir:
+        description: "Path to nt-espidf-tools directory (contains docs utilities)"
+        type: string
+        default: "nt-espidf-tools"
       doxygen_config:
         description: "Path to Doxyfile (relative to repo root)"
         type: string
@@ -19,6 +23,18 @@ on:
         description: "Run docs/check_docs.py if present"
         type: boolean
         default: true
+      auto_clone_tools:
+        description: "Auto-clone tools repo if tools_dir is missing"
+        type: boolean
+        default: false
+      tools_repo_url:
+        description: "Git URL for nt-espidf-tools"
+        type: string
+        default: "https://github.com/your-org/nt-espidf-tools.git"
+      tools_repo_ref:
+        description: "Branch or tag for nt-espidf-tools"
+        type: string
+        default: "main"
       deploy_pages:
         description: "Deploy to GitHub Pages (main branch, non-PR)"
         type: boolean
@@ -40,11 +56,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Ensure tools directory present
+        if: ${{ inputs.auto_clone_tools }}
+        run: |
+          if [ ! -d "${{ inputs.tools_dir }}" ]; then
+            echo "Cloning tools repo to ${{ inputs.tools_dir }}"
+            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
+              "${{ inputs.tools_repo_url }}" "${{ inputs.tools_dir }}"
+          else
+            echo "Tools directory exists: ${{ inputs.tools_dir }}"
+          fi
+
       - name: Link check (optional)
         if: ${{ inputs.run_link_check }}
         run: |
-          if [ -f "${{ inputs.project_dir }}/docs/check_docs.py" ]; then
-            python3 "${{ inputs.project_dir }}/docs/check_docs.py" "${{ inputs.project_dir }}/docs/index.md"
+          if [ -f "${{ inputs.tools_dir }}/scripts/check_docs.py" ]; then
+            python3 "${{ inputs.tools_dir }}/scripts/check_docs.py" "${{ inputs.project_dir }}/docs/index.md"
           else
             echo "No docs/check_docs.py — skipping"
           fi

@@ -20,6 +20,10 @@ jobs:
     uses: your-org/nt-espidf-autobuild-tools/.github/workflows/build.yml@v1
     with:
       project_dir: examples/esp32
+      tools_dir: nt-espidf-tools
+      auto_clone_tools: true
+      tools_repo_url: https://github.com/your-org/nt-espidf-tools.git
+      tools_repo_ref: main
       build_path: ci_build_path
       clean_build: false
 
@@ -51,6 +55,10 @@ jobs:
     uses: your-org/nt-espidf-autobuild-tools/.github/workflows/docs.yml@v1
     with:
       project_dir: .
+      tools_dir: nt-espidf-tools
+      auto_clone_tools: true
+      tools_repo_url: https://github.com/your-org/nt-espidf-tools.git
+      tools_repo_ref: main
       doxygen_config: Doxyfile
       output_dir: docs/doxygen/html
       deploy_pages: true
