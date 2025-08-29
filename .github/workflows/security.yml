@@ -1,0 +1,132 @@
+name: Security Audit (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      scan_type:
+        description: "all | dependencies | secrets | codeql"
+        type: string
+        default: "all"
+      run_codeql:
+        description: "Enable CodeQL job"
+        type: boolean
+        default: true
+      codeql_languages:
+        description: "Comma-separated (e.g., cpp,python)"
+        type: string
+        default: "cpp"
+      codeql_build_cmd:
+        description: "Optional build command for CodeQL (e.g., 'idf.py build' inside project dir)"
+        type: string
+        default: ""
+      project_dir:
+        description: "Project dir (used if codeql_build_cmd must run in it)"
+        type: string
+        default: "."
+    secrets:
+      GITHUB_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dependencies:
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'dependencies' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit safety bandit
+      - name: Find requirements
+        run: |
+          set -e
+          FILES=$(git ls-files | grep -E 'requirements(\.txt|\.in)?$' || true)
+          if [ -z "$FILES" ]; then
+            echo "requirements.txt" > req-list
+            cat > requirements.txt <<EOF
+pyyaml>=6.0
+esptool>=4.0.0
+pyserial>=3.5
+EOF
+          else
+            echo "$FILES" > req-list
+          fi
+          cat req-list
+      - name: pip-audit
+        run: |
+          while read -r f; do
+            echo "==> $f"
+            pip-audit --requirement "$f" || true
+          done < req-list
+      - name: safety
+        run: |
+          while read -r f; do
+            echo "==> $f"
+            safety check -r "$f" || true
+          done < req-list
+      - name: bandit (python sources)
+        run: |
+          bandit -r . || true
+
+  secrets:
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'secrets' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz \
+            -o gitleaks.tar.gz
+          tar -xzf gitleaks.tar.gz gitleaks && chmod +x gitleaks
+          sudo mv gitleaks /usr/local/bin/
+      - name: Run gitleaks
+        run: |
+          gitleaks detect --source . --report-format json --report-path gitleaks-report.json || true
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+          retention-days: 30
+
+  codeql:
+    if: ${{ (inputs.scan_type == 'all' || inputs.scan_type == 'codeql') && inputs.run_codeql }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ inputs.codeql_languages }}
+
+      - name: Autobuild (best effort)
+        uses: github/codeql-action/autobuild@v3
+        continue-on-error: true
+
+      - name: Manual build (optional)
+        if: ${{ inputs.codeql_build_cmd != '' }}
+        run: |
+          cd "${{ inputs.project_dir }}"
+          ${INPUT_CODEQL_BUILD_CMD}
+        env:
+          INPUT_CODEQL_BUILD_CMD: ${{ inputs.codeql_build_cmd }}
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3

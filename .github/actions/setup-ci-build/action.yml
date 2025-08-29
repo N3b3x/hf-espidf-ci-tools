@@ -1,0 +1,22 @@
+name: "Setup CI Build Workspace"
+description: "Run project's setup_ci.sh to stage a clean workspace"
+inputs:
+  project-path:
+    description: "Path to the project (contains scripts/)"
+    required: true
+  build-dir:
+    description: "Staging/build directory name"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Make setup script executable
+      shell: bash
+      run: chmod +x "${{ inputs.project-path }}/scripts/setup_ci.sh"
+
+    - name: Run setup_ci.sh
+      shell: bash
+      run: |
+        set -e
+        "${{ inputs.project-path }}/scripts/setup_ci.sh" "${{ inputs.build-dir }}"
+        test -d "${{ inputs.build-dir }}" || { echo "Missing build dir"; exit 1; }

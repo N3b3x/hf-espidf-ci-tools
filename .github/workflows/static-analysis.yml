@@ -1,0 +1,60 @@
+name: Static Analysis (Cppcheck) (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      paths:
+        description: "Dirs to analyze (space-separated)"
+        type: string
+        default: "src inc examples"
+      std:
+        description: "C++ standard"
+        type: string
+        default: "c++17"
+      strict:
+        description: "Fail job if any issues found"
+        type: boolean
+        default: false
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run cppcheck (Docker)
+        id: run
+        shell: bash
+        run: |
+          set -e
+          paths="${{ inputs.paths }}"
+          docker run --rm -v "$PWD":/src ghcr.io/facthunder/cppcheck:latest \
+            cppcheck \
+              --enable=warning,style,performance,portability \
+              --suppress=missingIncludeSystem \
+              --inline-suppr \
+              --std=${{ inputs.std }} \
+              --xml \
+              --output-file=/src/cppcheck_report.xml \
+              $(for p in $paths; do echo "/src/$p"; done) 2>&1 | tee cppcheck_output.txt || true
+
+          if [ -s cppcheck_report.xml ]; then
+            echo "issues=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "issues=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cppcheck-report
+          path: |
+            cppcheck_report.xml
+            cppcheck_output.txt
+          retention-days: 14
+
+      - name: Fail on issues (strict)
+        if: ${{ inputs.strict && steps.run.outputs.issues == 'true' }}
+        run: |
+          echo "Cppcheck reported issues (strict mode)"; exit 1
