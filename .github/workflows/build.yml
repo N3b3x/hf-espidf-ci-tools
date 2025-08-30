@@ -1,0 +1,173 @@
+name: ESP-IDF Build (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      project_dir:
+        description: "Path to the ESP-IDF project (contains scripts/, CMakeLists.txt)"
+        type: string
+        required: true
+      scripts_dir:
+        description: "Path to nt-espidf-tools directory (contains scripts directly)"
+        type: string
+        default: "nt-espidf-tools"
+      build_path:
+        description: "Staging/build workspace directory"
+        type: string
+        default: "ci_build_path"
+      clean_build:
+        description: "Skip caches for a clean build"
+        type: boolean
+        default: false
+      auto_clone_tools:
+        description: "Auto-clone tools repo if scripts_dir is missing"
+        type: boolean
+        default: false
+      tools_repo_url:
+        description: "Git URL for nt-espidf-tools"
+        type: string
+        default: "https://github.com/your-org/nt-espidf-tools.git"
+      tools_repo_ref:
+        description: "Branch or tag for nt-espidf-tools"
+        type: string
+        default: "main"
+    secrets:
+      GITHUB_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  BUILD_PATH: ${{ inputs.build_path }}
+  ESP32_PROJECT_PATH: ${{ inputs.project_dir }}
+  SCRIPTS_DIR: ${{ inputs.scripts_dir }}
+
+jobs:
+  generate-matrix:
+    name: Generate Build Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Ensure tools directory present
+        if: ${{ inputs.auto_clone_tools }}
+        run: |
+          if [ ! -d "${{ env.SCRIPTS_DIR }}" ]; then
+            echo "Cloning tools repo to ${{ env.SCRIPTS_DIR }}"
+            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
+              "${{ inputs.tools_repo_url }}" "${{ env.SCRIPTS_DIR }}"
+          else
+            echo "Tools directory exists: ${{ env.SCRIPTS_DIR }}"
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml jq
+
+      - name: Generate matrix
+        id: gen
+        run: |
+          set -e
+          MATRIX=$(python3 "${{ env.SCRIPTS_DIR }}/generate_matrix.py")
+          echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
+          echo "$MATRIX" | python3 -m json.tool
+
+  build:
+    name: Build ➜ ${{ matrix.idf_version }} · ${{ matrix.build_type }} · ${{ matrix.app_name }}
+    runs-on: ubuntu-latest
+    needs: generate-matrix
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache Python deps (for project scripts)
+        if: ${{ !inputs.clean_build }}
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.local/lib/python3.*/site-packages
+          key: >-
+            espidf-python-${{ runner.os }}-${{ matrix.idf_version_docker }}-
+            ${{ hashFiles(format('{0}/scripts/setup_common.sh', env.ESP32_PROJECT_PATH),
+                          format('{0}/scripts/requirements.txt', env.ESP32_PROJECT_PATH)) }}
+          restore-keys: |
+            espidf-python-${{ runner.os }}-
+
+      - name: Install Python deps (optional)
+        run: |
+          if [ -f "${{ env.SCRIPTS_DIR }}/requirements.txt" ]; then
+            python -m pip install --upgrade pip
+            pip install -r "${{ env.SCRIPTS_DIR }}/requirements.txt"
+          fi
+
+      - name: Prepare CI workspace (setup_ci.sh)
+        uses: ./.github/actions/setup-ci-build
+        with:
+          project-path: ${{ env.ESP32_PROJECT_PATH }}
+          build-dir: ${{ env.BUILD_PATH }}
+          script-path: ${{ env.SCRIPTS_DIR }}/setup_ci.sh
+
+      - name: Cache ccache
+        if: ${{ !inputs.clean_build }}
+        id: ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: >-
+            espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-${{ matrix.build_type }}-
+            ${{ hashFiles('src/**','inc/**','examples/**') }}
+          restore-keys: |
+            espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-
+            espidf-ccache-${{ runner.os }}-
+
+      - name: Build (espressif/esp-idf-ci-action)
+        id: build
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: ${{ matrix.idf_version_docker }}
+          target: ${{ matrix.target }}
+          path: .
+          extra_docker_args: >-
+            -v $HOME/.ccache:/root/.ccache
+            -e CCACHE_DIR=/root/.ccache
+            -e IDF_CCACHE_ENABLE=1
+          command: |
+            set -e
+            export BUILD_PATH="${{ env.BUILD_PATH }}"
+            export ESP32_PROJECT_PATH="${{ env.ESP32_PROJECT_PATH }}"
+            export IDF_TARGET="${{ matrix.target }}"
+            export BUILD_TYPE="${{ matrix.build_type }}"
+            export APP_TYPE="${{ matrix.app_name }}"
+
+            cd "${BUILD_PATH}"
+            ./scripts/build_app.sh "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
+            build_dir=$(ls -td build*/ 2>/dev/null | head -1)
+            [ -z "$build_dir" ] && { echo "No build dir!"; exit 1; }
+            echo "build_dir=${build_dir%/}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fw-${{ matrix.app_name }}-${{ matrix.idf_version }}-${{ matrix.build_type }}
+          path: ${{ env.BUILD_PATH }}/${{ steps.build.outputs.build_dir }}
+          retention-days: 7
+

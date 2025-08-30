@@ -1,0 +1,217 @@
+name: Security Audit (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      project_dir:
+        description: "Path to the ESP-IDF project (contains CMakeLists.txt)"
+        type: string
+        required: true
+      scripts_dir:
+        description: "Path to nt-espidf-tools directory (contains scripts directly)"
+        type: string
+        default: "nt-espidf-tools"
+      scan_type:
+        description: "all | dependencies | secrets | codeql"
+        type: string
+        default: "all"
+      run_codeql:
+        description: "Enable CodeQL job"
+        type: boolean
+        default: true
+      codeql_languages:
+        description: "Comma-separated (e.g., cpp,python)"
+        type: string
+        default: "cpp"
+      auto_clone_tools:
+        description: "Auto-clone tools repo if scripts_dir is missing"
+        type: boolean
+        default: false
+      tools_repo_url:
+        description: "Git URL for nt-espidf-tools"
+        type: string
+        default: "https://github.com/N3b3x/nt-espidf-tools.git"
+      tools_repo_ref:
+        description: "Branch or tag for nt-espidf-tools"
+        type: string
+        default: "main"
+    secrets:
+      GITHUB_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  ESP32_PROJECT_PATH: ${{ inputs.project_dir }}
+  SCRIPTS_DIR: ${{ inputs.scripts_dir }}
+
+jobs:
+  generate-matrix:
+    name: Generate Build Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Ensure tools directory present
+        if: ${{ inputs.auto_clone_tools }}
+        run: |
+          if [ ! -d "${{ env.SCRIPTS_DIR }}" ]; then
+            echo "Cloning tools repo to ${{ env.SCRIPTS_DIR }}"
+            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
+              "${{ inputs.tools_repo_url }}" "${{ env.SCRIPTS_DIR }}"
+          else
+            echo "Tools directory exists: ${{ env.SCRIPTS_DIR }}"
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml jq
+
+      - name: Generate matrix
+        id: gen
+        run: |
+          set -e
+          MATRIX=$(python3 "${{ env.SCRIPTS_DIR }}/generate_matrix.py")
+          echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
+          echo "$MATRIX" | python3 -m json.tool
+
+  dependencies:
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'dependencies' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit safety bandit
+      - name: Find requirements
+        run: |
+          set -e
+          FILES=$(git ls-files | grep -E 'requirements(\.txt|\.in)?$' || true)
+          if [ -z "$FILES" ]; then
+            echo "requirements.txt" > req-list
+            cat > requirements.txt <<EOF
+pyyaml>=6.0
+esptool>=4.0.0
+pyserial>=3.5
+EOF
+          else
+            echo "$FILES" > req-list
+          fi
+          cat req-list
+      - name: pip-audit
+        run: |
+          while read -r f; do
+            echo "==> $f"
+            pip-audit --requirement "$f" || true
+          done < req-list
+      - name: safety
+        run: |
+          while read -r f; do
+            echo "==> $f"
+            safety check -r "$f" || true
+          done < req-list
+      - name: bandit (python sources)
+        run: |
+          bandit -r . || true
+
+  secrets:
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'secrets' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz \
+            -o gitleaks.tar.gz
+          tar -xzf gitleaks.tar.gz gitleaks && chmod +x gitleaks
+          sudo mv gitleaks /usr/local/bin/
+      - name: Run gitleaks
+        run: |
+          gitleaks detect --source . --report-format json --report-path gitleaks-report.json || true
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+          retention-days: 30
+
+  codeql:
+    if: ${{ (inputs.scan_type == 'all' || inputs.scan_type == 'codeql') && inputs.run_codeql }}
+    runs-on: ubuntu-latest
+    needs: generate-matrix
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Ensure tools directory present
+        if: ${{ inputs.auto_clone_tools }}
+        run: |
+          if [ ! -d "${{ env.SCRIPTS_DIR }}" ]; then
+            echo "Cloning tools repo to ${{ env.SCRIPTS_DIR }}"
+            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
+              "${{ inputs.tools_repo_url }}" "${{ env.SCRIPTS_DIR }}"
+          else
+            echo "Tools directory exists: ${{ env.SCRIPTS_DIR }}"
+          fi
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ inputs.codeql_languages }}
+
+      - name: Autobuild (best effort)
+        uses: github/codeql-action/autobuild@v3
+        continue-on-error: true
+
+      - name: Manual build using build_app.sh (matrix-based)
+        run: |
+          set -e
+          echo "Building for CodeQL analysis using build_app.sh..."
+          echo "Matrix: ${{ matrix.idf_version }} · ${{ matrix.build_type }} · ${{ matrix.app_name }}"
+          echo "Project: ${{ env.ESP32_PROJECT_PATH }}"
+          echo "Scripts: ${{ env.SCRIPTS_DIR }}"
+          echo "Target: ${{ matrix.target }}"
+          
+          cd "${{ env.ESP32_PROJECT_PATH }}" 
+          
+          if [ -f "${{ env.SCRIPTS_DIR }}/build_app.sh" ]; then
+            echo "Running build_app.sh for CodeQL analysis..."
+            chmod +x "${{ env.SCRIPTS_DIR }}/build_app.sh"
+            "${{ env.SCRIPTS_DIR }}/build_app.sh" \
+              "${{ matrix.app_name }}" \
+              "${{ matrix.build_type }}" \
+              "${{ matrix.idf_version }}"
+          else
+            echo "Warning: build_app.sh not found, falling back to idf.py build"
+            idf.py build
+          fi
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
+

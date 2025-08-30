@@ -1,0 +1,104 @@
+name: Docs Build & Deploy (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      project_dir:
+        description: "Path containing Doxyfile and sources"
+        type: string
+        required: true
+      scripts_dir:
+        description: "Path to nt-espidf-tools directory (contains scripts directly)"
+        type: string
+        default: "nt-espidf-tools"
+      doxygen_config:
+        description: "Path to Doxyfile (relative to repo root)"
+        type: string
+        default: "Doxyfile"
+      output_dir:
+        description: "Generated HTML dir (relative to repo root)"
+        type: string
+        default: "docs/doxygen/html"
+      run_link_check:
+        description: "Run docs/check_docs.py if present"
+        type: boolean
+        default: true
+      auto_clone_tools:
+        description: "Auto-clone tools repo if scripts_dir is missing"
+        type: boolean
+        default: false
+      tools_repo_url:
+        description: "Git URL for nt-espidf-tools"
+        type: string
+        default: "https://github.com/your-org/nt-espidf-tools.git"
+      tools_repo_ref:
+        description: "Branch or tag for nt-espidf-tools"
+        type: string
+        default: "main"
+      deploy_pages:
+        description: "Deploy to GitHub Pages (main branch, non-PR)"
+        type: boolean
+        default: true
+    secrets:
+      GITHUB_TOKEN:
+        required: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure tools directory present
+        if: ${{ inputs.auto_clone_tools }}
+        run: |
+          if [ ! -d "${{ inputs.scripts_dir }}" ]; then
+            echo "Cloning tools repo to ${{ inputs.scripts_dir }}"
+            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
+              "${{ inputs.tools_repo_url }}" "${{ inputs.scripts_dir }}"
+          else
+            echo "Tools directory exists: ${{ inputs.scripts_dir }}"
+          fi
+
+      - name: Link check (optional)
+        if: ${{ inputs.run_link_check }}
+        run: |
+          if [ -f "${{ inputs.scripts_dir }}/check_docs.py" ]; then
+            python3 "${{ inputs.scripts_dir }/check_docs.py" "${{ inputs.project_dir }}/docs/index.md"
+          else
+            echo "No docs/check_docs.py — skipping"
+          fi
+
+      - name: Install Doxygen + Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Build docs (Doxygen)
+        run: |
+          cd "${{ inputs.project_dir }}"
+          doxygen "${{ inputs.doxygen_config }}"
+          test -d "${{ inputs.output_dir }}" || { echo "No docs at ${{ inputs.output_dir }}"; exit 1; }
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-html
+          path: ${{ inputs.output_dir }}
+          retention-days: 7
+
+      - name: Deploy to GitHub Pages
+        if: ${{ inputs.deploy_pages && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ inputs.output_dir }}
+          force_orphan: true
+
