@@ -8,9 +8,9 @@ on:
         type: string
         required: true
       scripts_dir:
-        description: "Path to nt-espidf-tools directory (contains scripts directly)"
+        description: "Path to nt-espidf-project-tools directory (contains scripts directly). Leave empty to auto-detect."
         type: string
-        default: "nt-espidf-tools"
+        required: false
       build_path:
         description: "Staging/build workspace directory"
         type: string
@@ -24,11 +24,11 @@ on:
         type: boolean
         default: false
       tools_repo_url:
-        description: "Git URL for nt-espidf-tools"
+        description: "Git URL for nt-espidf-project-tools"
         type: string
-        default: "https://github.com/your-org/nt-espidf-tools.git"
+        default: "https://github.com/N3b3x/nt-espidf-project-tools.git"
       tools_repo_ref:
-        description: "Branch or tag for nt-espidf-tools"
+        description: "Branch or tag for nt-espidf-project-tools"
         type: string
         default: "main"
     secrets:
@@ -38,6 +38,7 @@ on:
 permissions:
   contents: read
   actions: read
+  pull-requests: write   # needed for PR comment in size-report
 
 env:
   BUILD_PATH: ${{ inputs.build_path }}
@@ -52,8 +53,7 @@ jobs:
       matrix: ${{ steps.gen.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+        with: { submodules: recursive }
 
       - name: Ensure tools directory present
         if: ${{ inputs.auto_clone_tools }}
@@ -67,8 +67,7 @@ jobs:
           fi
 
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+        with: { python-version: '3.x' }
 
       - name: Install deps
         run: |
@@ -94,8 +93,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+        with: { submodules: recursive }
 
       - name: Cache Python deps (for project scripts)
         if: ${{ !inputs.clean_build }}
@@ -113,17 +111,32 @@ jobs:
 
       - name: Install Python deps (optional)
         run: |
-          if [ -f "${{ env.SCRIPTS_DIR }}/requirements.txt" ]; then
+          # Determine scripts path - use SCRIPTS_DIR if specified, otherwise look for nt-espidf-project-tools
+          if [ -n "${{ env.SCRIPTS_DIR }}" ]; then
+              SCRIPTS_PATH="${{ env.SCRIPTS_DIR }}"
+          else
+              # Look for scripts in project directory first
+              if [ -d "${ESP32_PROJECT_PATH}/nt-espidf-project-tools" ]; then
+                  SCRIPTS_PATH="${ESP32_PROJECT_PATH}/nt-espidf-project-tools"
+              else
+                  # Fallback to auto-cloned location
+                  SCRIPTS_PATH="nt-espidf-project-tools"
+              fi
+          fi
+          
+          if [ -f "${SCRIPTS_PATH}/requirements.txt" ]; then
             python -m pip install --upgrade pip
-            pip install -r "${{ env.SCRIPTS_DIR }}/requirements.txt"
+            pip install -r "${SCRIPTS_PATH}/requirements.txt"
           fi
 
+      # NOTE: when used as a reusable workflow, reference the composite action in this repo, not a local path in the consumer
       - name: Prepare CI workspace (setup_ci.sh)
-        uses: ./.github/actions/setup-ci-build
+        uses: N3b3x/hf-espidf-ci-tools/.github/actions/setup-ci-build@v1
         with:
           project-path: ${{ env.ESP32_PROJECT_PATH }}
           build-dir: ${{ env.BUILD_PATH }}
-          script-path: ${{ env.SCRIPTS_DIR }}/setup_ci.sh
+          # if you added script-path input to the composite, you can pass it here:
+          # script-path: ${{ env.SCRIPTS_DIR }}/setup_ci.sh
 
       - name: Cache ccache
         if: ${{ !inputs.clean_build }}
@@ -158,7 +171,21 @@ jobs:
             export APP_TYPE="${{ matrix.app_name }}"
 
             cd "${BUILD_PATH}"
-            ./scripts/build_app.sh "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
+            # Determine scripts path - use SCRIPTS_DIR if specified, otherwise look for nt-espidf-project-tools
+            if [ -n "${{ env.SCRIPTS_DIR }}" ]; then
+                SCRIPTS_PATH="${{ env.SCRIPTS_DIR }}"
+            else
+                # Look for scripts in project directory first
+                if [ -d "${ESP32_PROJECT_PATH}/nt-espidf-project-tools" ]; then
+                    SCRIPTS_PATH="${ESP32_PROJECT_PATH}/nt-espidf-project-tools"
+                else
+                    # Fallback to auto-cloned location
+                    SCRIPTS_PATH="nt-espidf-project-tools"
+                fi
+            fi
+            
+            # Run build script with correct paths
+            "${SCRIPTS_PATH}/build_app.sh" --project-path "${ESP32_PROJECT_PATH}" "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
             build_dir=$(ls -td build*/ 2>/dev/null | head -1)
             [ -z "$build_dir" ] && { echo "No build dir!"; exit 1; }
             echo "build_dir=${build_dir%/}" >> "$GITHUB_OUTPUT"
@@ -171,3 +198,100 @@ jobs:
           path: ${{ env.BUILD_PATH }}/${{ steps.build.outputs.build_dir }}
           retention-days: 7
 
+  # --- NEW: PR size summary inside the same reusable workflow ---
+  size-report:
+    name: Firmware Size Report
+    if: github.event_name == 'pull_request'
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all firmware artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: fw-*
+          merge-multiple: true
+          path: fw_artifacts/
+
+      - name: Build markdown summary
+        id: mk
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="size-summary.md"
+          echo "## 📦 Firmware Size Summary" > "$OUT"
+          echo "" >> "$OUT"
+          echo "| App | IDF | Target | Build | Flash/RAM summary |" >> "$OUT"
+          echo "|---|---|---|---|---|" >> "$OUT"
+
+          found=0
+          shopt -s nullglob
+          # Preferred: use size.info (written by build_app.sh)
+          while IFS= read -r -d '' info; do
+            dir="$(dirname "$info")"
+            app=$(grep -E '^APP='    "$info" | cut -d= -f2- || echo "-")
+            idf=$(grep -E '^IDF='    "$info" | cut -d= -f2- || echo "-")
+            tgt=$(grep -E '^TARGET=' "$info" | cut -d= -f2- || echo "-")
+            bld=$(grep -E '^BUILD='  "$info" | cut -d= -f2- || echo "-")
+
+            if [[ -f "$dir/size.txt" ]]; then
+              summary="$(grep -E 'Total|text\s+data\s+bss' "$dir/size.txt" | head -2 \
+                        | tr -s ' ' ' ' | sed 's/^/`/;s/$/`/' | paste -sd '<br/>' -)"
+            else
+              summary="`size.txt missing`"
+            fi
+
+            echo "| $app | $idf | $tgt | $bld | ${summary:-\`See size.txt\`} |" >> "$OUT"
+            found=$((found+1))
+          done < <(find fw_artifacts -type f -name "size.info" -print0)
+
+          # Fallback: if no size.info available, scan for size.txt
+          if [[ $found -eq 0 ]]; then
+            while IFS= read -r -d '' st; do
+              dir="$(dirname "$st")"
+              parent="$(basename "$dir")"
+              app="$(echo "$parent" | sed -E 's/^build_([^_]+).*/\1/')" || app="-"
+              idf="-"; tgt="-"; bld="$(echo "$parent" | grep -Eo '(Debug|Release)' || echo '-')"
+              summary="$(grep -E 'Total|text\s+data\s+bss' "$st" | head -2 \
+                         | tr -s ' ' ' ' | sed 's/^/`/;s/$/`/' | paste -sd '<br/>' -)"
+              echo "| $app | $idf | $tgt | $bld | ${summary:-\`See size.txt\`} |" >> "$OUT"
+              found=$((found+1))
+            done < <(find fw_artifacts -type f -name "size.txt" -print0)
+          fi
+
+          if [[ $found -eq 0 ]]; then
+            echo "_No size artifacts found. Ensure build_app.sh writes size.txt/size.info inside build dirs._" >> "$OUT"
+          fi
+
+          echo "file=$OUT" >> "$GITHUB_OUTPUT"
+
+      - name: Comment summary on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('${{ steps.mk.outputs.file }}', 'utf8');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+
+      # Optional guardrail: fail if size exceeds your budget
+      - name: Enforce size budgets (optional)
+        if: always()
+        shell: bash
+        env:
+          MAX_DEC_TOTAL: "1600000"   # example combined dec (text+data+bss) threshold in bytes
+        run: |
+          set -euo pipefail
+          vio=0
+          while IFS= read -r -d '' st; do
+            dec=$(grep -E '^\s*text\s+data\s+bss\s+dec' -A1 "$st" | tail -1 | awk '{print $4}' || echo 0)
+            dir="$(dirname "$st")"
+            if [[ "${dec:-0}" -gt "$MAX_DEC_TOTAL" ]]; then
+              echo "::error file=${st}::${dir} dec=${dec} exceeds MAX_DEC_TOTAL=${MAX_DEC_TOTAL}"
+              vio=$((vio+1))
+            fi
+          done < <(find fw_artifacts -type f -name "size.txt" -print0)
+          [[ $vio -gt 0 ]] && exit 1 || exit 0
