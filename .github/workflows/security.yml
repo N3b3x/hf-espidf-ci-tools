@@ -1,3 +1,4 @@
+---
 name: Security Audit (Reusable)
 
 on:
@@ -8,7 +9,10 @@ on:
         type: string
         required: true
       scripts_dir:
-        description: "Path to nt-espidf-project-tools directory (contains scripts directly). Leave empty to auto-detect in project directory or auto-clone from tools_repo_url."
+        description: >
+          Path to nt-espidf-project-tools directory (contains scripts directly).
+          Leave empty to auto-detect in project directory or auto-clone from
+          tools_repo_url.
         type: string
         required: false
       scan_type:
@@ -104,11 +108,11 @@ jobs:
           FILES=$(git ls-files | grep -E 'requirements(\.txt|\.in)?$' || true)
           if [ -z "$FILES" ]; then
             echo "requirements.txt" > req-list
-            cat > requirements.txt <<EOF
-pyyaml>=6.0
-esptool>=4.0.0
-pyserial>=3.5
-EOF
+            cat > requirements.txt <<'EOF'
+            pyyaml>=6.0
+            esptool>=4.0.0
+            pyserial>=3.5
+            EOF
           else
             echo "$FILES" > req-list
           fi
@@ -138,13 +142,15 @@ EOF
           fetch-depth: 0
       - name: Install gitleaks
         run: |
-          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz \
-            -o gitleaks.tar.gz
+          curl -sSL \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/ \
+            gitleaks_8.18.0_linux_x64.tar.gz -o gitleaks.tar.gz
           tar -xzf gitleaks.tar.gz gitleaks && chmod +x gitleaks
           sudo mv gitleaks /usr/local/bin/
       - name: Run gitleaks
         run: |
-          gitleaks detect --source . --report-format json --report-path gitleaks-report.json || true
+          gitleaks detect --source . --report-format json \
+            --report-path gitleaks-report.json || true
       - name: Upload report
         uses: actions/upload-artifact@v4
         if: always()
@@ -154,7 +160,9 @@ EOF
           retention-days: 30
 
   codeql:
-    if: ${{ (inputs.scan_type == 'all' || inputs.scan_type == 'codeql') && inputs.run_codeql }}
+    if: >
+      ${{ (inputs.scan_type == 'all' || inputs.scan_type == 'codeql') &&
+      inputs.run_codeql }}
     runs-on: ubuntu-latest
     needs: generate-matrix
     strategy:
@@ -193,14 +201,16 @@ EOF
         run: |
           set -e
           echo "Building for CodeQL analysis using build_app.sh..."
-          echo "Matrix: ${{ matrix.idf_version }} · ${{ matrix.build_type }} · ${{ matrix.app_name }}"
+          echo "Matrix: ${{ matrix.idf_version }} · ${{ matrix.build_type }}" \
+               " · ${{ matrix.app_name }}"
           echo "Project: ${{ env.ESP32_PROJECT_PATH }}"
           echo "Scripts: ${{ env.SCRIPTS_DIR }}"
           echo "Target: ${{ matrix.target }}"
-          
-          cd "${{ env.ESP32_PROJECT_PATH }}" 
-          
-          # Determine scripts path - use SCRIPTS_DIR if specified, otherwise look for nt-espidf-project-tools
+
+          cd "${{ env.ESP32_PROJECT_PATH }}"
+
+          # Determine scripts path - use SCRIPTS_DIR if specified, otherwise
+          # look for nt-espidf-project-tools
           if [ -n "${{ env.SCRIPTS_DIR }}" ]; then
               SCRIPTS_PATH="${{ env.SCRIPTS_DIR }}"
           else
@@ -212,7 +222,7 @@ EOF
                   SCRIPTS_PATH="nt-espidf-project-tools"
               fi
           fi
-          
+
           if [ -f "${SCRIPTS_PATH}/build_app.sh" ]; then
             echo "Running build_app.sh for CodeQL analysis..."
             chmod +x "${SCRIPTS_PATH}/build_app.sh"
@@ -228,4 +238,3 @@ EOF
 
       - name: Analyze
         uses: github/codeql-action/analyze@v3
-

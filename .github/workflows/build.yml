@@ -1,14 +1,18 @@
+---
 name: ESP-IDF Build (Reusable)
 
 on:
   workflow_call:
     inputs:
       project_dir:
-        description: "Path to the ESP-IDF project (contains scripts/, CMakeLists.txt)"
+        description: >
+          Path to the ESP-IDF project (contains scripts/, CMakeLists.txt)
         type: string
         required: true
       scripts_dir:
-        description: "Path to nt-espidf-project-tools directory (contains scripts directly). Leave empty to auto-detect."
+        description: >
+          Path to nt-espidf-project-tools directory (contains scripts directly).
+          Leave empty to auto-detect.
         type: string
         required: false
       build_path:
@@ -51,9 +55,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.gen.outputs.matrix }}
+      scripts_path: ${{ steps.validate.outputs.scripts_path }}
     steps:
       - uses: actions/checkout@v4
-        with: { submodules: recursive }
+        with:
+          submodules: recursive
 
       - name: Ensure tools directory present
         if: ${{ inputs.auto_clone_tools }}
@@ -66,8 +72,53 @@ jobs:
             echo "Tools directory exists: ${{ env.SCRIPTS_DIR }}"
           fi
 
+      - name: Validate scripts directory
+        id: validate
+        run: |
+          set -e
+          # Resolve scripts path using the same logic as other steps
+          if [ -n "${{ env.SCRIPTS_DIR }}" ]; then
+            SCRIPTS_PATH="${{ env.SCRIPTS_DIR }}"
+          else
+            if [ -d "${ESP32_PROJECT_PATH}/nt-espidf-project-tools" ]; then
+              SCRIPTS_PATH="${ESP32_PROJECT_PATH}/nt-espidf-project-tools"
+            else
+              SCRIPTS_PATH="nt-espidf-project-tools"
+            fi
+          fi
+
+          echo "Resolved scripts path: ${SCRIPTS_PATH}"
+          # Check if the directory exists
+          if [ ! -d "${SCRIPTS_PATH}" ]; then
+            echo "ERROR: Scripts directory not found at ${SCRIPTS_PATH}" >&2
+            echo "Available directories:" >&2
+            ls -la . || true
+            ls -la "${ESP32_PROJECT_PATH}" || true
+            exit 1
+          fi
+
+          # Check for required scripts
+          REQUIRED_SCRIPTS=("generate_matrix.py" "build_app.sh"
+                           "config_loader.sh")
+          for script in "${REQUIRED_SCRIPTS[@]}"; do
+            if [ ! -f "${SCRIPTS_PATH}/${script}" ]; then
+              echo "ERROR: Required script '${script}' not found in" \
+                   "${SCRIPTS_PATH}" >&2
+              echo "Available scripts:" >&2
+              ls -la "${SCRIPTS_PATH}" || true
+              exit 1
+            else
+              echo "✓ Found ${script}"
+            fi
+          done
+
+          echo "✓ All required scripts found in ${SCRIPTS_PATH}"
+          echo "SCRIPTS_PATH=${SCRIPTS_PATH}" >> "$GITHUB_ENV"
+          echo "scripts_path=${SCRIPTS_PATH}" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-python@v5
-        with: { python-version: '3.x' }
+        with:
+          python-version: '3.x'
 
       - name: Install deps
         run: |
@@ -78,12 +129,15 @@ jobs:
         id: gen
         run: |
           set -e
-          MATRIX=$(python3 "${{ env.SCRIPTS_DIR }}/generate_matrix.py")
+          # Scripts directory and generate_matrix.py already validated
+          MATRIX=$(python3 "${SCRIPTS_PATH}/generate_matrix.py")
           echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
           echo "$MATRIX" | python3 -m json.tool
 
   build:
-    name: Build ➜ ${{ matrix.idf_version }} · ${{ matrix.build_type }} · ${{ matrix.app_name }}
+    name: >
+      Build ➜ ${{ matrix.idf_version }} · ${{ matrix.build_type }} ·
+      ${{ matrix.app_name }}
     runs-on: ubuntu-latest
     needs: generate-matrix
     timeout-minutes: 30
@@ -93,7 +147,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with: { submodules: recursive }
+        with:
+          submodules: recursive
 
       - name: Cache Python deps (for project scripts)
         if: ${{ !inputs.clean_build }}
@@ -104,38 +159,33 @@ jobs:
             ~/.local/lib/python3.*/site-packages
           key: >-
             espidf-python-${{ runner.os }}-${{ matrix.idf_version_docker }}-
-            ${{ hashFiles(format('{0}/scripts/setup_common.sh', env.ESP32_PROJECT_PATH),
-                          format('{0}/scripts/requirements.txt', env.ESP32_PROJECT_PATH)) }}
+            ${{ hashFiles(format('{0}/scripts/setup_common.sh',
+                                 env.ESP32_PROJECT_PATH),
+                          format('{0}/scripts/requirements.txt',
+                                 env.ESP32_PROJECT_PATH)) }}
           restore-keys: |
             espidf-python-${{ runner.os }}-
 
       - name: Install Python deps (optional)
         run: |
-          # Determine scripts path - use SCRIPTS_DIR if specified, otherwise look for nt-espidf-project-tools
-          if [ -n "${{ env.SCRIPTS_DIR }}" ]; then
-              SCRIPTS_PATH="${{ env.SCRIPTS_DIR }}"
-          else
-              # Look for scripts in project directory first
-              if [ -d "${ESP32_PROJECT_PATH}/nt-espidf-project-tools" ]; then
-                  SCRIPTS_PATH="${ESP32_PROJECT_PATH}/nt-espidf-project-tools"
-              else
-                  # Fallback to auto-cloned location
-                  SCRIPTS_PATH="nt-espidf-project-tools"
-              fi
-          fi
-          
-          if [ -f "${SCRIPTS_PATH}/requirements.txt" ]; then
+          # Scripts directory already validated in generate-matrix job
+          if [ -f "${{ needs.generate-matrix.outputs.scripts_path }}" \
+               "/requirements.txt" ]; then
             python -m pip install --upgrade pip
-            pip install -r "${SCRIPTS_PATH}/requirements.txt"
+            pip install -r "${{ needs.generate-matrix.outputs.scripts_path }}" \
+                        "/requirements.txt"
           fi
 
-      # NOTE: when used as a reusable workflow, reference the composite action in this repo, not a local path in the consumer
+      # NOTE: when used as a reusable workflow, reference the composite action
+      # in this repo, not a local path in the consumer
       - name: Prepare CI workspace (setup_ci.sh)
-        uses: N3b3x/hf-espidf-ci-tools/.github/actions/setup-ci-build@v1
+        uses: >
+          N3b3x/hf-espidf-ci-tools/.github/actions/setup-ci-build@v1
         with:
           project-path: ${{ env.ESP32_PROJECT_PATH }}
           build-dir: ${{ env.BUILD_PATH }}
-          # if you added script-path input to the composite, you can pass it here:
+          # if you added script-path input to the composite, you can pass it
+          # here:
           # script-path: ${{ env.SCRIPTS_DIR }}/setup_ci.sh
 
       - name: Cache ccache
@@ -145,7 +195,8 @@ jobs:
         with:
           path: ~/.ccache
           key: >-
-            espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-${{ matrix.build_type }}-
+            espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-
+            ${{ matrix.build_type }}-
             ${{ hashFiles('src/**','inc/**','examples/**') }}
           restore-keys: |
             espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-
@@ -171,21 +222,11 @@ jobs:
             export APP_TYPE="${{ matrix.app_name }}"
 
             cd "${BUILD_PATH}"
-            # Determine scripts path - use SCRIPTS_DIR if specified, otherwise look for nt-espidf-project-tools
-            if [ -n "${{ env.SCRIPTS_DIR }}" ]; then
-                SCRIPTS_PATH="${{ env.SCRIPTS_DIR }}"
-            else
-                # Look for scripts in project directory first
-                if [ -d "${ESP32_PROJECT_PATH}/nt-espidf-project-tools" ]; then
-                    SCRIPTS_PATH="${ESP32_PROJECT_PATH}/nt-espidf-project-tools"
-                else
-                    # Fallback to auto-cloned location
-                    SCRIPTS_PATH="nt-espidf-project-tools"
-                fi
-            fi
-            
+            # Scripts directory already validated in generate-matrix job
             # Run build script with correct paths
-            "${SCRIPTS_PATH}/build_app.sh" --project-path "${ESP32_PROJECT_PATH}" "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
+            "${{ needs.generate-matrix.outputs.scripts_path }}/build_app.sh" \
+              --project-path "${ESP32_PROJECT_PATH}" \
+              "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
             build_dir=$(ls -td build*/ 2>/dev/null | head -1)
             [ -z "$build_dir" ] && { echo "No build dir!"; exit 1; }
             echo "build_dir=${build_dir%/}" >> "$GITHUB_OUTPUT"
@@ -194,7 +235,9 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: fw-${{ matrix.app_name }}-${{ matrix.idf_version }}-${{ matrix.build_type }}
+          name: >
+            fw-${{ matrix.app_name }}-${{ matrix.idf_version }}-
+            ${{ matrix.build_type }}
           path: ${{ env.BUILD_PATH }}/${{ steps.build.outputs.build_dir }}
           retention-days: 7
 
@@ -220,7 +263,8 @@ jobs:
           OUT="size-summary.md"
           echo "## 📦 Firmware Size Summary" > "$OUT"
           echo "" >> "$OUT"
-          echo "| App | IDF | Target | Build | Flash/RAM summary |" >> "$OUT"
+          echo "| App | IDF | Target | Build | Flash/RAM summary |" \
+               >> "$OUT"
           echo "|---|---|---|---|---|" >> "$OUT"
 
           found=0
@@ -234,13 +278,16 @@ jobs:
             bld=$(grep -E '^BUILD='  "$info" | cut -d= -f2- || echo "-")
 
             if [[ -f "$dir/size.txt" ]]; then
-              summary="$(grep -E 'Total|text\s+data\s+bss' "$dir/size.txt" | head -2 \
-                        | tr -s ' ' ' ' | sed 's/^/`/;s/$/`/' | paste -sd '<br/>' -)"
+              summary="$(grep -E 'Total|text\s+data\s+bss' "$dir/size.txt" | \
+                        head -2 | tr -s ' ' ' ' | sed 's/^/`/;s/$/`/' | \
+                        paste -sd '<br/>' -)"
             else
               summary="`size.txt missing`"
             fi
 
-            echo "| $app | $idf | $tgt | $bld | ${summary:-\`See size.txt\`} |" >> "$OUT"
+            echo "| $app | $idf | $tgt | $bld |" \
+                 " ${summary:-\`See size.txt\`} |" \
+                 >> "$OUT"
             found=$((found+1))
           done < <(find fw_artifacts -type f -name "size.info" -print0)
 
@@ -249,17 +296,24 @@ jobs:
             while IFS= read -r -d '' st; do
               dir="$(dirname "$st")"
               parent="$(basename "$dir")"
-              app="$(echo "$parent" | sed -E 's/^build_([^_]+).*/\1/')" || app="-"
-              idf="-"; tgt="-"; bld="$(echo "$parent" | grep -Eo '(Debug|Release)' || echo '-')"
-              summary="$(grep -E 'Total|text\s+data\s+bss' "$st" | head -2 \
-                         | tr -s ' ' ' ' | sed 's/^/`/;s/$/`/' | paste -sd '<br/>' -)"
-              echo "| $app | $idf | $tgt | $bld | ${summary:-\`See size.txt\`} |" >> "$OUT"
+              app="$(echo "$parent" | sed -E 's/^build_([^_]+).*/\1/')" || \
+                  app="-"
+              idf="-"; tgt="-"
+              bld="$(echo "$parent" | grep -Eo '(Debug|Release)' || \
+                  echo '-')"
+              summary="$(grep -E 'Total|text\s+data\s+bss' "$st" | \
+                        head -2 | tr -s ' ' ' ' | sed 's/^/`/;s/$/`/' | \
+                        paste -sd '<br/>' -)"
+              echo "| $app | $idf | $tgt | $bld |" \
+                   " ${summary:-\`See size.txt\`} |" \
+                   >> "$OUT"
               found=$((found+1))
             done < <(find fw_artifacts -type f -name "size.txt" -print0)
           fi
 
           if [[ $found -eq 0 ]]; then
-            echo "_No size artifacts found. Ensure build_app.sh writes size.txt/size.info inside build dirs._" >> "$OUT"
+            echo "_No size artifacts found. Ensure build_app.sh writes" \
+                 "size.txt/size.info inside build dirs._" >> "$OUT"
           fi
 
           echo "file=$OUT" >> "$GITHUB_OUTPUT"
@@ -269,7 +323,8 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const body = fs.readFileSync('${{ steps.mk.outputs.file }}', 'utf8');
+            const body = fs.readFileSync('${{ steps.mk.outputs.file }}',
+                                        'utf8');
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -282,15 +337,17 @@ jobs:
         if: always()
         shell: bash
         env:
-          MAX_DEC_TOTAL: "1600000"   # example combined dec (text+data+bss) threshold in bytes
+          MAX_DEC_TOTAL: "1600000"   # example combined dec threshold in bytes
         run: |
           set -euo pipefail
           vio=0
           while IFS= read -r -d '' st; do
-            dec=$(grep -E '^\s*text\s+data\s+bss\s+dec' -A1 "$st" | tail -1 | awk '{print $4}' || echo 0)
+            dec=$(grep -E '^\s*text\s+data\s+bss\s+dec' -A1 "$st" | \
+                  tail -1 | awk '{print $4}' || echo 0)
             dir="$(dirname "$st")"
             if [[ "${dec:-0}" -gt "$MAX_DEC_TOTAL" ]]; then
-              echo "::error file=${st}::${dir} dec=${dec} exceeds MAX_DEC_TOTAL=${MAX_DEC_TOTAL}"
+              echo "::error file=${st}::${dir} dec=${dec} exceeds" \
+                   "MAX_DEC_TOTAL=${MAX_DEC_TOTAL}"
               vio=$((vio+1))
             fi
           done < <(find fw_artifacts -type f -name "size.txt" -print0)

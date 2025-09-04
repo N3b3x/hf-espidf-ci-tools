@@ -1,3 +1,4 @@
+---
 name: "ESP-IDF C/C++ Lint"
 description: "clang-format + clang-tidy via cpp-linter"
 inputs:
@@ -26,4 +27,3 @@ runs:
         extensions: 'c,cpp,cc,cxx,h,hpp'
         ignore: 'build|.git'
         path: ${{ inputs.paths }}
-

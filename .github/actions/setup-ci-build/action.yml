@@ -1,3 +1,4 @@
+---
 name: "Setup CI Build Workspace"
 description: "Run project's setup_ci.sh to stage a clean workspace"
 inputs:
@@ -8,7 +9,8 @@ inputs:
     description: "Staging/build directory name"
     required: true
   script-path:
-    description: "Path to setup_ci.sh (default: <project-path>/scripts/setup_ci.sh)"
+    description: >
+      Path to setup_ci.sh (default: <project-path>/scripts/setup_ci.sh)
     required: false
 runs:
   using: "composite"
@@ -31,5 +33,5 @@ runs:
           SCRIPT_PATH="${{ inputs.project-path }}/scripts/setup_ci.sh"
         fi
         "$SCRIPT_PATH" "${{ inputs.build-dir }}"
-        test -d "${{ inputs.build-dir }}" || { echo "Missing build dir"; exit 1; }
-
+        test -d "${{ inputs.build-dir }}" || { \
+          echo "Missing build dir"; exit 1; }

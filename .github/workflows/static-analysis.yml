@@ -1,3 +1,4 @@
+---
 name: Static Analysis (Cppcheck) (Reusable)
 
 on:
@@ -36,7 +37,8 @@ jobs:
               --std=${{ inputs.std }} \
               --xml \
               --output-file=/src/cppcheck_report.xml \
-              $(for p in $paths; do echo "/src/$p"; done) 2>&1 | tee cppcheck_output.txt || true
+              $(for p in $paths; do echo "/src/$p"; done) 2>&1 | \
+              tee cppcheck_output.txt || true
 
           if [ -s cppcheck_report.xml ]; then
             echo "issues=true" >> "$GITHUB_OUTPUT"
@@ -58,4 +60,3 @@ jobs:
         if: ${{ inputs.strict && steps.run.outputs.issues == 'true' }}
         run: |
           echo "Cppcheck reported issues (strict mode)"; exit 1
-

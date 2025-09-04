@@ -1,3 +1,4 @@
+---
 name: C/C++ Lint (Reusable)
 
 on:
@@ -30,4 +31,3 @@ jobs:
         with:
           paths: ${{ inputs.paths }}
           clang_version: ${{ inputs.clang_version }}
-

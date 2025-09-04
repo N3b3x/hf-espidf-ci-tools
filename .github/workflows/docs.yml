@@ -1,3 +1,4 @@
+---
 name: Docs Build & Deploy (Reusable)
 
 on:
@@ -8,7 +9,9 @@ on:
         type: string
         required: true
       scripts_dir:
-        description: "Path to nt-espidf-project-tools directory (contains scripts directly). Leave empty to auto-detect."
+        description: >
+          Path to nt-espidf-project-tools directory (contains scripts directly).
+          Leave empty to auto-detect.
         type: string
         required: false
       doxygen_config:
@@ -59,13 +62,14 @@ jobs:
       - name: Ensure tools directory present
         if: ${{ inputs.auto_clone_tools }}
         run: |
-          # Determine scripts path - use scripts_dir if specified, otherwise use default
+          # Determine scripts path - use scripts_dir if specified, otherwise
+          # use default
           if [ -n "${{ inputs.scripts_dir }}" ]; then
               SCRIPTS_PATH="${{ inputs.scripts_dir }}"
           else
               SCRIPTS_PATH="nt-espidf-project-tools"
           fi
-          
+
           if [ ! -d "$SCRIPTS_PATH" ]; then
             echo "Cloning tools repo to $SCRIPTS_PATH"
             git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
@@ -77,21 +81,25 @@ jobs:
       - name: Link check (optional)
         if: ${{ inputs.run_link_check }}
         run: |
-          # Determine scripts path - use scripts_dir if specified, otherwise look for nt-espidf-project-tools
+          # Determine scripts path - use scripts_dir if specified, otherwise
+          # look for nt-espidf-project-tools
           if [ -n "${{ inputs.scripts_dir }}" ]; then
               SCRIPTS_PATH="${{ inputs.scripts_dir }}"
           else
               # Look for scripts in project directory first
-              if [ -d "${{ inputs.project_dir }}/nt-espidf-project-tools" ]; then
-                  SCRIPTS_PATH="${{ inputs.project_dir }}/nt-espidf-project-tools"
+              if [ -d "${{ inputs.project_dir }}" \
+                   "/nt-espidf-project-tools" ]; then
+                  SCRIPTS_PATH="${{ inputs.project_dir }}" \
+                    "/nt-espidf-project-tools"
               else
                   # Fallback to auto-cloned location
                   SCRIPTS_PATH="nt-espidf-project-tools"
               fi
           fi
-          
+
           if [ -f "${SCRIPTS_PATH}/check_docs.py" ]; then
-            python3 "${SCRIPTS_PATH}/check_docs.py" "${{ inputs.project_dir }}/docs/index.md"
+            python3 "${SCRIPTS_PATH}/check_docs.py" \
+              "${{ inputs.project_dir }}/docs/index.md"
           else
             echo "No docs/check_docs.py — skipping"
           fi
@@ -105,7 +113,8 @@ jobs:
         run: |
           cd "${{ inputs.project_dir }}"
           doxygen "${{ inputs.doxygen_config }}"
-          test -d "${{ inputs.output_dir }}" || { echo "No docs at ${{ inputs.output_dir }}"; exit 1; }
+          test -d "${{ inputs.output_dir }}" || { \
+            echo "No docs at ${{ inputs.output_dir }}"; exit 1; }
 
       - name: Upload docs artifact
         uses: actions/upload-artifact@v4
@@ -115,10 +124,11 @@ jobs:
           retention-days: 7
 
       - name: Deploy to GitHub Pages
-        if: ${{ inputs.deploy_pages && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+        if: >
+          ${{ inputs.deploy_pages && github.ref == 'refs/heads/main' &&
+          github.event_name != 'pull_request' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ${{ inputs.output_dir }}
           force_orphan: true
-
