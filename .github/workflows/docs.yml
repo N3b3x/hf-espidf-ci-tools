@@ -4,16 +4,6 @@ name: Docs Build & Deploy (Reusable)
 on:
   workflow_call:
     inputs:
-      project_dir:
-        description: "Path containing Doxyfile and sources"
-        type: string
-        required: true
-      project_tools_dir:
-        description: >
-          Path to project tools directory (contains scripts directly).
-          Leave empty to auto-detect. Only needed if using scripts dir outside of project dir or project-specific tools.
-        type: string
-        required: false
       doxygen_config:
         description: "Path to Doxyfile (relative to repo root)"
         type: string
@@ -30,29 +20,30 @@ on:
         description: "Comma-separated paths to check for broken links"
         type: string
         default: "docs/**,*.md,**/docs/**"
-      auto_clone_tools:
-        description: "Auto-clone tools repo if project_tools_dir is missing (only needed for project-specific tools)"
+      run_markdown_lint:
+        description: "Run markdown linting on documentation files"
         type: boolean
         default: false
-      tools_repo_url:
-        description: "Git URL for project tools repository (optional, uses default if not specified)"
+      markdown_lint_paths:
+        description: "Glob patterns for markdown files to lint"
         type: string
-        required: false
-      tools_repo_ref:
-        description: "Branch or tag for project tools repository (optional, uses default if not specified)"
+        default: "**/*.md"
+      run_spell_check:
+        description: "Run spell checking on documentation files"
+        type: boolean
+        default: false
+      spell_check_paths:
+        description: "Glob patterns for files to spell check"
         type: string
-        required: false
-      tools_repo_sha:
-        description: "Specific commit SHA for project tools repository (most secure option)"
+        default: "**/*.md"
+      spell_check_config:
+        description: "Path to cspell configuration file"
         type: string
-        required: false
+        default: ".cspell.json"
       deploy_pages:
         description: "Deploy to GitHub Pages (main branch, non-PR)"
         type: boolean
         default: true
-    secrets:
-      GITHUB_TOKEN:
-        required: false
 
 permissions:
   contents: write
@@ -67,21 +58,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Ensure tools directory present (if needed)
-        if: ${{ inputs.auto_clone_tools || inputs.project_tools_dir }}
-        id: tools-validate
-        uses: ./.github/actions/ensure-tools-directory
-        with:
-          project_tools_dir: ${{ inputs.project_tools_dir }}
-          project_dir: ${{ inputs.project_dir }}
-          auto_clone_tools: ${{ inputs.auto_clone_tools }}
-          tools_repo_url: ${{ inputs.tools_repo_url }}
-          tools_repo_ref: ${{ inputs.tools_repo_ref }}
-          tools_repo_sha: ${{ inputs.tools_repo_sha }}
-
       - name: Check documentation links
         if: ${{ inputs.run_link_check }}
         uses: AlexanderDokuchaev/md-dead-link-check@v1.2.0
+        with:
+          paths: ${{ inputs.link_check_paths }}
+
+      - name: Setup Node.js (for linting)
+        if: ${{ inputs.run_markdown_lint || inputs.run_spell_check }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install markdownlint
+        if: ${{ inputs.run_markdown_lint }}
+        run: npm install -g markdownlint-cli
+
+      - name: Lint markdown files
+        if: ${{ inputs.run_markdown_lint }}
+        run: markdownlint "${{ inputs.markdown_lint_paths }}" --ignore node_modules
+
+      - name: Install cspell
+        if: ${{ inputs.run_spell_check }}
+        run: npm install -g cspell
+
+      - name: Spell check
+        if: ${{ inputs.run_spell_check }}
+        run: |
+          if [ -f "${{ inputs.spell_check_config }}" ]; then
+            cspell "${{ inputs.spell_check_paths }}" --config "${{ inputs.spell_check_config }}"
+          else
+            cspell "${{ inputs.spell_check_paths }}"
+          fi
 
       - name: Install Doxygen + Graphviz
         run: |
@@ -90,7 +98,6 @@ jobs:
 
       - name: Build docs (Doxygen)
         run: |
-          cd "${{ inputs.project_dir }}"
           doxygen "${{ inputs.doxygen_config }}"
           test -d "${{ inputs.output_dir }}" || { \
             echo "No docs at ${{ inputs.output_dir }}"; exit 1; }

@@ -64,9 +64,6 @@ on:
         description: "Post a single, collapsible thread comment in a pull request detailing all linting issues"
         type: boolean
         default: false
-    secrets:
-      GITHUB_TOKEN:
-        required: false
 
 permissions:
   contents: write  # Required for auto_fix to push changes

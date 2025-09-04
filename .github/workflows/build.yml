@@ -39,9 +39,6 @@ on:
         description: "Specific commit SHA for project tools repository (most secure option)"
         type: string
         required: false
-    secrets:
-      GITHUB_TOKEN:
-        required: false
 
 permissions:
   contents: read

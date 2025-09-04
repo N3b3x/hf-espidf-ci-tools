@@ -19,6 +19,8 @@ The Documentation workflow builds Doxygen documentation and optionally deploys i
 **Key Features**: 
 - Doxygen + Graphviz integration
 - Optional link checking
+- Markdown linting (markdownlint)
+- Spell checking (cspell)
 - GitHub Pages deployment
 - Artifact storage
 
@@ -28,14 +30,15 @@ The Documentation workflow builds Doxygen documentation and optionally deploys i
 
 | Input | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| `project_dir` | string | ✅ | - | Path containing Doxyfile and sources |
-| `scripts_dir` | string | ❌ | `nt-espidf-tools` | Path to nt-espidf-tools directory |
 | `doxygen_config` | string | ❌ | `Doxyfile` | Path to Doxyfile (relative to repo root) |
 | `output_dir` | string | ❌ | `docs/doxygen/html` | Generated HTML directory |
-| `run_link_check` | boolean | ❌ | `true` | Run docs/check_docs.py if present |
-| `auto_clone_tools` | boolean | ❌ | `false` | Auto-clone tools repo if missing |
-| `tools_repo_url` | string | ❌ | `https://github.com/N3b3x/nt-espidf-tools.git` | Git URL for tools repo |
-| `tools_repo_ref` | string | ❌ | `main` | Branch/tag for tools repo |
+| `run_link_check` | boolean | ❌ | `true` | Run documentation link checker |
+| `link_check_paths` | string | ❌ | `docs/**,*.md,**/docs/**` | Comma-separated paths to check for broken links |
+| `run_markdown_lint` | boolean | ❌ | `false` | Run markdown linting on documentation files |
+| `markdown_lint_paths` | string | ❌ | `**/*.md` | Glob patterns for markdown files to lint |
+| `run_spell_check` | boolean | ❌ | `false` | Run spell checking on documentation files |
+| `spell_check_paths` | string | ❌ | `**/*.md` | Glob patterns for files to spell check |
+| `spell_check_config` | string | ❌ | `.cspell.json` | Path to cspell configuration file |
 | `deploy_pages` | boolean | ❌ | `true` | Deploy to GitHub Pages |
 
 ## 📤 Outputs
@@ -55,26 +58,26 @@ jobs:
   docs:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
     with:
-      project_dir: .
-      scripts_dir: nt-espidf-tools
       doxygen_config: Doxyfile
       output_dir: docs/doxygen/html
 ```
 
-### With Auto-clone Tools
+### With Documentation Quality Checks
 
 ```yaml
 jobs:
   docs:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
     with:
-      project_dir: .
-      scripts_dir: nt-espidf-tools
-      auto_clone_tools: true
-      tools_repo_url: https://github.com/N3b3x/nt-espidf-tools.git
-      tools_repo_ref: main
       doxygen_config: Doxyfile
       output_dir: docs/doxygen/html
+      run_link_check: true
+      link_check_paths: "docs/**,*.md,**/docs/**,examples/**"
+      run_markdown_lint: true
+      markdown_lint_paths: "docs/**,*.md"
+      run_spell_check: true
+      spell_check_paths: "docs/**,*.md"
+      spell_check_config: ".cspell.json"
       deploy_pages: true
     secrets:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,8 +90,6 @@ jobs:
   docs:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
     with:
-      project_dir: examples/esp32
-      scripts_dir: nt-espidf-tools
       doxygen_config: docs/Doxyfile.custom
       output_dir: docs/generated/html
       run_link_check: false
@@ -132,9 +133,38 @@ The link checker:
 - Ignores external URLs, anchors, and common non-file patterns
 - Reports broken links with file and line number information
 - Can be configured to fail the workflow on broken links
-- Supports both built-in checker and external `md-dead-link-check` tool
+- Uses the external `md-dead-link-check` action directly
 
-**No external dependencies required** - the link checker is built into the workflow and doesn't require project tools.
+### Markdown Linting
+
+Optional markdown linting using `markdownlint-cli` to enforce consistent markdown formatting and catch common issues.
+
+```yaml
+run_markdown_lint: true  # Enable markdown linting (default: false)
+markdown_lint_paths: "**/*.md"  # Glob patterns for files to lint
+```
+
+Features:
+- Enforces consistent markdown formatting
+- Catches common markdown issues
+- Configurable via `.markdownlint.json` file
+- Ignores `node_modules` by default
+
+### Spell Checking
+
+Optional spell checking using `cspell` to catch spelling errors in documentation.
+
+```yaml
+run_spell_check: true  # Enable spell checking (default: false)
+spell_check_paths: "**/*.md"  # Glob patterns for files to check
+spell_check_config: ".cspell.json"  # Path to cspell config file
+```
+
+Features:
+- Catches spelling errors in documentation
+- Configurable via `.cspell.json` file
+- Supports custom dictionaries and ignore patterns
+- Works with multiple file types
 
 ### Link Checker Options
 
@@ -208,6 +238,7 @@ docs.yourproject.com
 - Verify `Doxyfile` exists and is valid
 - Check source directories exist (`src/`, `inc/`, `examples/`)
 - Ensure Graphviz is installed (handled automatically)
+- Verify `doxygen_config` path is correct
 
 **GitHub Pages Not Deploying**
 - Check repository permissions
@@ -215,9 +246,19 @@ docs.yourproject.com
 - Ensure workflow runs on main branch (not PRs)
 
 **Link Check Fails**
-- Verify `check_docs.py` exists in tools repo
-- Check script handles errors gracefully
-- Review script output for specific issues
+- Verify link paths are correct in `link_check_paths`
+- Check that markdown files exist at specified paths
+- Review link checker output for specific broken links
+
+**Markdown Lint Fails**
+- Check markdown syntax and formatting
+- Review `.markdownlint.json` configuration if present
+- Fix linting errors reported by markdownlint
+
+**Spell Check Fails**
+- Review spelling errors in documentation
+- Add words to `.cspell.json` custom dictionary if needed
+- Check `spell_check_config` path is correct
 
 ### Debug Mode
 
