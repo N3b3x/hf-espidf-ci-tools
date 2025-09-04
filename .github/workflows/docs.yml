@@ -8,10 +8,10 @@ on:
         description: "Path containing Doxyfile and sources"
         type: string
         required: true
-      scripts_dir:
+      project_tools_dir:
         description: >
-          Path to nt-espidf-project-tools directory (contains scripts directly).
-          Leave empty to auto-detect.
+          Path to project tools directory (contains scripts directly).
+          Leave empty to auto-detect. Only needed if using scripts dir outside of project dir or project-specific tools.
         type: string
         required: false
       doxygen_config:
@@ -23,21 +23,29 @@ on:
         type: string
         default: "docs/doxygen/html"
       run_link_check:
-        description: "Run docs/check_docs.py if present"
+        description: "Run documentation link checker"
         type: boolean
         default: true
+      link_check_paths:
+        description: "Comma-separated paths to check for broken links"
+        type: string
+        default: "docs/**,*.md,**/docs/**"
       auto_clone_tools:
-        description: "Auto-clone tools repo if scripts_dir is missing"
+        description: "Auto-clone tools repo if project_tools_dir is missing (only needed for project-specific tools)"
         type: boolean
         default: false
       tools_repo_url:
-        description: "Git URL for nt-espidf-project-tools"
+        description: "Git URL for project tools repository (optional, uses default if not specified)"
         type: string
-        default: "https://github.com/N3b3x/nt-espidf-project-tools.git"
+        required: false
       tools_repo_ref:
-        description: "Branch or tag for nt-espidf-project-tools"
+        description: "Branch or tag for project tools repository (optional, uses default if not specified)"
         type: string
-        default: "main"
+        required: false
+      tools_repo_sha:
+        description: "Specific commit SHA for project tools repository (most secure option)"
+        type: string
+        required: false
       deploy_pages:
         description: "Deploy to GitHub Pages (main branch, non-PR)"
         type: boolean
@@ -59,50 +67,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Ensure tools directory present
-        if: ${{ inputs.auto_clone_tools }}
-        run: |
-          # Determine scripts path - use scripts_dir if specified, otherwise
-          # use default
-          if [ -n "${{ inputs.scripts_dir }}" ]; then
-              SCRIPTS_PATH="${{ inputs.scripts_dir }}"
-          else
-              SCRIPTS_PATH="nt-espidf-project-tools"
-          fi
+      - name: Ensure tools directory present (if needed)
+        if: ${{ inputs.auto_clone_tools || inputs.project_tools_dir }}
+        id: tools-validate
+        uses: ./.github/actions/ensure-tools-directory
+        with:
+          project_tools_dir: ${{ inputs.project_tools_dir }}
+          project_dir: ${{ inputs.project_dir }}
+          auto_clone_tools: ${{ inputs.auto_clone_tools }}
+          tools_repo_url: ${{ inputs.tools_repo_url }}
+          tools_repo_ref: ${{ inputs.tools_repo_ref }}
+          tools_repo_sha: ${{ inputs.tools_repo_sha }}
 
-          if [ ! -d "$SCRIPTS_PATH" ]; then
-            echo "Cloning tools repo to $SCRIPTS_PATH"
-            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
-              "${{ inputs.tools_repo_url }}" "$SCRIPTS_PATH"
-          else
-            echo "Tools directory exists: $SCRIPTS_PATH"
-          fi
-
-      - name: Link check (optional)
+      - name: Check documentation links
         if: ${{ inputs.run_link_check }}
-        run: |
-          # Determine scripts path - use scripts_dir if specified, otherwise
-          # look for nt-espidf-project-tools
-          if [ -n "${{ inputs.scripts_dir }}" ]; then
-              SCRIPTS_PATH="${{ inputs.scripts_dir }}"
-          else
-              # Look for scripts in project directory first
-              if [ -d "${{ inputs.project_dir }}" \
-                   "/nt-espidf-project-tools" ]; then
-                  SCRIPTS_PATH="${{ inputs.project_dir }}" \
-                    "/nt-espidf-project-tools"
-              else
-                  # Fallback to auto-cloned location
-                  SCRIPTS_PATH="nt-espidf-project-tools"
-              fi
-          fi
-
-          if [ -f "${SCRIPTS_PATH}/check_docs.py" ]; then
-            python3 "${SCRIPTS_PATH}/check_docs.py" \
-              "${{ inputs.project_dir }}/docs/index.md"
-          else
-            echo "No docs/check_docs.py — skipping"
-          fi
+        uses: AlexanderDokuchaev/md-dead-link-check@v1.2.0
 
       - name: Install Doxygen + Graphviz
         run: |

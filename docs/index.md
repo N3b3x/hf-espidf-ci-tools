@@ -1,6 +1,6 @@
 # Documentation Index
 
-Welcome to the nt-espidf-ci-tools documentation! This guide provides comprehensive coverage of all reusable workflows and how to integrate them into your ESP-IDF projects.
+Welcome to the hf-espidf-ci-tools documentation! This guide provides comprehensive coverage of all reusable workflows and how to integrate them into your ESP-IDF projects.
 
 ## 🚀 Quick Navigation
 
@@ -9,6 +9,7 @@ Welcome to the nt-espidf-ci-tools documentation! This guide provides comprehensi
 | **[Build](build-workflow.md)** | ESP-IDF matrix builds with caching | [→ Build Guide](build-workflow.md) |
 | **[Docs](docs-workflow.md)** | Doxygen + GitHub Pages deployment | [→ Docs Guide](docs-workflow.md) |
 | **[Lint](lint-workflow.md)** | C/C++ code quality checks | [→ Lint Guide](lint-workflow.md) |
+| **[Link Check](link-check-workflow.md)** | Documentation link validation | [→ Link Check Guide](link-check-workflow.md) |
 | **[Static Analysis](static-analysis-workflow.md)** | Cppcheck security analysis | [→ Static Analysis Guide](static-analysis-workflow.md) |
 | **[Security](security-workflow.md)** | Dependencies, secrets, CodeQL | [→ Security Guide](security-workflow.md) |
 
@@ -17,7 +18,7 @@ Welcome to the nt-espidf-ci-tools documentation! This guide provides comprehensi
 Before using these workflows, ensure you have:
 
 1. **ESP-IDF project** with proper structure
-2. **nt-espidf-tools repository** cloned in your project
+2. **hf-espidf-project-tools repository** cloned in your project
 3. **GitHub Actions enabled** in your repository
 
 ## 🏗️ Project Structure
@@ -26,12 +27,12 @@ Before using these workflows, ensure you have:
 your-esp32-project/
 ├── .github/workflows/          # Your CI workflows
 ├── examples/esp32/             # ESP-IDF project (project_dir)
-├── nt-espidf-tools/            # Scripts repo (scripts_dir)
+├── hf-espidf-project-tools/    # Project tools repo (project_tools_dir)
 │   ├── generate_matrix.py      # Build matrix generator
 │   ├── setup_ci.sh            # CI workspace setup
 │   ├── build_app.sh           # Application builder
 │   ├── requirements.txt        # Python dependencies
-│   └── check_docs.py          # Documentation link checker
+│   └── config_loader.sh       # Configuration management
 ├── src/                        # Source code
 ├── inc/                        # Headers
 └── CMakeLists.txt              # ESP-IDF project file
@@ -42,7 +43,7 @@ your-esp32-project/
 ### 1. Clone the Tools Repository
 
 ```bash
-git clone https://github.com/N3b3x/nt-espidf-tools.git
+git clone https://github.com/N3b3x/hf-espidf-project-tools.git
 ```
 
 ### 2. Create Your First CI Workflow
@@ -56,23 +57,23 @@ on:
 
 jobs:
   build:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
     with:
       project_dir: examples/esp32
-      scripts_dir: nt-espidf-tools
+      project_tools_dir: hf-espidf-project-tools
       auto_clone_tools: true
-      tools_repo_url: https://github.com/N3b3x/nt-espidf-tools.git
+      tools_repo_url: https://github.com/N3b3x/hf-espidf-project-tools.git
       tools_repo_ref: main
       build_path: ci_build_path
       clean_build: false
 
   lint:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/lint.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
     with:
       paths: "src/**,inc/**,examples/**"
 
   static:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/static-analysis.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/static-analysis.yml@v1
     with:
       paths: "src inc examples"
       strict: false
@@ -100,6 +101,13 @@ jobs:
 - **Use Case**: Code style consistency
 
 [→ Full Lint Guide](lint-workflow.md)
+
+### Link Check Workflow
+- **Purpose**: Documentation link validation
+- **Key Features**: External/internal link checking, anchor validation
+- **Use Case**: Documentation integrity
+
+[→ Full Link Check Guide](link-check-workflow.md)
 
 ### Static Analysis Workflow
 - **Purpose**: Security and quality analysis with cppcheck
@@ -151,8 +159,8 @@ jobs:
 
 ## 🔗 Related Resources
 
-- [Main Repository](https://github.com/N3b3x/nt-espidf-ci-tools)
-- [Tools Repository](https://github.com/N3b3x/nt-espidf-tools)
+- [Main Repository](https://github.com/N3b3x/hf-espidf-ci-tools)
+- [Project Tools Repository](https://github.com/N3b3x/hf-espidf-project-tools)
 - [ESP-IDF Documentation](https://docs.espressif.com/projects/esp-idf/)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 

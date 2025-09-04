@@ -52,7 +52,7 @@ The Security workflow provides comprehensive security auditing including depende
 ```yaml
 jobs:
   security:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/security.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
     with:
       project_dir: examples/esp32
       scripts_dir: nt-espidf-tools
@@ -66,7 +66,7 @@ jobs:
 ```yaml
 jobs:
   security:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/security.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
     with:
       project_dir: examples/esp32
       scripts_dir: nt-espidf-tools
@@ -79,7 +79,7 @@ jobs:
 ```yaml
 jobs:
   security:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/security.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
     with:
       project_dir: examples/esp32
       scripts_dir: nt-espidf-tools
@@ -124,14 +124,14 @@ The workflow automatically generates the same build matrix as your build workflo
 # In your CI workflow, ensure consistency:
 jobs:
   build:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
     with:
       project_dir: examples/esp32
       scripts_dir: nt-espidf-tools
       # ... other inputs
 
   security:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/security.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
     with:
       project_dir: examples/esp32
       scripts_dir: nt-espidf-tools

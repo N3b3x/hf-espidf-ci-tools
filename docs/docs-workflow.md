@@ -53,7 +53,7 @@ The Documentation workflow builds Doxygen documentation and optionally deploys i
 ```yaml
 jobs:
   docs:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/docs.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
     with:
       project_dir: .
       scripts_dir: nt-espidf-tools
@@ -66,7 +66,7 @@ jobs:
 ```yaml
 jobs:
   docs:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/docs.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
     with:
       project_dir: .
       scripts_dir: nt-espidf-tools
@@ -85,7 +85,7 @@ jobs:
 ```yaml
 jobs:
   docs:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/docs.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
     with:
       project_dir: examples/esp32
       scripts_dir: nt-espidf-tools
@@ -119,22 +119,45 @@ EXTRACT_STATIC        = YES
 
 ### Link Checking
 
-If you have a `check_docs.py` script in your tools repo, it will be run automatically:
+The workflow includes a built-in link checker that verifies all local links in documentation files are valid. This helps maintain documentation quality and prevents broken links.
 
-```python
-# nt-espidf-tools/check_docs.py
-import sys
-import markdown
-import re
+```yaml
+run_link_check: true  # Enable link checking (default: true)
+link_check_paths: "docs/**,*.md"  # Paths to check for broken links
+```
 
-def check_docs(markdown_file):
-    """Check documentation links and structure"""
-    # Your link checking logic here
-    pass
+The link checker:
+- Scans all markdown files in the specified paths
+- Validates local file references and cross-directory links
+- Ignores external URLs, anchors, and common non-file patterns
+- Reports broken links with file and line number information
+- Can be configured to fail the workflow on broken links
+- Supports both built-in checker and external `md-dead-link-check` tool
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        check_docs(sys.argv[1])
+**No external dependencies required** - the link checker is built into the workflow and doesn't require project tools.
+
+### Link Checker Options
+
+**Link Checking (md-dead-link-check):**
+```yaml
+run_link_check: true
+link_check_paths: "docs/**,*.md,**/docs/**"
+# Uses external md-dead-link-check action directly
+# The external action uses its default configuration
+```
+
+### Standalone Link Check
+
+For repositories that only need link checking without documentation generation, use the dedicated link check workflow:
+
+```yaml
+jobs:
+  link-check:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/link-check.yml@v1
+    with:
+      paths: "docs/**,*.md,**/docs/**"  # Paths to check
+      fail_on_errors: true              # Fail on broken links
+      # Uses external md-dead-link-check action directly
 ```
 
 ### GitHub Pages Setup

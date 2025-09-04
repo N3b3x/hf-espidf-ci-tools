@@ -9,9 +9,9 @@ on:
           Path to the ESP-IDF project (contains scripts/, CMakeLists.txt)
         type: string
         required: true
-      scripts_dir:
+      project_tools_dir:
         description: >
-          Path to nt-espidf-project-tools directory (contains scripts directly).
+          Path to project tools directory (contains scripts directly).
           Leave empty to auto-detect.
         type: string
         required: false
@@ -24,17 +24,21 @@ on:
         type: boolean
         default: false
       auto_clone_tools:
-        description: "Auto-clone tools repo if scripts_dir is missing"
+        description: "Auto-clone tools repo if project_tools_dir is missing"
         type: boolean
-        default: false
+        default: true
       tools_repo_url:
-        description: "Git URL for nt-espidf-project-tools"
+        description: "Git URL for project tools repository (optional, uses default if not specified)"
         type: string
-        default: "https://github.com/N3b3x/nt-espidf-project-tools.git"
+        required: false
       tools_repo_ref:
-        description: "Branch or tag for nt-espidf-project-tools"
+        description: "Branch or tag for project tools repository (optional, uses default if not specified)"
         type: string
-        default: "main"
+        required: false
+      tools_repo_sha:
+        description: "Specific commit SHA for project tools repository (most secure option)"
+        type: string
+        required: false
     secrets:
       GITHUB_TOKEN:
         required: false
@@ -47,7 +51,7 @@ permissions:
 env:
   BUILD_PATH: ${{ inputs.build_path }}
   ESP32_PROJECT_PATH: ${{ inputs.project_dir }}
-  SCRIPTS_DIR: ${{ inputs.scripts_dir }}
+  PROJECT_TOOLS_DIR: ${{ inputs.project_tools_dir }}
 
 jobs:
   generate-matrix:
@@ -55,66 +59,22 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.gen.outputs.matrix }}
-      scripts_path: ${{ steps.validate.outputs.scripts_path }}
+      project_tools_path: ${{ steps.validate.outputs.project_tools_path }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Ensure tools directory present
-        if: ${{ inputs.auto_clone_tools }}
-        run: |
-          if [ ! -d "${{ env.SCRIPTS_DIR }}" ]; then
-            echo "Cloning tools repo to ${{ env.SCRIPTS_DIR }}"
-            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
-              "${{ inputs.tools_repo_url }}" "${{ env.SCRIPTS_DIR }}"
-          else
-            echo "Tools directory exists: ${{ env.SCRIPTS_DIR }}"
-          fi
-
-      - name: Validate scripts directory
         id: validate
-        run: |
-          set -e
-          # Resolve scripts path using the same logic as other steps
-          if [ -n "${{ env.SCRIPTS_DIR }}" ]; then
-            SCRIPTS_PATH="${{ env.SCRIPTS_DIR }}"
-          else
-            if [ -d "${ESP32_PROJECT_PATH}/nt-espidf-project-tools" ]; then
-              SCRIPTS_PATH="${ESP32_PROJECT_PATH}/nt-espidf-project-tools"
-            else
-              SCRIPTS_PATH="nt-espidf-project-tools"
-            fi
-          fi
-
-          echo "Resolved scripts path: ${SCRIPTS_PATH}"
-          # Check if the directory exists
-          if [ ! -d "${SCRIPTS_PATH}" ]; then
-            echo "ERROR: Scripts directory not found at ${SCRIPTS_PATH}" >&2
-            echo "Available directories:" >&2
-            ls -la . || true
-            ls -la "${ESP32_PROJECT_PATH}" || true
-            exit 1
-          fi
-
-          # Check for required scripts
-          REQUIRED_SCRIPTS=("generate_matrix.py" "build_app.sh"
-                           "config_loader.sh")
-          for script in "${REQUIRED_SCRIPTS[@]}"; do
-            if [ ! -f "${SCRIPTS_PATH}/${script}" ]; then
-              echo "ERROR: Required script '${script}' not found in" \
-                   "${SCRIPTS_PATH}" >&2
-              echo "Available scripts:" >&2
-              ls -la "${SCRIPTS_PATH}" || true
-              exit 1
-            else
-              echo "✓ Found ${script}"
-            fi
-          done
-
-          echo "✓ All required scripts found in ${SCRIPTS_PATH}"
-          echo "SCRIPTS_PATH=${SCRIPTS_PATH}" >> "$GITHUB_ENV"
-          echo "scripts_path=${SCRIPTS_PATH}" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/ensure-tools-directory
+        with:
+          project_tools_dir: ${{ env.PROJECT_TOOLS_DIR }}
+          project_dir: ${{ env.ESP32_PROJECT_PATH }}
+          auto_clone_tools: ${{ inputs.auto_clone_tools }}
+          tools_repo_url: ${{ inputs.tools_repo_url }}
+          tools_repo_ref: ${{ inputs.tools_repo_ref }}
+          tools_repo_sha: ${{ inputs.tools_repo_sha }}
 
       - uses: actions/setup-python@v5
         with:
@@ -130,7 +90,7 @@ jobs:
         run: |
           set -e
           # Scripts directory and generate_matrix.py already validated
-          MATRIX=$(python3 "${SCRIPTS_PATH}/generate_matrix.py")
+          MATRIX=$(python3 "${{ steps.validate.outputs.project_tools_path }}/generate_matrix.py")
           echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
           echo "$MATRIX" | python3 -m json.tool
 
@@ -168,25 +128,21 @@ jobs:
 
       - name: Install Python deps (optional)
         run: |
-          # Scripts directory already validated in generate-matrix job
-          if [ -f "${{ needs.generate-matrix.outputs.scripts_path }}" \
-               "/requirements.txt" ]; then
+          # Project tools directory already validated in generate-matrix job
+          if [ -f "${{ needs.generate-matrix.outputs.project_tools_path }}/requirements.txt" ]; then
             python -m pip install --upgrade pip
-            pip install -r "${{ needs.generate-matrix.outputs.scripts_path }}" \
-                        "/requirements.txt"
+            pip install -r "${{ needs.generate-matrix.outputs.project_tools_path }}/requirements.txt"
           fi
 
-      # NOTE: when used as a reusable workflow, reference the composite action
-      # in this repo, not a local path in the consumer
       - name: Prepare CI workspace (setup_ci.sh)
-        uses: >
-          N3b3x/hf-espidf-ci-tools/.github/actions/setup-ci-build@v1
-        with:
-          project-path: ${{ env.ESP32_PROJECT_PATH }}
-          build-dir: ${{ env.BUILD_PATH }}
-          # if you added script-path input to the composite, you can pass it
-          # here:
-          # script-path: ${{ env.SCRIPTS_DIR }}/setup_ci.sh
+        shell: bash
+        run: |
+          set -e
+          SCRIPT_PATH="${{ needs.generate-matrix.outputs.project_tools_path }}/setup_ci.sh"
+          chmod +x "$SCRIPT_PATH"
+          "$SCRIPT_PATH" --project-path "${{ env.ESP32_PROJECT_PATH }}" "${{ env.BUILD_PATH }}"
+          test -d "${{ env.BUILD_PATH }}" || { \
+            echo "Missing build dir"; exit 1; }
 
       - name: Cache ccache
         if: ${{ !inputs.clean_build }}
@@ -222,9 +178,9 @@ jobs:
             export APP_TYPE="${{ matrix.app_name }}"
 
             cd "${BUILD_PATH}"
-            # Scripts directory already validated in generate-matrix job
+            # Project tools directory already validated in generate-matrix job
             # Run build script with correct paths
-            "${{ needs.generate-matrix.outputs.scripts_path }}/build_app.sh" \
+            "${{ needs.generate-matrix.outputs.project_tools_path }}/build_app.sh" \
               --project-path "${ESP32_PROJECT_PATH}" \
               "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
             build_dir=$(ls -td build*/ 2>/dev/null | head -1)

@@ -1,92 +1,226 @@
-# Build Workflow Guide
+# 🏗️ ESP-IDF Build Workflow Guide
 
-The ESP-IDF Build workflow provides matrix-based building across multiple ESP-IDF versions, build types, and applications with intelligent caching and artifact management.
+<div align="center">
+
+![Build](https://img.shields.io/badge/Build-Matrix%20ESP--IDF-blue?style=for-the-badge&logo=espressif)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-orange?style=for-the-badge&logo=github)
+![Matrix](https://img.shields.io/badge/Matrix-Parallel%20Builds-green?style=for-the-badge&logo=matrix)
+
+**🚀 Advanced ESP32 Build System for HardFOC Projects**
+
+*Matrix-based building across multiple ESP-IDF versions, build types, and applications with intelligent caching and artifact management*
+
+</div>
+
+---
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
-- [Usage Examples](#usage-examples)
-- [Configuration](#configuration)
-- [Troubleshooting](#troubleshooting)
-- [Navigation](#navigation)
+- [🎯 Overview](#-overview)
+- [⚙️ Inputs & Configuration](#️-inputs--configuration)
+- [📤 Outputs & Artifacts](#-outputs--artifacts)
+- [🚀 Usage Examples](#-usage-examples)
+- [🔧 Configuration](#-configuration)
+- [🏗️ Build Process](#️-build-process)
+- [🔍 Troubleshooting](#-troubleshooting)
+- [📚 Related Documentation](#-related-documentation)
+
+---
 
 ## 🎯 Overview
 
-**Purpose**: Matrix builds across ESP-IDF versions and build types  
-**Key Features**: 
-- Dynamic matrix generation from your project's configuration
-- Intelligent caching (pip, ccache)
-- Build artifact uploads
-- ESP-IDF environment management via official actions
+### **Purpose**
+The ESP-IDF Build workflow provides **matrix-based building** across multiple ESP-IDF versions, build types, and applications with intelligent caching and artifact management for HardFOC ESP32 projects.
 
-**Use Case**: CI/CD for ESP32 applications requiring multiple build configurations
+### **Key Features** 
+- 🔄 **Dynamic Matrix Generation** - From your project's `app_config.yml` configuration
+- 🚀 **Parallel Execution** - Multiple builds run simultaneously for maximum efficiency
+- 💾 **Intelligent Caching** - pip and ccache optimization for faster builds
+- 📦 **Artifact Management** - Automatic upload and organization of build outputs
+- 🛡️ **ESP-IDF Environment** - Official Espressif actions for reliable builds
+- 📊 **Size Reporting** - Automatic PR comments with firmware size analysis
+- 🔧 **Project Tools Integration** - Seamless integration with HardFOC project tools
 
-## ⚙️ Inputs
+### **Use Cases**
+- ✅ **CI/CD for ESP32 applications** requiring multiple build configurations
+- ✅ **Multi-version testing** across different ESP-IDF releases
+- ✅ **Parallel builds** for faster development cycles
+- ✅ **Automated artifact management** for releases and testing
+- ✅ **Size optimization tracking** with PR integration
 
-| Input | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `project_dir` | string | ✅ | - | Path to ESP-IDF project (contains CMakeLists.txt) |
-| `scripts_dir` | string | ❌ | `nt-espidf-tools` | Path to nt-espidf-tools directory |
-| `build_path` | string | ❌ | `ci_build_path` | Staging/build workspace directory |
-| `clean_build` | boolean | ❌ | `false` | Skip caches for clean build |
-| `auto_clone_tools` | boolean | ❌ | `false` | Auto-clone tools repo if missing |
-| `tools_repo_url` | string | ❌ | `https://github.com/N3b3x/nt-espidf-tools.git` | Git URL for tools repo |
-| `tools_repo_ref` | string | ❌ | `main` | Branch/tag for tools repo |
+---
 
-## 📤 Outputs
+## ⚙️ Inputs & Configuration
+
+### **Required Inputs**
+
+| Input | Type | Required | Description |
+|-------|------|----------|-------------|
+| `project_dir` | string | ✅ | Path to ESP-IDF project (contains `CMakeLists.txt`, `app_config.yml`) |
+
+### **Optional Inputs**
+
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `project_tools_dir` | string | Auto-detect | Path to project tools directory (contains scripts) |
+| `build_path` | string | `ci_build_path` | Staging/build workspace directory |
+| `clean_build` | boolean | `false` | Skip caches for a clean build |
+| `auto_clone_tools` | boolean | `true` | Auto-clone tools repo if missing |
+| `tools_repo_url` | string | Default | Git URL for project tools repository |
+| `tools_repo_ref` | string | Default | Branch or tag for project tools repository |
+| `tools_repo_sha` | string | - | Specific commit SHA (most secure option) |
+
+---
+
+## 📤 Outputs & Artifacts
+
+### **Workflow Outputs**
 
 | Output | Description |
 |--------|-------------|
-| `matrix` | JSON matrix from generate_matrix.py |
-| Build artifacts | Uploaded for each matrix combination |
+| `matrix` | JSON matrix from `generate_matrix.py` with all build combinations |
+| `project_tools_path` | Resolved path to project tools directory |
+
+### **Build Artifacts**
+
+| Artifact | Description | Retention | Location |
+|----------|-------------|-----------|----------|
+| `fw-{app}-{version}-{build}` | Complete build directory with all outputs | 7 days | Root artifact |
+| `size.txt` | Human-readable firmware size analysis | 7 days | Inside build directory |
+| `size.json` | Machine-readable size data (JSON format) | 7 days | Inside build directory |
+| `size.info` | Build metadata for PR reporting | 7 days | Inside build directory |
+| `size.meta` | Additional metadata (ELF/MAP file paths) | 7 days | Inside build directory |
+| `*.bin` | Firmware binary files | 7 days | Inside build directory |
+| `*.elf` | ELF executable files | 7 days | Inside build directory |
+
+**Artifact Structure:**
+```
+fw-gpio_test-release_v5_5-Release/
+└── build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5/  # ESP-IDF build directory
+    ├── size.txt                      # Size analysis
+    ├── size.json                     # JSON size data
+    ├── size.info                     # PR metadata
+    ├── size.meta                     # Additional metadata
+    ├── gpio_test.bin                 # Firmware binary
+    ├── gpio_test.elf                 # ELF file
+    └── ...                           # Other build outputs
+```
+
+**Build Directory Naming:**
+The build directory follows the pattern: `build-app-{app_type}-type-{build_type}-target-{target}-idf-{idf_version}`
+
+Examples:
+- `build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5`
+- `build-app-adc_test-type-Debug-target-esp32c6-idf-release_v5_4`
+
+### **PR Integration**
+
+- 📊 **Automatic Size Reports** - PR comments with firmware size analysis
+- 📈 **Size Budget Enforcement** - Optional size limit checking
+- 🔍 **Build Status** - Clear success/failure indicators
+
+---
 
 ## 🚀 Usage Examples
 
-### Basic Usage
+### **Basic Usage**
 
 ```yaml
+name: Build ESP32 Firmware
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
 jobs:
   build:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
     with:
       project_dir: examples/esp32
-      scripts_dir: nt-espidf-tools
-      build_path: ci_build_path
 ```
 
-### With Auto-clone Tools
+### **Advanced Configuration**
 
 ```yaml
+name: Advanced ESP32 Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      clean_build:
+        description: 'Clean build (no cache)'
+        required: false
+        default: false
+        type: boolean
+
 jobs:
   build:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
     with:
       project_dir: examples/esp32
-      scripts_dir: nt-espidf-tools
+      project_tools_dir: hf-espidf-project-tools
+      build_path: ci_build_path
+      clean_build: ${{ github.event.inputs.clean_build == 'true' }}
       auto_clone_tools: true
-      tools_repo_url: https://github.com/N3b3x/nt-espidf-tools.git
+      tools_repo_url: https://github.com/N3b3x/hf-espidf-ci-tools.git
       tools_repo_ref: main
-      build_path: ci_build_path
-      clean_build: false
+      tools_repo_sha: ${{ github.sha }}  # Pin to specific commit
 ```
 
-### Clean Build (No Caching)
+### **Clean Build (No Caching)**
 
 ```yaml
 jobs:
   build:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
     with:
       project_dir: examples/esp32
-      scripts_dir: nt-espidf-tools
-      clean_build: true  # Skip all caches
+      clean_build: true  # Skip all caches for fresh build
 ```
 
-## ⚙️ Configuration
+### **Custom Tools Directory**
 
-### Matrix Generation
+```yaml
+jobs:
+  build:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: examples/esp32
+      project_tools_dir: custom-tools  # Use custom tools directory
+      auto_clone_tools: false  # Don't auto-clone, use existing
+```
+
+---
+
+## 🔧 Configuration
+
+### **Project Structure Requirements**
+
+Your ESP32 project must have this structure:
+
+```
+your-project/
+├── examples/
+│   └── esp32/                    # ESP-IDF project directory
+│       ├── CMakeLists.txt        # ESP-IDF project file
+│       ├── app_config.yml        # Build configuration
+│       ├── main/                 # Application source code
+│       ├── components/           # Custom components
+│       └── hf-espidf-project-tools/  # Project tools (submodule)
+│           ├── generate_matrix.py    # Matrix generator
+│           ├── setup_ci.sh          # CI workspace setup
+│           ├── build_app.sh         # Application builder
+│           ├── config_loader.sh     # Configuration loader
+│           └── requirements.txt     # Python dependencies
+```
+
+### **Matrix Generation**
 
 The workflow calls your project's `generate_matrix.py` script to create the build matrix:
 
@@ -95,49 +229,239 @@ The workflow calls your project's `generate_matrix.py` script to create the buil
 {
   "include": [
     {
-      "idf_version": "release/v5.5",
-      "idf_version_docker": "v5.5",
-      "build_type": "debug",
-      "target": "esp32c6",
-      "app_name": "my_app"
+      "idf_version": "release/v5.5",        # Git format for ESP-IDF cloning
+      "idf_version_docker": "v5.5",         # Docker-safe format for artifacts
+      "idf_version_file": "release_v5_5",   # File-safe format for build dirs
+      "build_type": "Debug",                # Build configuration
+      "app_name": "gpio_test",              # Application name
+      "target": "esp32c6",                  # Target MCU
+      "config_source": "app"                # Configuration source
     }
   ]
 }
 ```
 
-### Required Scripts
+### **Required Scripts**
 
-Your `nt-espidf-tools` directory must contain:
+Your `hf-espidf-project-tools` directory must contain:
 
-- `generate_matrix.py` - Matrix generator
-- `setup_ci.sh` - CI workspace preparation
-- `build_app.sh` - Application builder
-- `requirements.txt` - Python dependencies (optional)
+| Script | Purpose | Required |
+|--------|---------|----------|
+| `generate_matrix.py` | Matrix generator from `app_config.yml` | ✅ |
+| `setup_ci.sh` | CI workspace preparation | ✅ |
+| `build_app.sh` | Application builder | ✅ |
+| `config_loader.sh` | Configuration loader | ✅ |
+| `requirements.txt` | Python dependencies | ❌ |
 
-### Build Process
+---
 
-1. **Matrix Generation**: Runs `generate_matrix.py` to create build combinations
-2. **Workspace Setup**: Calls `setup_ci.sh` to prepare build directory
-3. **ESP-IDF Setup**: Uses `espressif/esp-idf-ci-action` for environment
-4. **Build Execution**: Runs `build_app.sh` for each matrix combination
-5. **Artifact Upload**: Uploads build outputs as artifacts
+## 🏗️ Build Process
 
-## 🔧 Troubleshooting
+### **Phase 1: Matrix Generation**
+```
+┌─────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Checkout    │───▶│ Ensure Tools    │───▶│ Install Python  │───▶│ Run generate    │───▶│ Output JSON     │
+│ Repo        │    │ Directory       │    │ Deps            │    │ matrix.py       │    │ Matrix          │
+└─────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
-### Common Issues
+### **Phase 2: Parallel Build Execution**
+```
+┌─────────────┐
+│ Matrix      │
+│ Entry       │
+└──────┬──────┘
+       │
+       ▼
+┌───────────────────────────────────────────────────────────────────────────────────────┐     
+│  ┌─────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐ │
+│  │ Checkout    │───▶│ Cache Python    │───▶│ Install Python  │───▶│ Setup CI        │ │
+│  │ Repo        │    │ Deps            │    │ Deps            │    │ Workspace       │ │
+│  └─────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘ │
+│                                                                            │          │
+│                                                                            ▼          │
+│  ┌─────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐ │
+│  │ Upload      │◀───│ Build with      │◀───│ ESP-IDF CI      │◀───│ Cache ccache    │ │
+│  │ Artifacts   │    │ build_app.sh    │    │ Action          │    │                 │ │
+│  └─────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘ │
+└──────┬────────────────────────────────────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────┐
+│ Matrix      │
+│ Exit        │
+└─────────────┘
+```
 
-**Matrix Generation Fails**
-- Ensure `generate_matrix.py` exists in `scripts_dir`
-- Check Python dependencies are installed
-- Verify script outputs valid JSON
+### **Phase 3: Size Reporting**
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Download        │───▶│ Parse Size      │───▶│ Generate        │───▶│ Comment on      │
+│ Artifacts       │    │ Data            │    │ Markdown        │    │ PR              │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
-**Build Fails**
-- Check `setup_ci.sh` creates proper workspace
-- Verify `build_app.sh` handles all matrix parameters
-- Ensure ESP-IDF version compatibility
+### **Detailed Build Steps**
 
-**Cache Issues**
-- Set `clean_build: true` to bypass caches
+1. **🔍 Matrix Generation**:
+   - Validates project tools directory
+   - Runs `generate_matrix.py` with project configuration
+   - Outputs JSON matrix for parallel execution
+
+2. **🏗️ Workspace Setup**:
+   - Calls `setup_ci.sh --project-path` to prepare build directory
+   - Copies all necessary project files to CI workspace
+   - Sets up proper directory structure
+
+3. **🛡️ ESP-IDF Environment**:
+   - Uses `espressif/esp-idf-ci-action@v1` for reliable environment
+   - Sets up ESP-IDF tools and dependencies
+   - Configures target and build parameters
+
+4. **⚡ Build Execution**:
+   - Runs `build_app.sh` with matrix parameters
+   - Handles incremental builds with ccache
+   - Generates size analysis and metadata
+
+5. **📦 Artifact Management**:
+   - Uploads firmware binaries and build outputs
+   - Organizes artifacts by app, version, and build type
+   - Sets appropriate retention policies
+
+6. **📊 Size Reporting**:
+   - Aggregates size data from all builds
+   - Creates comprehensive PR comments
+   - Enforces size budgets (optional)
+
+---
+
+## 🔍 Troubleshooting
+
+### **Common Issues & Solutions**
+
+#### **Matrix Generation Fails**
+**Symptoms**: "Matrix generation failed" or "No matrix entries found"
+**Solutions**:
+```bash
+# Check script exists and is executable
+ls -la hf-espidf-project-tools/generate_matrix.py
+chmod +x hf-espidf-project-tools/generate_matrix.py
+
+# Test matrix generation locally
+cd examples/esp32
+python3 hf-espidf-project-tools/generate_matrix.py --validate
+
+# Check Python dependencies
+pip install pyyaml jq
+```
+
+#### **Build Fails**
+**Symptoms**: "Build failed" or "ESP-IDF not found"
+**Solutions**:
+```bash
+# Verify setup_ci.sh creates proper workspace
+./hf-espidf-project-tools/setup_ci.sh --project-path . ci_build_path
+ls -la ci_build_path/
+
+# Check build_app.sh handles matrix parameters
+./hf-espidf-project-tools/build_app.sh --help
+
+# Validate ESP-IDF version compatibility
+python3 hf-espidf-project-tools/generate_matrix.py --validate
+```
+
+#### **Cache Issues**
+**Symptoms**: "Cache miss" or "Build too slow"
+**Solutions**:
+```yaml
+# Use clean build to bypass caches
+clean_build: true
+
+# Check cache configuration
+# Cache keys should include relevant file hashes
+```
+
+#### **Artifact Upload Fails**
+**Symptoms**: "Artifact upload failed" or "No artifacts found"
+**Solutions**:
+```bash
+# Check build outputs exist
+ls -la ci_build_path/build-app-*/
+
+# Verify build_app.sh generates proper outputs
+./hf-espidf-project-tools/build_app.sh gpio_test Release
+
+# Check size files are created inside build directory
+ls -la ci_build_path/build-app-*/size.*
+
+# Verify artifact structure
+find ci_build_path/build-app-*/ -name "*.bin" -o -name "*.elf" -o -name "size.*"
+```
+
+#### **Size Report Issues**
+**Symptoms**: "No size artifacts found" or "Size data missing"
+**Solutions**:
+```bash
+# Check size files are created in build directory
+ls -la build-app-*/size.*
+
+# Verify size.info contains metadata
+cat build-app-*/size.info
+
+# Check build_app.sh size generation
+./hf-espidf-project-tools/build_app.sh gpio_test Release
+ls -la build-app-*/size.*
+```
+
+### **Debug Mode**
+
+Enable verbose output for debugging:
+
+```yaml
+jobs:
+  build:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: examples/esp32
+      clean_build: true  # Bypass caches for debugging
+```
+
+### **Local Testing**
+
+Test the build process locally:
+
+```bash
+# 1. Setup environment
+cd examples/esp32
+source hf-espidf-project-tools/setup_common.sh
+
+# 2. Test matrix generation
+python3 hf-espidf-project-tools/generate_matrix.py --validate
+
+# 3. Test CI setup
+./hf-espidf-project-tools/setup_ci.sh --project-path . ci_build_path
+
+# 4. Test build
+./hf-espidf-project-tools/build_app.sh gpio_test Release
+```
+
+---
+
+## 📚 Related Documentation
+
+- 📖 [**Main Documentation**](../README.md) - Complete CI tools overview
+- 🔧 [**Lint Workflow**](lint-workflow.md) - C/C++ linting and formatting
+- 📚 [**Docs Workflow**](docs-workflow.md) - Documentation building and deployment
+- 🛡️ [**Security Workflow**](security-workflow.md) - Security auditing and analysis
+- 🔍 [**Static Analysis**](static-analysis-workflow.md) - Code quality analysis
+- 🔗 [**Link Checker**](link-check-workflow.md) - Documentation link validation
+
+### **Project Tools Documentation**
+
+- 🏗️ [**Build System**](../hf-espidf-project-tools/docs/README_BUILD_SYSTEM.md) - Complete build system guide
+- ⚙️ [**Configuration System**](../hf-espidf-project-tools/docs/README_CONFIG_SYSTEM.md) - Configuration management
+- 🚀 [**CI Pipeline**](../hf-espidf-project-tools/docs/README_CI_PIPELINE.md) - CI/CD integration guide
+- 🔧 [**Scripts Overview**](../hf-espidf-project-tools/docs/README_SCRIPTS_OVERVIEW.md) - All available scripts
 - Check cache key generation in workflow
 - Verify cache paths are accessible
 

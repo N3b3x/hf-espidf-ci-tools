@@ -8,9 +8,9 @@ on:
         description: "Path to the ESP-IDF project (contains CMakeLists.txt)"
         type: string
         required: true
-      scripts_dir:
+      project_tools_dir:
         description: >
-          Path to nt-espidf-project-tools directory (contains scripts directly).
+          Path to project tools directory (contains scripts directly).
           Leave empty to auto-detect in project directory or auto-clone from
           tools_repo_url.
         type: string
@@ -28,17 +28,21 @@ on:
         type: string
         default: "cpp"
       auto_clone_tools:
-        description: "Auto-clone tools repo if scripts_dir is missing"
+        description: "Auto-clone tools repo if project_tools_dir is missing"
         type: boolean
-        default: false
+        default: true
       tools_repo_url:
-        description: "Git URL for nt-espidf-project-tools"
+        description: "Git URL for project tools repository (optional, uses default if not specified)"
         type: string
-        default: "https://github.com/N3b3x/nt-espidf-project-tools.git"
+        required: false
       tools_repo_ref:
-        description: "Branch or tag for nt-espidf-project-tools"
+        description: "Branch or tag for project tools repository (optional, uses default if not specified)"
         type: string
-        default: "main"
+        required: false
+      tools_repo_sha:
+        description: "Specific commit SHA for project tools repository (most secure option)"
+        type: string
+        required: false
     secrets:
       GITHUB_TOKEN:
         required: false
@@ -49,7 +53,7 @@ permissions:
 
 env:
   ESP32_PROJECT_PATH: ${{ inputs.project_dir }}
-  SCRIPTS_DIR: ${{ inputs.scripts_dir }}
+  PROJECT_TOOLS_DIR: ${{ inputs.project_tools_dir }}
 
 jobs:
   generate-matrix:
@@ -63,15 +67,15 @@ jobs:
           submodules: recursive
 
       - name: Ensure tools directory present
-        if: ${{ inputs.auto_clone_tools }}
-        run: |
-          if [ ! -d "${{ env.SCRIPTS_DIR }}" ]; then
-            echo "Cloning tools repo to ${{ env.SCRIPTS_DIR }}"
-            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
-              "${{ inputs.tools_repo_url }}" "${{ env.SCRIPTS_DIR }}"
-          else
-            echo "Tools directory exists: ${{ env.SCRIPTS_DIR }}"
-          fi
+        id: tools-validate
+        uses: ./.github/actions/ensure-tools-directory
+        with:
+          project_tools_dir: ${{ env.PROJECT_TOOLS_DIR }}
+          project_dir: ${{ env.ESP32_PROJECT_PATH }}
+          auto_clone_tools: ${{ inputs.auto_clone_tools }}
+          tools_repo_url: ${{ inputs.tools_repo_url }}
+          tools_repo_ref: ${{ inputs.tools_repo_ref }}
+          tools_repo_sha: ${{ inputs.tools_repo_sha }}
 
       - uses: actions/setup-python@v5
         with:
@@ -86,7 +90,7 @@ jobs:
         id: gen
         run: |
           set -e
-          MATRIX=$(python3 "${{ env.SCRIPTS_DIR }}/generate_matrix.py")
+          MATRIX=$(python3 "${{ steps.tools-validate.outputs.project_tools_path }}/generate_matrix.py")
           echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
           echo "$MATRIX" | python3 -m json.tool
 
@@ -178,15 +182,15 @@ jobs:
           submodules: recursive
 
       - name: Ensure tools directory present
-        if: ${{ inputs.auto_clone_tools }}
-        run: |
-          if [ ! -d "${{ env.SCRIPTS_DIR }}" ]; then
-            echo "Cloning tools repo to ${{ env.SCRIPTS_DIR }}"
-            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
-              "${{ inputs.tools_repo_url }}" "${{ env.SCRIPTS_DIR }}"
-          else
-            echo "Tools directory exists: ${{ env.SCRIPTS_DIR }}"
-          fi
+        id: tools-validate-codeql
+        uses: ./.github/actions/ensure-tools-directory
+        with:
+          project_tools_dir: ${{ env.PROJECT_TOOLS_DIR }}
+          project_dir: ${{ env.ESP32_PROJECT_PATH }}
+          auto_clone_tools: ${{ inputs.auto_clone_tools }}
+          tools_repo_url: ${{ inputs.tools_repo_url }}
+          tools_repo_ref: ${{ inputs.tools_repo_ref }}
+          tools_repo_sha: ${{ inputs.tools_repo_sha }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -204,24 +208,13 @@ jobs:
           echo "Matrix: ${{ matrix.idf_version }} · ${{ matrix.build_type }}" \
                " · ${{ matrix.app_name }}"
           echo "Project: ${{ env.ESP32_PROJECT_PATH }}"
-          echo "Scripts: ${{ env.SCRIPTS_DIR }}"
+          echo "Project Tools: ${{ env.PROJECT_TOOLS_DIR }}"
           echo "Target: ${{ matrix.target }}"
 
           cd "${{ env.ESP32_PROJECT_PATH }}"
 
-          # Determine scripts path - use SCRIPTS_DIR if specified, otherwise
-          # look for nt-espidf-project-tools
-          if [ -n "${{ env.SCRIPTS_DIR }}" ]; then
-              SCRIPTS_PATH="${{ env.SCRIPTS_DIR }}"
-          else
-              # Look for scripts in project directory first
-              if [ -d "${ESP32_PROJECT_PATH}/nt-espidf-project-tools" ]; then
-                  SCRIPTS_PATH="${ESP32_PROJECT_PATH}/nt-espidf-project-tools"
-              else
-                  # Fallback to auto-cloned location
-                  SCRIPTS_PATH="nt-espidf-project-tools"
-              fi
-          fi
+          # Use the resolved project tools path from the tools validation step
+          SCRIPTS_PATH="${{ steps.tools-validate-codeql.outputs.project_tools_path }}"
 
           if [ -f "${SCRIPTS_PATH}/build_app.sh" ]; then
             echo "Running build_app.sh for CodeQL analysis..."

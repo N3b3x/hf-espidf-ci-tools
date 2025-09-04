@@ -46,7 +46,7 @@ The Static Analysis workflow runs cppcheck via Docker for comprehensive C/C++ co
 ```yaml
 jobs:
   static:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/static-analysis.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/static-analysis.yml@v1
     with:
       paths: "src inc examples"
       std: "c++17"
@@ -58,7 +58,7 @@ jobs:
 ```yaml
 jobs:
   static:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/static-analysis.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/static-analysis.yml@v1
     with:
       paths: "src inc examples"
       std: "c++20"
@@ -70,7 +70,7 @@ jobs:
 ```yaml
 jobs:
   static:
-    uses: N3b3x/nt-espidf-project-tools/.github/workflows/static-analysis.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/static-analysis.yml@v1
     with:
       paths: "src lib tests"
       std: "c++14"

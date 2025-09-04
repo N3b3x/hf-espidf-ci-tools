@@ -12,12 +12,64 @@ on:
         description: "Clang major version"
         type: string
         default: "20"
+      auto_fix:
+        description: "Automatically format files and push changes back to the repository"
+        type: boolean
+        default: false
+      commit:
+        description: "Automatically commit and push fixes to the repository (only used when auto_fix is true)"
+        type: boolean
+        default: true
+      commit_message:
+        description: "Commit message for auto-fix changes (only used when auto_fix is true)"
+        type: string
+        required: false
+      git_name:
+        description: "Git author name for auto-fix commits"
+        type: string
+        required: false
+      git_email:
+        description: "Git author email for auto-fix commits"
+        type: string
+        required: false
+      style:
+        description: "clang-format style (llvm, google, webkit, or 'file' to use .clang-format)"
+        type: string
+        default: "file"
+      tidy_checks:
+        description: "clang-tidy checks (comma-separated glob patterns, use - prefix to disable)"
+        type: string
+        required: false
+      ignore:
+        description: "Files or directories to exclude from linting (comma-separated)"
+        type: string
+        default: "build|.git"
+      files_changed_only:
+        description: "Only lint files that have been changed in the pull request"
+        type: boolean
+        default: false
+      lines_changed_only:
+        description: "Only inspect lines that have changed in the pull request"
+        type: boolean
+        default: false
+      step_summary:
+        description: "Add a summary of linting results to the workflow step summary"
+        type: boolean
+        default: true
+      file_annotations:
+        description: "Display linting errors and warnings as file annotations in the GitHub UI"
+        type: boolean
+        default: true
+      thread_comments:
+        description: "Post a single, collapsible thread comment in a pull request detailing all linting issues"
+        type: boolean
+        default: false
     secrets:
       GITHUB_TOKEN:
         required: false
 
 permissions:
-  contents: read
+  contents: write  # Required for auto_fix to push changes
   pull-requests: write
 
 jobs:
@@ -26,8 +78,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run lint
-        uses: ./.github/actions/espidf-lint
+      - name: Run C/C++ linters
+        uses: cpp-linter/cpp-linter-action@v2
         with:
+          style: ${{ inputs.style }}
+          tidy-checks: ${{ inputs.tidy_checks }}
+          version: ${{ inputs.clang_version }}
+          files-changed-only: ${{ inputs.files_changed_only }}
+          lines-changed-only: ${{ inputs.lines_changed_only }}
+          file-annotations: ${{ inputs.file_annotations }}
+          step-summary: ${{ inputs.step_summary }}
+          thread-comments: ${{ inputs.thread_comments }}
+          extensions: 'c,cpp,cc,cxx,h,hpp'
+          ignore: ${{ inputs.ignore }}
           paths: ${{ inputs.paths }}
-          clang_version: ${{ inputs.clang_version }}
+          auto-fix: ${{ inputs.auto_fix }}
+          commit: ${{ inputs.commit }}
+          commit-message: ${{ inputs.commit_message }}
+          git-name: ${{ inputs.git_name }}
+          git-email: ${{ inputs.git_email }}
