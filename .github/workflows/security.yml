@@ -113,7 +113,7 @@ jobs:
             pyyaml>=6.0
             esptool>=4.0.0
             pyserial>=3.5
-            EOF
+EOF
           else
             echo "$FILES" > req-list
           fi
