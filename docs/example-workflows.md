@@ -537,7 +537,6 @@ jobs:
     with:
       project_dir: ${{ env.PROJECT_DIR }}
       clean_build: false  # Always use caches
-      build_path: "fast_build_${{ github.run_id }}"
 
   # Parallel linting with minimal checks
   lint-fast:

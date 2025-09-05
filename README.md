@@ -132,7 +132,6 @@ jobs:
       auto_clone_tools: true
       tools_repo_url: https://github.com/N3b3x/nt-espidf-tools.git
       tools_repo_ref: main
-      build_path: ci_build_path
       clean_build: false
 
   lint:

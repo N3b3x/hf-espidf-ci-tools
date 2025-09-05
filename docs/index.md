@@ -29,10 +29,9 @@ your-esp32-project/
 ├── examples/esp32/             # ESP-IDF project (project_dir)
 ├── hf-espidf-project-tools/    # Project tools repo (project_tools_dir)
 │   ├── generate_matrix.py      # Build matrix generator
-│   ├── setup_ci.sh            # CI workspace setup
 │   ├── build_app.sh           # Application builder
 │   ├── requirements.txt        # Python dependencies
-│   └── config_loader.sh       # Configuration management
+│   └── config_loader.sh        # Configuration management
 ├── src/                        # Source code
 ├── inc/                        # Headers
 └── CMakeLists.txt              # ESP-IDF project file
@@ -64,7 +63,6 @@ jobs:
       auto_clone_tools: true
       tools_repo_url: https://github.com/N3b3x/hf-espidf-project-tools.git
       tools_repo_ref: main
-      build_path: ci_build_path
       clean_build: false
 
   lint:

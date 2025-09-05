@@ -63,7 +63,6 @@ The ESP-IDF Build workflow provides **matrix-based building** across multiple ES
 | Input | Type | Default | Description |
 |-------|------|---------|-------------|
 | `project_tools_dir` | string | Auto-detect | Path to project tools directory (contains scripts) |
-| `build_path` | string | `ci_build_path` | Staging/build workspace directory |
 | `clean_build` | boolean | `false` | Skip caches for a clean build |
 | `auto_clone_tools` | boolean | `true` | Auto-clone tools repo if missing |
 | `tools_repo_url` | string | Default | Git URL for project tools repository |
@@ -165,7 +164,6 @@ jobs:
     with:
       project_dir: examples/esp32
       project_tools_dir: hf-espidf-project-tools
-      build_path: ci_build_path
       clean_build: ${{ github.event.inputs.clean_build == 'true' }}
       auto_clone_tools: true
       tools_repo_url: https://github.com/N3b3x/hf-espidf-ci-tools.git
@@ -214,7 +212,6 @@ your-project/
 │       ├── components/           # Custom components
 │       └── hf-espidf-project-tools/  # Project tools (submodule)
 │           ├── generate_matrix.py    # Matrix generator
-│           ├── setup_ci.sh          # CI workspace setup
 │           ├── build_app.sh         # Application builder
 │           ├── config_loader.sh     # Configuration loader
 │           └── requirements.txt     # Python dependencies
@@ -248,7 +245,6 @@ Your `hf-espidf-project-tools` directory must contain:
 | Script | Purpose | Required |
 |--------|---------|----------|
 | `generate_matrix.py` | Matrix generator from `app_config.yml` | ✅ |
-| `setup_ci.sh` | CI workspace preparation | ✅ |
 | `build_app.sh` | Application builder | ✅ |
 | `config_loader.sh` | Configuration loader | ✅ |
 | `requirements.txt` | Python dependencies | ❌ |
@@ -275,15 +271,15 @@ Your `hf-espidf-project-tools` directory must contain:
        ▼
 ┌───────────────────────────────────────────────────────────────────────────────────────┐     
 │  ┌─────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐ │
-│  │ Checkout    │───▶│ Cache Python    │───▶│ Install Python  │───▶│ Setup CI        │ │
-│  │ Repo        │    │ Deps            │    │ Deps            │    │ Workspace       │ │
+│  │ Checkout    │───▶│ Cache Python    │───▶│ Install Python  │───▶│ ESP-IDF CI      │ │
+│  │ Repo        │    │ Deps            │    │ Deps            │    │ Action          │ │
 │  └─────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘ │
 │                                                                            │          │
 │                                                                            ▼          │
-│  ┌─────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐ │
-│  │ Upload      │◀───│ Build with      │◀───│ ESP-IDF CI      │◀───│ Cache ccache    │ │
-│  │ Artifacts   │    │ build_app.sh    │    │ Action          │    │                 │ │
-│  └─────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘ │
+│  ┌─────────────┐    ┌─────────────────┐                           ┌─────────────────┐ │
+│  │ Upload      │◀───│ Build with      │◀───---------------------──│ Cache ccache    │ │
+│  │ Artifacts   │    │ build_app.sh    │ *ESP-IDF CI HAS IDF RDY*  │                 │ │
+│  └─────────────┘    └─────────────────┘                           └─────────────────┘ │
 └──────┬────────────────────────────────────────────────────────────────────────────────┘
        │
        ▼
@@ -308,10 +304,10 @@ Your `hf-espidf-project-tools` directory must contain:
    - Runs `generate_matrix.py` with project configuration
    - Outputs JSON matrix for parallel execution
 
-2. **🏗️ Workspace Setup**:
-   - Calls `setup_ci.sh --project-path` to prepare build directory
-   - Copies all necessary project files to CI workspace
-   - Sets up proper directory structure
+2. **🏗️ Direct Project Building**:
+   - ESP-IDF CI action works directly with project files
+   - No file copying or workspace preparation needed
+   - Builds directly from source directory structure
 
 3. **🛡️ ESP-IDF Environment**:
    - Uses `espressif/esp-idf-ci-action@v1` for reliable environment
@@ -359,9 +355,9 @@ pip install pyyaml jq
 **Symptoms**: "Build failed" or "ESP-IDF not found"
 **Solutions**:
 ```bash
-# Verify setup_ci.sh creates proper workspace
-./hf-espidf-project-tools/setup_ci.sh --project-path . ci_build_path
-ls -la ci_build_path/
+# Verify project structure is ready for building
+ls -la src/ inc/ examples/
+ls -la CMakeLists.txt app_config.yml
 
 # Check build_app.sh handles matrix parameters
 ./hf-espidf-project-tools/build_app.sh --help
@@ -386,16 +382,16 @@ clean_build: true
 **Solutions**:
 ```bash
 # Check build outputs exist
-ls -la ci_build_path/build-app-*/
+ls -la build-app-*/
 
 # Verify build_app.sh generates proper outputs
 ./hf-espidf-project-tools/build_app.sh gpio_test Release
 
 # Check size files are created inside build directory
-ls -la ci_build_path/build-app-*/size.*
+ls -la build-app-*/size.*
 
 # Verify artifact structure
-find ci_build_path/build-app-*/ -name "*.bin" -o -name "*.elf" -o -name "size.*"
+find build-app-*/ -name "*.bin" -o -name "*.elf" -o -name "size.*"
 ```
 
 #### **Size Report Issues**
@@ -438,8 +434,7 @@ source hf-espidf-project-tools/setup_common.sh
 # 2. Test matrix generation
 python3 hf-espidf-project-tools/generate_matrix.py --validate
 
-# 3. Test CI setup
-./hf-espidf-project-tools/setup_ci.sh --project-path . ci_build_path
+# 3. Test direct building (no setup needed)
 
 # 4. Test build
 ./hf-espidf-project-tools/build_app.sh gpio_test Release

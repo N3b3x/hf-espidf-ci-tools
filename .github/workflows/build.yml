@@ -15,10 +15,6 @@ on:
           Leave empty to auto-detect.
         type: string
         required: false
-      build_path:
-        description: "Staging/build workspace directory"
-        type: string
-        default: "ci_build_path"
       clean_build:
         description: "Skip caches for a clean build"
         type: boolean
@@ -46,7 +42,6 @@ permissions:
   pull-requests: write   # needed for PR comment in size-report
 
 env:
-  BUILD_PATH: ${{ inputs.build_path }}
   ESP32_PROJECT_PATH: ${{ inputs.project_dir }}
   PROJECT_TOOLS_DIR: ${{ inputs.project_tools_dir }}
 
@@ -131,16 +126,6 @@ jobs:
             pip install -r "${{ needs.generate-matrix.outputs.project_tools_path }}/requirements.txt"
           fi
 
-      #- name: Prepare CI workspace (setup_ci.sh)
-        #shell: bash
-        #run: |
-          #set -e
-          #SCRIPT_PATH="${{ needs.generate-matrix.outputs.project_tools_path }}/setup_ci.sh"
-          #chmod +x "$SCRIPT_PATH"
-        #  "$SCRIPT_PATH" --project-path "${{ env.ESP32_PROJECT_PATH }}" "${{ env.BUILD_PATH }}"
-          #test -d "${{ env.BUILD_PATH }}" || { \
-            #echo "Missing build dir"; exit 1; }
-
       - name: Cache ccache
         if: ${{ !inputs.clean_build }}
         id: ccache
@@ -168,13 +153,12 @@ jobs:
             -e IDF_CCACHE_ENABLE=1
           command: |
             set -e
-            export BUILD_PATH="${{ env.BUILD_PATH }}"
             export ESP32_PROJECT_PATH="${{ env.ESP32_PROJECT_PATH }}"
             export IDF_TARGET="${{ matrix.target }}"
             export BUILD_TYPE="${{ matrix.build_type }}"
             export APP_TYPE="${{ matrix.app_name }}"
 
-            cd "${BUILD_PATH}"
+            cd "${ESP32_PROJECT_PATH}"
             # Project tools directory already validated in generate-matrix job
             # Run build script with correct paths
             "${{ needs.generate-matrix.outputs.project_tools_path }}/build_app.sh" \
@@ -191,7 +175,7 @@ jobs:
           name: >
             fw-${{ matrix.app_name }}-${{ matrix.idf_version }}-
             ${{ matrix.build_type }}
-          path: ${{ env.BUILD_PATH }}/${{ steps.build.outputs.build_dir }}
+          path: ${{ env.ESP32_PROJECT_PATH }}/${{ steps.build.outputs.build_dir }}
           retention-days: 7
 
   # --- NEW: PR size summary inside the same reusable workflow ---
