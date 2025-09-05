@@ -1,5 +1,15 @@
 # Static Analysis Workflow Guide
 
+<div align="center">
+
+[← Previous: Link Check Workflow](link-check-workflow.md) | [Next: Security Workflow →](security-workflow.md)
+
+**🔒 Cppcheck Security Analysis**
+
+</div>
+
+---
+
 The Static Analysis workflow runs cppcheck via Docker for comprehensive C/C++ code analysis with configurable strictness and artifact generation.
 
 ## 📋 Table of Contents
@@ -136,6 +146,11 @@ Create a `.cppcheck-suppressions` file for false positives:
 
 ---
 
-**← Back to [Documentation Index](index.md)**  
-**← Back to [Main README](../README.md)**
+<div align="center">
+
+[← Previous: Link Check Workflow](link-check-workflow.md) | [Next: Security Workflow →](security-workflow.md)
+
+**📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
+
+</div>
 

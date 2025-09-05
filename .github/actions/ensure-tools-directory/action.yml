@@ -15,17 +15,6 @@ inputs:
     description: "Auto-clone tools repo if project_tools_dir is missing"
     required: false
     default: "true"
-  tools_repo_url:
-    description: "Git URL for project tools repository (must be from trusted source)"
-    required: false
-    default: "https://github.com/N3b3x/hf-espidf-project-tools.git"
-  tools_repo_ref:
-    description: "Branch or tag for project tools repository (use specific tags for production)"
-    required: false
-    default: "main"
-  tools_repo_sha:
-    description: "Specific commit SHA for project tools repository (most secure option)"
-    required: false
 outputs:
   project_tools_path:
     description: "Resolved path to the project tools directory"
@@ -39,8 +28,10 @@ runs:
       run: |
         set -e
         
-        # Extract directory name from repo URL (fallback to default)
-        TOOLS_DIR_NAME=$(basename "${{ inputs.tools_repo_url }}" .git)
+        # Use hardcoded trusted repository URL and main branch
+        TOOLS_REPO_URL="https://github.com/N3b3x/hf-espidf-project-tools.git"
+        TOOLS_BRANCH="main"
+        TOOLS_DIR_NAME=$(basename "${TOOLS_REPO_URL}" .git)
         echo "Tools directory name: ${TOOLS_DIR_NAME}"
         
         # Resolve project tools path using consistent logic
@@ -60,24 +51,10 @@ runs:
         if [ ! -d "${SCRIPTS_PATH}" ] && [ "${{ inputs.auto_clone_tools }}" = "true" ]; then
           echo "Cloning tools repo to ${SCRIPTS_PATH}"
           
-          # Security: Validate repo URL is from trusted source
-          if [[ "${{ inputs.tools_repo_url }}" != https://github.com/N3b3x/* ]]; then
-            echo "WARNING: Cloning from untrusted source: ${{ inputs.tools_repo_url }}" >&2
-            echo "Only https://github.com/N3b3x/* repositories are considered trusted" >&2
-          fi
-          
-          # Use SHA if provided (most secure), otherwise use ref
-          if [ -n "${{ inputs.tools_repo_sha }}" ]; then
-            echo "Cloning specific commit SHA: ${{ inputs.tools_repo_sha }}"
-            git clone --depth 1 "${{ inputs.tools_repo_url }}" "${SCRIPTS_PATH}"
-            cd "${SCRIPTS_PATH}"
-            git checkout "${{ inputs.tools_repo_sha }}"
-            cd - > /dev/null
-          else
-            echo "Cloning branch/tag: ${{ inputs.tools_repo_ref }}"
-            git clone --depth 1 --branch "${{ inputs.tools_repo_ref }}" \
-              "${{ inputs.tools_repo_url }}" "${SCRIPTS_PATH}"
-          fi
+          # Security: Using hardcoded trusted repository URL and main branch
+          echo "Cloning from trusted source: ${TOOLS_REPO_URL} (${TOOLS_BRANCH} branch)"
+          git clone --depth 1 --branch "${TOOLS_BRANCH}" \
+            "${TOOLS_REPO_URL}" "${SCRIPTS_PATH}"
         elif [ ! -d "${SCRIPTS_PATH}" ]; then
           echo "ERROR: Project tools directory not found at ${SCRIPTS_PATH}" >&2
           echo "Available directories:" >&2

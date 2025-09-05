@@ -31,18 +31,6 @@ on:
         description: "Auto-clone tools repo if project_tools_dir is missing"
         type: boolean
         default: true
-      tools_repo_url:
-        description: "Git URL for project tools repository (optional, uses default if not specified)"
-        type: string
-        required: false
-      tools_repo_ref:
-        description: "Branch or tag for project tools repository (optional, uses default if not specified)"
-        type: string
-        required: false
-      tools_repo_sha:
-        description: "Specific commit SHA for project tools repository (most secure option)"
-        type: string
-        required: false
 
 permissions:
   contents: read
@@ -70,9 +58,6 @@ jobs:
           project_tools_dir: ${{ env.PROJECT_TOOLS_DIR }}
           project_dir: ${{ env.ESP32_PROJECT_PATH }}
           auto_clone_tools: ${{ inputs.auto_clone_tools }}
-          tools_repo_url: ${{ inputs.tools_repo_url }}
-          tools_repo_ref: ${{ inputs.tools_repo_ref }}
-          tools_repo_sha: ${{ inputs.tools_repo_sha }}
 
       - uses: actions/setup-python@v5
         with:
@@ -193,9 +178,6 @@ jobs:
           project_tools_dir: ${{ env.PROJECT_TOOLS_DIR }}
           project_dir: ${{ env.ESP32_PROJECT_PATH }}
           auto_clone_tools: ${{ inputs.auto_clone_tools }}
-          tools_repo_url: ${{ inputs.tools_repo_url }}
-          tools_repo_ref: ${{ inputs.tools_repo_ref }}
-          tools_repo_sha: ${{ inputs.tools_repo_sha }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3

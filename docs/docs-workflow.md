@@ -1,5 +1,15 @@
 # Documentation Workflow Guide
 
+<div align="center">
+
+[← Previous: Build Workflow](build-workflow.md) | [Next: Lint Workflow →](lint-workflow.md)
+
+**📖 Doxygen + GitHub Pages Deployment**
+
+</div>
+
+---
+
 The Documentation workflow builds Doxygen documentation and optionally deploys it to GitHub Pages with link checking and artifact management.
 
 ## 📋 Table of Contents
@@ -298,6 +308,11 @@ ls docs/doxygen/html/
 
 ---
 
-**← Back to [Documentation Index](index.md)**  
-**← Back to [Main README](../README.md)**
+<div align="center">
+
+[← Previous: Build Workflow](build-workflow.md) | [Next: Lint Workflow →](lint-workflow.md)
+
+**📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
+
+</div>
 

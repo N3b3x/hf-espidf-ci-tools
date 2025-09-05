@@ -1,5 +1,15 @@
 # Lint Workflow Guide
 
+<div align="center">
+
+[← Previous: Docs Workflow](docs-workflow.md) | [Next: Link Check Workflow →](link-check-workflow.md)
+
+**🔍 C/C++ Code Quality Checks**
+
+</div>
+
+---
+
 The C/C++ Lint workflow runs clang-format and clang-tidy using cpp-linter for code quality enforcement.
 
 ## 📋 Table of Contents
@@ -220,6 +230,11 @@ HeaderFilterRegex: ''
 
 ---
 
-**← Back to [Documentation Index](index.md)**  
-**← Back to [Main README](../README.md)**
+<div align="center">
+
+[← Previous: Docs Workflow](docs-workflow.md) | [Next: Link Check Workflow →](link-check-workflow.md)
+
+**📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
+
+</div>
 

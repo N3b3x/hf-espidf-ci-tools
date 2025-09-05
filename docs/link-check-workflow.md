@@ -10,6 +10,8 @@
 
 *Standalone workflow for checking documentation links and ensuring all references are valid*
 
+[← Previous: Lint Workflow](lint-workflow.md) | [Next: Static Analysis Workflow →](static-analysis-workflow.md)
+
 </div>
 
 ---
@@ -372,4 +374,10 @@ Broken links:
 
 ---
 
-**← Back to [Documentation Index](index.md) | [Example Workflows](example-workflows.md) →**
+<div align="center">
+
+[← Previous: Lint Workflow](lint-workflow.md) | [Next: Static Analysis Workflow →](static-analysis-workflow.md)
+
+**📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
+
+</div>

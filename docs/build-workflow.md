@@ -12,6 +12,12 @@
 
 </div>
 
+<div align="center">
+
+[← Previous: Documentation Index](index.md) | [Next: Docs Workflow →](docs-workflow.md)
+
+</div>
+
 ---
 
 ## 📋 Table of Contents
@@ -65,9 +71,6 @@ The ESP-IDF Build workflow provides **matrix-based building** across multiple ES
 | `project_tools_dir` | string | Auto-detect | Path to project tools directory (contains scripts) |
 | `clean_build` | boolean | `false` | Skip caches for a clean build |
 | `auto_clone_tools` | boolean | `true` | Auto-clone tools repo if missing |
-| `tools_repo_url` | string | Default | Git URL for project tools repository |
-| `tools_repo_ref` | string | Default | Branch or tag for project tools repository |
-| `tools_repo_sha` | string | - | Specific commit SHA (most secure option) |
 
 ---
 
@@ -166,9 +169,6 @@ jobs:
       project_tools_dir: hf-espidf-project-tools
       clean_build: ${{ github.event.inputs.clean_build == 'true' }}
       auto_clone_tools: true
-      tools_repo_url: https://github.com/N3b3x/hf-espidf-ci-tools.git
-      tools_repo_ref: main
-      tools_repo_sha: ${{ github.sha }}  # Pin to specific commit
 ```
 
 ### **Clean Build (No Caching)**
@@ -484,6 +484,11 @@ env:
 
 ---
 
-**← Back to [Documentation Index](index.md)**  
-**← Back to [Main README](../README.md)**
+<div align="center">
+
+[← Previous: Documentation Index](index.md) | [Next: Docs Workflow →](docs-workflow.md)
+
+**📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
+
+</div>
 

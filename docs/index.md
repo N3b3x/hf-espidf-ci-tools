@@ -1,5 +1,15 @@
 # Documentation Index
 
+<div align="center">
+
+[← Previous: Example Workflows](example-workflows.md) | [Next: Build Workflow →](build-workflow.md)
+
+**📋 Documentation Index and Navigation**
+
+</div>
+
+---
+
 Welcome to the hf-espidf-ci-tools documentation! This guide provides comprehensive coverage of all reusable workflows and how to integrate them into your ESP-IDF projects.
 
 ## 🚀 Quick Navigation
@@ -61,8 +71,6 @@ jobs:
       project_dir: examples/esp32
       project_tools_dir: hf-espidf-project-tools
       auto_clone_tools: true
-      tools_repo_url: https://github.com/N3b3x/hf-espidf-project-tools.git
-      tools_repo_ref: main
       clean_build: false
 
   lint:
@@ -164,4 +172,10 @@ jobs:
 
 ---
 
-**← Back to [Main README](../README.md)**
+<div align="center">
+
+[← Previous: Example Workflows](example-workflows.md) | [Next: Build Workflow →](build-workflow.md)
+
+**📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
+
+</div>

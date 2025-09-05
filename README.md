@@ -84,7 +84,6 @@ jobs:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
     with:
       project_dir: examples/esp32
-      tools_repo_sha: ${{ github.sha }}
 
   # Lint and auto-fix code
   lint:
@@ -130,8 +129,6 @@ jobs:
       project_dir: examples/esp32   # Change to where your esp32 project directory is
       scripts_dir: nt-espidf-tools  
       auto_clone_tools: true
-      tools_repo_url: https://github.com/N3b3x/nt-espidf-tools.git
-      tools_repo_ref: main
       clean_build: false
 
   lint:
@@ -166,8 +163,6 @@ jobs:
       project_dir: .
       scripts_dir: nt-espidf-tools
       auto_clone_tools: true
-      tools_repo_url: https://github.com/N3b3x/nt-espidf-tools.git
-      tools_repo_ref: main
       doxygen_config: Doxyfile
       output_dir: docs/doxygen/html
       deploy_pages: true

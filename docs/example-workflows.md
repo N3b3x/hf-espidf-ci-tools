@@ -10,6 +10,8 @@
 
 *Ready-to-use GitHub Actions workflows that leverage all CI tools in parallel*
 
+[← Previous: Security Workflow](security-workflow.md) | [Next: Documentation Index →](index.md)
+
 </div>
 
 ---
@@ -136,7 +138,6 @@ jobs:
       project_dir: ${{ env.PROJECT_DIR }}
       project_tools_dir: ${{ env.TOOLS_DIR }}
       clean_build: ${{ github.event.inputs.clean_build == 'true' }}
-      tools_repo_sha: ${{ github.sha }}
 
   # 🔧 Lint and format code
   lint:
@@ -164,7 +165,6 @@ jobs:
       scan_type: "all"
       run_codeql: true
       codeql_languages: "cpp,python"
-      tools_repo_sha: ${{ github.sha }}
 
   # 🔍 Static analysis
   static-analysis:
@@ -286,7 +286,6 @@ jobs:
     with:
       project_dir: ${{ env.PROJECT_DIR }}
       clean_build: true  # Clean build for release
-      tools_repo_sha: ${{ github.sha }}
 
   # Strict linting for release
   lint-release:
@@ -306,7 +305,6 @@ jobs:
       scan_type: "all"
       run_codeql: true
       codeql_languages: "cpp,python"
-      tools_repo_sha: ${{ github.sha }}
 
   # Comprehensive static analysis
   static-analysis-release:
@@ -401,7 +399,6 @@ jobs:
       scan_type: "all"
       run_codeql: true
       codeql_languages: "cpp,python"
-      tools_repo_sha: ${{ github.sha }}
 
   # Build only if security passes
   build-secure:
@@ -410,7 +407,6 @@ jobs:
     with:
       project_dir: examples/esp32
       clean_build: true
-      tools_repo_sha: ${{ github.sha }}
 
   # Strict linting with security focus
   lint-secure:
@@ -641,3 +637,13 @@ For more detailed information, see the individual workflow documentation:
 - [Lint Workflow](lint-workflow.md)
 - [Security Workflow](security-workflow.md)
 - [Documentation Workflow](docs-workflow.md)
+
+---
+
+<div align="center">
+
+[← Previous: Security Workflow](security-workflow.md) | [Next: Documentation Index →](index.md)
+
+**📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
+
+</div>

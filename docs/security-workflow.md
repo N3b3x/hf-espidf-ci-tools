@@ -1,14 +1,26 @@
 # Security Workflow Guide
 
+<div align="center">
+
+[← Previous: Static Analysis Workflow](static-analysis-workflow.md) | [Next: Example Workflows →](example-workflows.md)
+
+**🛡️ Dependencies, Secrets, CodeQL**
+
+</div>
+
+---
+
 The Security workflow provides comprehensive security auditing including dependency scanning, secret detection, and optional CodeQL analysis.
 
 ## 📋 Table of Contents
 
 - [Overview](#overview)
+- [Security Features](#security-features)
 - [Inputs](#inputs)
 - [Outputs](#outputs)
 - [Usage Examples](#usage-examples)
 - [Configuration](#configuration)
+- [Security Best Practices](#security-best-practices)
 - [Troubleshooting](#troubleshooting)
 - [Navigation](#navigation)
 
@@ -16,12 +28,31 @@ The Security workflow provides comprehensive security auditing including depende
 
 **Purpose**: Comprehensive security auditing  
 **Key Features**: 
-- Python dependency vulnerability scanning
-- Secret and credential detection
-- Optional CodeQL analysis
-- Configurable scan types
+- **Automatic Requirements Discovery**: Finds all `requirements.txt` and `requirements.in` files automatically
+- **Python dependency vulnerability scanning**: Uses pip-audit and safety
+- **Secret and credential detection**: Uses gitleaks to find accidentally committed secrets
+- **Optional CodeQL analysis**: Static code analysis for C/C++ and other languages
+- **Configurable scan types**: Choose specific security checks to run
 
-**Use Case**: Security compliance and vulnerability detection
+**Use Case**: Security compliance and vulnerability detection for mixed-language projects
+
+## 🔒 Security Features
+
+### Repository Security
+- **Trusted Source Only**: Tools are only cloned from the trusted N3b3x/hf-espidf-project-tools repository
+- **No External URLs**: Users cannot specify arbitrary repository URLs, preventing supply chain attacks
+- **Main Branch Only**: Always uses the main branch for consistency and stability
+- **Shallow Cloning**: Uses `--depth 1` to minimize attack surface and reduce clone time
+
+### Input Validation
+- **Path Sanitization**: All file paths are validated and sanitized
+- **Parameter Validation**: Input parameters are validated before use
+- **Error Handling**: Secure error messages that don't leak sensitive information
+
+### Automatic Discovery
+- **Requirements Files**: Automatically finds all `requirements*.txt` and `requirements*.in` files
+- **No Manual Configuration**: Scans entire repository without user input
+- **Comprehensive Coverage**: Covers all Python dependencies in the project
 
 ## ⚙️ Inputs
 
@@ -33,8 +64,6 @@ The Security workflow provides comprehensive security auditing including depende
 | `run_codeql` | boolean | ❌ | `true` | Enable CodeQL analysis |
 | `codeql_languages` | string | ❌ | `cpp` | Comma-separated languages |
 | `auto_clone_tools` | boolean | ❌ | `false` | Auto-clone tools repo if missing |
-| `tools_repo_url` | string | ❌ | `https://github.com/N3b3x/nt-espidf-tools.git` | Git URL for tools repo |
-| `tools_repo_ref` | string | ❌ | `main` | Branch/tag for tools repo |
 
 ## 📤 Outputs
 
@@ -84,8 +113,6 @@ jobs:
       project_dir: examples/esp32
       scripts_dir: nt-espidf-tools
       auto_clone_tools: true
-      tools_repo_url: https://github.com/N3b3x/nt-espidf-tools.git
-      tools_repo_ref: main
       scan_type: "codeql"
       run_codeql: true
       codeql_languages: "cpp"
@@ -139,6 +166,32 @@ jobs:
       # CodeQL will analyze ALL matrix combinations automatically
 ```
 
+## 🛡️ Security Best Practices
+
+### For Production Environments
+1. **Disable auto-clone**: Set `auto_clone_tools: false` and include tools in your repository
+2. **Regular updates**: Periodically update the tools in your repository after reviewing changes
+3. **Version control**: Track tool versions in your project's dependency management
+4. **Code review**: Review all tool updates before applying them
+
+### For Development Environments
+1. **Enable auto-clone**: Set `auto_clone_tools: true` for convenience
+2. **Monitor changes**: Keep track of tool updates and security advisories
+3. **Test updates**: Verify tool updates don't break your build process
+4. **Use staging**: Test changes in staging before production
+
+### For CI/CD Pipelines
+1. **Audit trail**: Log which tools version is being used
+2. **Dependency scanning**: Use tools like Dependabot to monitor for vulnerabilities
+3. **Access controls**: Limit who can modify the tools repository
+4. **Regular updates**: Keep tools up to date with security patches
+
+### Requirements File Management
+- **Use specific versions**: Pin dependencies to specific versions in `requirements.txt`
+- **Regular updates**: Update dependencies regularly and test thoroughly
+- **Security scanning**: Run the security workflow regularly to catch vulnerabilities
+- **Separate environments**: Use different requirements files for dev/staging/production
+
 ## 🔧 Troubleshooting
 
 ### Common Issues
@@ -184,6 +237,11 @@ env:
 
 ---
 
-**← Back to [Documentation Index](index.md)**  
-**← Back to [Main README](../README.md)**
+<div align="center">
+
+[← Previous: Static Analysis Workflow](static-analysis-workflow.md) | [Next: Example Workflows →](example-workflows.md)
+
+**📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
+
+</div>
 
