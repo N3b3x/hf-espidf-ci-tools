@@ -109,7 +109,7 @@ jobs:
           FILES=$(git ls-files | grep -E 'requirements(\.txt|\.in)?$' || true)
           if [ -z "$FILES" ]; then
             echo "requirements.txt" > req-list
-            cat > requirements.txt <<'EOF'
+            cat > requirements.txt <<EOF
             pyyaml>=6.0
             esptool>=4.0.0
             pyserial>=3.5
