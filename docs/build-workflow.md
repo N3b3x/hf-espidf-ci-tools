@@ -72,6 +72,84 @@ The ESP-IDF Build workflow provides **matrix-based building** across multiple ES
 | `clean_build` | boolean | `false` | Skip caches for a clean build |
 | `auto_clone_tools` | boolean | `true` | Auto-clone tools repo if missing |
 
+### **Path Configuration**
+
+**Important:** All paths are resolved relative to the repository root where the workflow runs.
+
+#### **Project Directory (`project_dir`)**
+- **Purpose**: Points to your ESP-IDF project directory (contains `CMakeLists.txt`, `app_config.yml`)
+- **Examples**: 
+  - `examples/esp32` (most common)
+  - `firmware/esp32-project`
+  - `src/esp32-app`
+
+#### **Tools Directory (`project_tools_dir`)**
+- **Purpose**: Points to directory containing the build scripts (`build_app.sh`, `generate_matrix.py`, etc.)
+- **Auto-detection**: If not specified, looks for `hf-espidf-project-tools` subdirectory in project directory
+- **Examples**:
+  - `examples/esp32/scripts` (when using submodule)
+  - `examples/esp32/hf-espidf-project-tools` (when cloned directly)
+  - `tools/esp32-build-scripts` (custom location)
+
+#### **Common Configuration Patterns**
+
+**Pattern 1: Submodule Setup (Recommended)**
+```yaml
+# Repository structure:
+# your-repo/
+# ├── examples/esp32/           # ESP-IDF project
+# │   ├── CMakeLists.txt
+# │   ├── app_config.yml
+# │   └── scripts/              # Submodule pointing to hf-espidf-project-tools
+# │       ├── build_app.sh
+# │       └── generate_matrix.py
+
+jobs:
+  build:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: examples/esp32
+      project_tools_dir: examples/esp32/scripts  # Points to submodule
+```
+
+**Pattern 2: Direct Clone Setup**
+```yaml
+# Repository structure:
+# your-repo/
+# ├── examples/esp32/           # ESP-IDF project
+# │   ├── CMakeLists.txt
+# │   ├── app_config.yml
+# │   └── hf-espidf-project-tools/  # Cloned directly
+# │       ├── build_app.sh
+# │       └── generate_matrix.py
+
+jobs:
+  build:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: examples/esp32
+      # project_tools_dir not needed - auto-detects hf-espidf-project-tools
+```
+
+**Pattern 3: Custom Tools Location**
+```yaml
+# Repository structure:
+# your-repo/
+# ├── firmware/esp32/           # ESP-IDF project
+# │   ├── CMakeLists.txt
+# │   └── app_config.yml
+# └── build-tools/              # Custom tools location
+#     ├── build_app.sh
+#     └── generate_matrix.py
+
+jobs:
+  build:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: firmware/esp32
+      project_tools_dir: build-tools
+```
+
 ---
 
 ## 📤 Outputs & Artifacts
