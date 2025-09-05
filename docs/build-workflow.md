@@ -110,7 +110,13 @@ jobs:
     with:
       project_dir: examples/esp32
       project_tools_dir: examples/esp32/scripts  # Points to submodule
+      # auto_clone_tools not needed - workflow respects explicit project_tools_dir
 ```
+
+**✅ Automatic Behavior:**
+- When `project_tools_dir` is specified, the workflow uses that path directly
+- No auto-cloning occurs when explicit path is provided
+- Submodule detection and validation happens automatically
 
 **Pattern 2: Direct Clone Setup**
 ```yaml
@@ -149,6 +155,53 @@ jobs:
       project_dir: firmware/esp32
       project_tools_dir: build-tools
 ```
+
+---
+
+## 🔧 Troubleshooting
+
+### **Common Issues**
+
+#### **"build_app.sh: No such file or directory"**
+
+**Cause**: Path resolution or submodule checkout issues
+
+**Solutions**:
+1. **Check Submodule Status**: Verify submodule is properly initialized
+   ```bash
+   git submodule status
+   git submodule update --init --recursive
+   ```
+2. **Verify Paths**: Check that `project_tools_dir` points to the correct location
+3. **Check Repository Structure**: Ensure the tools directory contains required scripts
+4. **For Explicit Paths**: When `project_tools_dir` is specified, the workflow uses that path directly (no auto-cloning)
+
+#### **"Project tools directory not found"**
+
+**Cause**: Incorrect path configuration or missing tools directory
+
+**Solutions**:
+1. **Verify Paths**: Ensure paths are relative to repository root
+2. **Check Auto-clone**: Set `auto_clone_tools: true` if not using submodules
+3. **Manual Setup**: Clone tools repository manually if needed
+
+#### **Submodule Detection Issues**
+
+**Symptoms**: Workflow runs but can't find scripts in submodule
+
+**Solutions**:
+1. **Specify `project_tools_dir`** - When using submodules, explicitly set the path to the submodule
+2. **Verify Submodule URL**: Ensure submodule points to correct repository
+3. **Check Submodule Commit**: Ensure submodule is at a valid commit
+4. **Auto-clone Logic**: Auto-clone only happens when `project_tools_dir` is not specified
+
+### **Debug Information**
+
+The workflow provides detailed logging to help diagnose issues:
+- Path resolution details
+- Submodule detection and validation
+- Available directory listings
+- Script validation results
 
 ---
 

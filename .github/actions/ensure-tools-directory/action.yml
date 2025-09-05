@@ -60,22 +60,49 @@ runs:
         fi
         echo "Resolved project path: ${PROJECT_PATH}"
         
-        # Clone if directory doesn't exist and auto_clone_tools is true
-        if [ ! -d "${SCRIPTS_PATH}" ] && [ "${{ inputs.auto_clone_tools }}" = "true" ]; then
-          echo "Cloning tools repo to ${SCRIPTS_PATH}"
-          
-          # Security: Using hardcoded trusted repository URL and main branch
-          echo "Cloning from trusted source: ${TOOLS_REPO_URL} (${TOOLS_BRANCH} branch)"
-          git clone --depth 1 --branch "${TOOLS_BRANCH}" \
-            "${TOOLS_REPO_URL}" "${SCRIPTS_PATH}"
-        elif [ ! -d "${SCRIPTS_PATH}" ]; then
-          echo "ERROR: Project tools directory not found at ${SCRIPTS_PATH}" >&2
-          echo "Available directories:" >&2
-          ls -la . || true
-          ls -la "${PROJECT_PATH}" || true
-          exit 1
+        # Check if directory exists and handle accordingly
+        if [ ! -d "${SCRIPTS_PATH}" ]; then
+          # Only auto-clone if project_tools_dir was not explicitly provided
+          if [ -z "${{ inputs.project_tools_dir }}" ] && [ "${{ inputs.auto_clone_tools }}" = "true" ]; then
+            echo "Auto-cloning tools repo to ${SCRIPTS_PATH}"
+            
+            # Security: Using hardcoded trusted repository URL and main branch
+            echo "Cloning from trusted source: ${TOOLS_REPO_URL} (${TOOLS_BRANCH} branch)"
+            git clone --depth 1 --branch "${TOOLS_BRANCH}" \
+              "${TOOLS_REPO_URL}" "${SCRIPTS_PATH}"
+          else
+            echo "ERROR: Project tools directory not found at ${SCRIPTS_PATH}" >&2
+            echo "Available directories:" >&2
+            ls -la . || true
+            ls -la "${PROJECT_PATH}" || true
+            echo ""
+            if [ -n "${{ inputs.project_tools_dir }}" ]; then
+              echo "HINT: You specified project_tools_dir='${{ inputs.project_tools_dir }}' but it doesn't exist." >&2
+              echo "HINT: Check the path or ensure the submodule is properly initialized." >&2
+            else
+              echo "HINT: If using submodules, ensure the submodule is properly initialized." >&2
+              echo "HINT: If using auto-clone, set auto_clone_tools: true" >&2
+            fi
+            exit 1
+          fi
         else
           echo "Tools directory exists: ${SCRIPTS_PATH}"
+          
+          # Check if this looks like a submodule (has .git file or directory)
+          if [ -f "${SCRIPTS_PATH}/.git" ] || [ -d "${SCRIPTS_PATH}/.git" ]; then
+            echo "Detected submodule at ${SCRIPTS_PATH}"
+            # Verify it's the correct submodule
+            if [ -f "${SCRIPTS_PATH}/.git" ]; then
+              SUBMODULE_URL=$(git config --file "${SCRIPTS_PATH}/.git" remote.origin.url 2>/dev/null || echo "")
+              if [ "$SUBMODULE_URL" = "${TOOLS_REPO_URL}" ]; then
+                echo "✓ Confirmed correct submodule: ${SUBMODULE_URL}"
+              else
+                echo "⚠️  Submodule URL mismatch: ${SUBMODULE_URL} (expected: ${TOOLS_REPO_URL})"
+              fi
+            fi
+          else
+            echo "Directory exists but doesn't appear to be a git repository"
+          fi
         fi
 
         # Validate required scripts exist
