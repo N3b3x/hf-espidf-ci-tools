@@ -109,9 +109,11 @@ jobs:
           FILES=$(git ls-files | grep -E 'requirements(\.txt|\.in)?$' || true)
           if [ -z "$FILES" ]; then
             echo "requirements.txt" > req-list
-            echo "pyyaml>=6.0" > requirements.txt
-            echo "esptool>=4.0.0" >> requirements.txt
-            echo "pyserial>=3.5" >> requirements.txt
+            cat > requirements.txt <<EOF
+pyyaml>=6.0
+esptool>=4.0.0
+pyserial>=3.5
+EOF
           else
             echo "$FILES" > req-list
           fi
