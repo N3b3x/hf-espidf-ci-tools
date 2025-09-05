@@ -100,7 +100,7 @@ The ESP-IDF Build workflow provides **matrix-based building** across multiple ES
 # ├── examples/esp32/           # ESP-IDF project
 # │   ├── CMakeLists.txt
 # │   ├── app_config.yml
-# │   └── scripts/              # Submodule pointing to hf-espidf-project-tools
+# │   └── hf-espidf-project-tools/  # Submodule containing project tools
 # │       ├── build_app.sh
 # │       └── generate_matrix.py
 

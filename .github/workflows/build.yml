@@ -6,7 +6,7 @@ on:
     inputs:
       project_dir:
         description: >
-          Path to the ESP-IDF project (contains scripts/, CMakeLists.txt)
+          Path to the ESP-IDF project (contains CMakeLists.txt)
         type: string
         required: true
       project_tools_dir:
@@ -96,10 +96,10 @@ jobs:
             ~/.local/lib/python3.*/site-packages
           key: >-
             espidf-python-${{ runner.os }}-${{ matrix.idf_version_docker }}-
-            ${{ hashFiles(format('{0}/scripts/setup_common.sh',
-                                 env.ESP32_PROJECT_PATH),
-                          format('{0}/scripts/requirements.txt',
-                                 env.ESP32_PROJECT_PATH)) }}
+            ${{ hashFiles(format('{0}/setup_common.sh',
+                                 needs.generate-matrix.outputs.project_tools_path),
+                          format('{0}/requirements.txt',
+                                 needs.generate-matrix.outputs.project_tools_path)) }}
           restore-keys: |
             espidf-python-${{ runner.os }}-
 
