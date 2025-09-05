@@ -206,7 +206,7 @@ jobs:
           if [ -f "${SCRIPTS_PATH}/build_app.sh" ]; then
             echo "Running build_app.sh for CodeQL analysis..."
             chmod +x "${SCRIPTS_PATH}/build_app.sh"
-            "${SCRIPTS_PATH}/build_app.sh" \
+            "./${SCRIPTS_PATH}/build_app.sh" \
               --project-path "${{ env.ESP32_PROJECT_PATH }}" \
               "${{ matrix.app_name }}" \
               "${{ matrix.build_type }}" \
