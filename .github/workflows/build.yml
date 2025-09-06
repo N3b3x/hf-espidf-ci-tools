@@ -196,6 +196,11 @@ jobs:
             
             # Find build directory - try multiple patterns
             echo "Looking for build directory..."
+            echo "Changing to ESP-IDF project directory: ${ESP32_PROJECT_PATH}"
+            cd "${ESP32_PROJECT_PATH}" || {
+              echo "ERROR: Failed to change to ESP-IDF project directory: ${ESP32_PROJECT_PATH}"
+              exit 1
+            }
             echo "Current directory contents:"
             ls -la . || echo "Failed to list current directory"
             echo ""
