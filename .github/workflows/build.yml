@@ -142,8 +142,6 @@ jobs:
             export IDF_TARGET="${{ matrix.target }}"
             export BUILD_TYPE="${{ matrix.build_type }}"
             export APP_TYPE="${{ matrix.app_name }}"
-
-            cd "${ESP32_PROJECT_PATH}"
             
             # Debug: List ESP32 project directory contents
             echo "======================================================"
