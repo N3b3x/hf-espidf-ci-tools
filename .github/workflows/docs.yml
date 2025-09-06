@@ -132,7 +132,7 @@ jobs:
         with:
           config: pyproject.toml
           version: 1.2.0
-          python_version: 3.10
+          python_version: '3.10'
 
       - name: Setup Node.js (for linting)
         if: ${{ inputs.run_markdown_lint || inputs.run_spell_check }}
