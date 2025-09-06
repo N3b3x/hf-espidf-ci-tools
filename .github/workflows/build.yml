@@ -152,13 +152,13 @@ jobs:
             echo "ESP32 project path: ${ESP32_PROJECT_PATH}"
             echo "Current working directory: $(pwd)"
             echo ""
-            echo "ESP32 project directory contents:"
-            ls -la "${ESP32_PROJECT_PATH}" || echo "Failed to list ESP32 project directory"
+            echo "Current directory contents:"
+            ls -la . || echo "Failed to list current directory"
             echo ""
             echo "Looking for key files:"
             for file in CMakeLists.txt app_config.yml main components; do
-              if [ -e "${ESP32_PROJECT_PATH}/${file}" ]; then
-                echo "✓ Found ${file}: $(ls -la "${ESP32_PROJECT_PATH}/${file}")"
+              if [ -e "./${file}" ]; then
+                echo "✓ Found ${file}: $(ls -la "./${file}")"
               else
                 echo "✗ Missing ${file}"
               fi
@@ -193,7 +193,7 @@ jobs:
             # Project tools directory already validated in generate-matrix job
             # Run build script with correct paths
             "${{ needs.generate-matrix.outputs.project_tools_path }}/build_app.sh" \
-              --project-path "${ESP32_PROJECT_PATH}" \
+              --project-path "." \
               "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
             build_dir=$(ls -td build*/ 2>/dev/null | head -1)
             [ -z "$build_dir" ] && { echo "No build dir!"; exit 1; }
