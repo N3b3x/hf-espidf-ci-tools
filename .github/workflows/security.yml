@@ -203,6 +203,27 @@ jobs:
           # Use the resolved project tools path from the tools validation step
           SCRIPTS_PATH="${{ steps.tools-validate-codeql.outputs.project_tools_path }}"
 
+          # Debug: List ESP32 project directory contents
+          echo "======================================================"
+          echo "ESP32 PROJECT DIRECTORY DEBUG INFO (CodeQL)"
+          echo "======================================================"
+          echo "ESP32 project path: ${{ env.ESP32_PROJECT_PATH }}"
+          echo "Current working directory: $(pwd)"
+          echo ""
+          echo "ESP32 project directory contents:"
+          ls -la "${{ env.ESP32_PROJECT_PATH }}" || echo "Failed to list ESP32 project directory"
+          echo ""
+          echo "Looking for key files:"
+          for file in CMakeLists.txt app_config.yml main components; do
+            if [ -e "${{ env.ESP32_PROJECT_PATH }}/${file}" ]; then
+              echo "✓ Found ${file}: $(ls -la "${{ env.ESP32_PROJECT_PATH }}/${file}")"
+            else
+              echo "✗ Missing ${file}"
+            fi
+          done
+          echo "======================================================"
+          echo ""
+
           # Debug: List scripts directory contents and check permissions
           echo "======================================================"
           echo "SCRIPTS DIRECTORY DEBUG INFO (CodeQL)"

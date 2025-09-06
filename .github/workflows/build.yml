@@ -145,6 +145,27 @@ jobs:
 
             cd "${ESP32_PROJECT_PATH}"
             
+            # Debug: List ESP32 project directory contents
+            echo "======================================================"
+            echo "ESP32 PROJECT DIRECTORY DEBUG INFO"
+            echo "======================================================"
+            echo "ESP32 project path: ${ESP32_PROJECT_PATH}"
+            echo "Current working directory: $(pwd)"
+            echo ""
+            echo "ESP32 project directory contents:"
+            ls -la "${ESP32_PROJECT_PATH}" || echo "Failed to list ESP32 project directory"
+            echo ""
+            echo "Looking for key files:"
+            for file in CMakeLists.txt app_config.yml main components; do
+              if [ -e "${ESP32_PROJECT_PATH}/${file}" ]; then
+                echo "✓ Found ${file}: $(ls -la "${ESP32_PROJECT_PATH}/${file}")"
+              else
+                echo "✗ Missing ${file}"
+              fi
+            done
+            echo "======================================================"
+            echo ""
+            
             # Debug: List scripts directory contents and check permissions
             echo "======================================================"
             echo "SCRIPTS DIRECTORY DEBUG INFO"
