@@ -155,8 +155,8 @@ jobs:
             echo ""
             echo "Looking for key files:"
             for file in CMakeLists.txt app_config.yml main components; do
-              if [ -e "./${file}" ]; then
-                echo "✓ Found ${file}: $(ls -la "./${file}")"
+              if [ -e "./${ESP32_PROJECT_PATH}/${file}" ]; then
+                echo "✓ Found ${file}: $(ls -la "./${ESP32_PROJECT_PATH}/${file}")"
               else
                 echo "✗ Missing ${file}"
               fi

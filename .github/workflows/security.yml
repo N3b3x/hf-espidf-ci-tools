@@ -198,8 +198,6 @@ jobs:
           echo "Project Tools: ${{ env.PROJECT_TOOLS_DIR }}"
           echo "Target: ${{ matrix.target }}"
 
-          cd "${{ env.ESP32_PROJECT_PATH }}"
-
           # Use the resolved project tools path from the tools validation step
           SCRIPTS_PATH="${{ steps.tools-validate-codeql.outputs.project_tools_path }}"
 
@@ -215,8 +213,8 @@ jobs:
           echo ""
           echo "Looking for key files:"
           for file in CMakeLists.txt app_config.yml main components; do
-            if [ -e "./${file}" ]; then
-              echo "✓ Found ${file}: $(ls -la "./${file}")"
+            if [ -e "./${ESP32_PROJECT_PATH}/${file}" ]; then
+              echo "✓ Found ${file}: $(ls -la "./${ESP32_PROJECT_PATH}/${file}")"
             else
               echo "✗ Missing ${file}"
             fi
