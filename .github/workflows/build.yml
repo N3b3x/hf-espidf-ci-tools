@@ -170,17 +170,15 @@ jobs:
             echo "======================================================"
             echo "SCRIPTS DIRECTORY DEBUG INFO"
             echo "======================================================"
-            # Convert absolute path to relative path for Docker container
-            PROJECT_TOOLS_RELATIVE=$(echo "${{ needs.generate-matrix.outputs.project_tools_path }}" | sed "s|$(pwd)/||")
-            echo "Scripts path: ${PROJECT_TOOLS_RELATIVE}"
+            echo "Scripts path: ${{ needs.generate-matrix.outputs.project_tools_path }}"
             echo "Current working directory: $(pwd)"
             echo ""
             echo "Scripts directory contents:"
-            ls -la "${PROJECT_TOOLS_RELATIVE}" || echo "Failed to list scripts directory"
+            ls -la "${{ needs.generate-matrix.outputs.project_tools_path }}" || echo "Failed to list scripts directory"
             echo ""
             echo "Checking script permissions:"
             for script in build_app.sh flash_app.sh config_loader.sh generate_matrix.py; do
-              script_path="${PROJECT_TOOLS_RELATIVE}/$script"
+              script_path="${{ needs.generate-matrix.outputs.project_tools_path }}/$script"
               if [ -f "$script_path" ]; then
                 echo "✓ Found $script: $(ls -la "$script_path")"
                 # Ensure script is executable
@@ -194,7 +192,7 @@ jobs:
             
             # Project tools directory already validated in generate-matrix job
             # Run build script with correct paths
-            "${PROJECT_TOOLS_RELATIVE}/build_app.sh" \
+            "${{ needs.generate-matrix.outputs.project_tools_path }}/build_app.sh" \
               --project-path "." \
               "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
             build_dir=$(ls -td build*/ 2>/dev/null | head -1)

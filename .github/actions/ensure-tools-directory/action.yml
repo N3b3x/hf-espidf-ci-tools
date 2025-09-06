@@ -34,23 +34,24 @@ runs:
         TOOLS_DIR_NAME=$(basename "${TOOLS_REPO_URL}" .git)
         echo "Tools directory name: ${TOOLS_DIR_NAME}"
         
-        # Resolve project tools path using consistent logic
+        # Resolve project tools path using consistent logic - always output relative paths
         if [ -n "${{ inputs.project_tools_dir }}" ]; then
-          # Handle both absolute and relative paths
+          # Use the input as-is if it's already relative, or make it relative if absolute
           if [[ "${{ inputs.project_tools_dir }}" == /* ]]; then
-            SCRIPTS_PATH="${{ inputs.project_tools_dir }}"
+            # Convert absolute path to relative by removing the workspace root
+            SCRIPTS_PATH=$(echo "${{ inputs.project_tools_dir }}" | sed "s|^$(pwd)/||")
           else
-            SCRIPTS_PATH="$(pwd)/${{ inputs.project_tools_dir }}"
+            SCRIPTS_PATH="${{ inputs.project_tools_dir }}"
           fi
         else
           if [ -d "${{ inputs.project_dir }}/${TOOLS_DIR_NAME}" ]; then
-            SCRIPTS_PATH="$(pwd)/${{ inputs.project_dir }}/${TOOLS_DIR_NAME}"
+            SCRIPTS_PATH="${{ inputs.project_dir }}/${TOOLS_DIR_NAME}"
           else
-            SCRIPTS_PATH="$(pwd)/${TOOLS_DIR_NAME}"
+            SCRIPTS_PATH="${TOOLS_DIR_NAME}"
           fi
         fi
 
-        echo "Resolved project tools path: ${SCRIPTS_PATH}"
+        echo "Resolved project tools path (relative): ${SCRIPTS_PATH}"
         
         # Also resolve project directory path to absolute
         if [[ "${{ inputs.project_dir }}" == /* ]]; then
@@ -109,7 +110,7 @@ runs:
         echo "======================================================"
         echo "TOOLS DIRECTORY VALIDATION"
         echo "======================================================"
-        echo "Scripts path: ${SCRIPTS_PATH}"
+        echo "Scripts path (relative): ${SCRIPTS_PATH}"
         echo "Directory contents:"
         ls -la "${SCRIPTS_PATH}" || echo "Failed to list directory"
         echo ""
