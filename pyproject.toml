@@ -2,7 +2,6 @@
 # Configuration for md-dead-link-check
 # This file serves as a fallback template
 # The workflow dynamically generates pyproject.toml based on link_check_paths input
-
 # Default include patterns (used when no custom paths are provided)
 include = [
     "docs/**/*.md",

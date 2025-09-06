@@ -102,23 +102,18 @@ jobs:
           include = [
             $INCLUDE_PATHS
           ]
-          
           # Exclude patterns for files to skip
           exclude = [
             $EXCLUDE_PATHS
           ]
-          
           # Additional configuration options
           ignore_links = [
             # Add any specific links to ignore here
           ]
-          
           # Timeout for link checking (in seconds)
           timeout = 30
-          
           # Follow redirects
           follow_redirects = true
-          
           # Check external links
           check_external = true
           EOF
