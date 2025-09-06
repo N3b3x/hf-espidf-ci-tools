@@ -193,8 +193,36 @@ jobs:
             "${{ needs.generate-matrix.outputs.project_tools_path }}/build_app.sh" \
               --project-path "${ESP32_PROJECT_PATH}" \
               "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
-            build_dir=$(ls -td build*/ 2>/dev/null | head -1)
-            [ -z "$build_dir" ] && { echo "No build dir!"; exit 1; }
+            
+            # Find build directory - try multiple patterns
+            echo "Looking for build directory..."
+            echo "Current directory contents:"
+            ls -la . || echo "Failed to list current directory"
+            echo ""
+            
+            # Try different build directory patterns
+            build_dir=""
+            for pattern in "build*" "build-app-*" "build_*"; do
+              echo "Trying pattern: $pattern"
+              found_dirs=$(ls -td $pattern 2>/dev/null | head -1)
+              if [ -n "$found_dirs" ]; then
+                build_dir="$found_dirs"
+                echo "Found build directory with pattern '$pattern': $build_dir"
+                break
+              fi
+            done
+            
+            # If still no build directory found, list all directories
+            if [ -z "$build_dir" ]; then
+              echo "No build directory found with standard patterns. All directories:"
+              ls -la | grep "^d" || echo "No directories found"
+              echo "All files and directories:"
+              ls -la
+              echo "ERROR: No build directory found!"
+              exit 1
+            fi
+            
+            echo "Using build directory: $build_dir"
             echo "build_dir=${build_dir%/}" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifacts

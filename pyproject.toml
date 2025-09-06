@@ -1,0 +1,36 @@
+[tool.md-dead-link-check]
+# Configuration for md-dead-link-check
+# This file serves as a fallback template
+# The workflow dynamically generates pyproject.toml based on link_check_paths input
+
+# Default include patterns (used when no custom paths are provided)
+include = [
+    "docs/**/*.md",
+    "*.md",
+    "**/docs/**/*.md",
+    "README.md"
+]
+
+# Exclude patterns for files to skip
+# Default excludes (always included):
+# - node_modules/**, .git/**, **/node_modules/**
+# Additional excludes can be specified via link_check_exclude_paths input
+exclude = [
+    "node_modules/**",
+    ".git/**",
+    "**/node_modules/**"
+]
+
+# Additional configuration options
+ignore_links = [
+    # Add any specific links to ignore here
+]
+
+# Timeout for link checking (in seconds)
+timeout = 30
+
+# Follow redirects
+follow_redirects = true
+
+# Check external links
+check_external = true

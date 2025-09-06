@@ -20,6 +20,10 @@ on:
         description: "Comma-separated paths to check for broken links"
         type: string
         default: "docs/**,*.md,**/docs/**"
+      link_check_exclude_paths:
+        description: "Comma-separated paths to exclude from link checking (in addition to defaults)"
+        type: string
+        default: ""
       run_markdown_lint:
         description: "Run markdown linting on documentation files"
         type: boolean
@@ -60,9 +64,67 @@ jobs:
 
       - name: Check documentation links
         if: ${{ inputs.run_link_check }}
-        uses: AlexanderDokuchaev/md-dead-link-check@v1.2.0
-        with:
-          paths: ${{ inputs.link_check_paths }}
+        run: |
+          # Create temporary pyproject.toml with dynamic paths from input
+          echo "Creating pyproject.toml with paths: ${{ inputs.link_check_paths }}"
+          echo "Exclude paths: ${{ inputs.link_check_exclude_paths }}"
+          
+          # Convert comma-separated paths to JSON array format
+          IFS=',' read -ra PATHS <<< "${{ inputs.link_check_paths }}"
+          INCLUDE_PATHS=""
+          for path in "${PATHS[@]}"; do
+            # Trim whitespace and add quotes
+            path=$(echo "$path" | xargs)
+            if [ -n "$INCLUDE_PATHS" ]; then
+              INCLUDE_PATHS="$INCLUDE_PATHS,\n            \"$path\""
+            else
+              INCLUDE_PATHS="\"$path\""
+            fi
+          done
+          
+          # Convert comma-separated exclude paths to JSON array format
+          EXCLUDE_PATHS="\"node_modules/**\",\n            \".git/**\",\n            \"**/node_modules/**\""
+          if [ -n "${{ inputs.link_check_exclude_paths }}" ]; then
+            IFS=',' read -ra EXCLUDE_PATHS_ARRAY <<< "${{ inputs.link_check_exclude_paths }}"
+            for path in "${EXCLUDE_PATHS_ARRAY[@]}"; do
+              # Trim whitespace and add quotes
+              path=$(echo "$path" | xargs)
+              if [ -n "$path" ]; then
+                EXCLUDE_PATHS="$EXCLUDE_PATHS,\n            \"$path\""
+              fi
+            done
+          fi
+          
+          cat > pyproject.toml << EOF
+          [tool.md-dead-link-check]
+          # Configuration for md-dead-link-check
+          # Include patterns for files to check
+          include = [
+            $INCLUDE_PATHS
+          ]
+          
+          # Exclude patterns for files to skip
+          exclude = [
+            $EXCLUDE_PATHS
+          ]
+          
+          # Additional configuration options
+          ignore_links = [
+            # Add any specific links to ignore here
+          ]
+          
+          # Timeout for link checking (in seconds)
+          timeout = 30
+          
+          # Follow redirects
+          follow_redirects = true
+          
+          # Check external links
+          check_external = true
+          EOF
+          
+          # Run the link checker using the action
+          python -m md_dead_link_check --config pyproject.toml
 
       - name: Setup Node.js (for linting)
         if: ${{ inputs.run_markdown_lint || inputs.run_spell_check }}
