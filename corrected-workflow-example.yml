@@ -1,0 +1,82 @@
+name: 🏗️ ESP32 Build (Corrected)
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    uses: espressif/esp-idf-ci-action@v1
+    with:
+      esp_idf_version: release-v5.5
+      target: esp32c6
+      path: examples/esp32  # This should point to your ESP32 project directory
+      extra_docker_args: -v $HOME/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache -e IDF_CCACHE_ENABLE=1
+      command: |
+        set -e
+        
+        # Set environment variables
+        export ESP32_PROJECT_PATH="examples/esp32"
+        export IDF_TARGET="esp32c6"
+        export BUILD_TYPE="Release"
+        export APP_TYPE="ascii_art"
+        
+        # Change to project directory
+        cd "${ESP32_PROJECT_PATH}"
+        
+        # Debug: List current directory contents (not relative path)
+        echo "======================================================"
+        echo "ESP32 PROJECT DIRECTORY DEBUG INFO"
+        echo "======================================================"
+        echo "ESP32 project path: ${ESP32_PROJECT_PATH}"
+        echo "Current working directory: $(pwd)"
+        echo ""
+        echo "Current directory contents:"
+        ls -la . || echo "Failed to list current directory"
+        echo ""
+        echo "Looking for key files:"
+        for file in CMakeLists.txt app_config.yml main components; do
+          if [ -e "./${file}" ]; then
+            echo "✓ Found ${file}: $(ls -la "./${file}")"
+          else
+            echo "✗ Missing ${file}"
+          fi
+        done
+        echo "======================================================"
+        echo ""
+        
+        # Debug: List scripts directory contents
+        echo "======================================================"
+        echo "SCRIPTS DIRECTORY DEBUG INFO"
+        echo "======================================================"
+        echo "Scripts path: ./scripts"
+        echo "Current working directory: $(pwd)"
+        echo ""
+        echo "Scripts directory contents:"
+        ls -la "./scripts" || echo "Failed to list scripts directory"
+        echo ""
+        echo "Checking script permissions:"
+        for script in build_app.sh flash_app.sh config_loader.sh generate_matrix.py; do
+          script_path="./scripts/$script"
+          if [ -f "$script_path" ]; then
+            echo "✓ Found $script: $(ls -la "$script_path")"
+            # Ensure script is executable
+            chmod +x "$script_path" 2>/dev/null || echo "Warning: Could not chmod $script"
+          else
+            echo "✗ Missing $script"
+          fi
+        done
+        echo "======================================================"
+        echo ""
+        
+        # Run build script with correct relative paths
+        "./scripts/build_app.sh" \
+          --project-path "." \
+          "${APP_TYPE}" "${BUILD_TYPE}" "release/v5.5"
+        
+        # Find build directory
+        build_dir=$(ls -td build*/ 2>/dev/null | head -1)
+        [ -z "$build_dir" ] && { echo "No build dir!"; exit 1; }
+        echo "build_dir=${build_dir%/}" >> "$GITHUB_OUTPUT"
