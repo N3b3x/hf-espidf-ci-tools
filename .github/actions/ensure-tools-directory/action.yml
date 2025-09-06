@@ -105,18 +105,32 @@ runs:
           fi
         fi
 
-        # Validate required scripts exist
+        # Debug: List directory contents and check permissions
+        echo "======================================================"
+        echo "TOOLS DIRECTORY VALIDATION"
+        echo "======================================================"
+        echo "Scripts path: ${SCRIPTS_PATH}"
+        echo "Directory contents:"
+        ls -la "${SCRIPTS_PATH}" || echo "Failed to list directory"
+        echo ""
+        echo "Checking script permissions:"
+        
+        # Validate required scripts exist and ensure they're executable
         REQUIRED_SCRIPTS=("generate_matrix.py" "build_app.sh" "config_loader.sh")
         for script in "${REQUIRED_SCRIPTS[@]}"; do
-          if [ ! -f "${SCRIPTS_PATH}/${script}" ]; then
+          script_path="${SCRIPTS_PATH}/${script}"
+          if [ ! -f "${script_path}" ]; then
             echo "ERROR: Required script '${script}' not found in ${SCRIPTS_PATH}" >&2
             echo "Available scripts:" >&2
             ls -la "${SCRIPTS_PATH}" || true
             exit 1
           else
-            echo "✓ Found ${script}"
+            echo "✓ Found ${script}: $(ls -la "${script_path}")"
+            # Ensure script is executable
+            chmod +x "${script_path}" 2>/dev/null || echo "Warning: Could not chmod ${script}"
           fi
         done
 
-        echo "✓ All required scripts found in ${SCRIPTS_PATH}"
+        echo "======================================================"
+        echo "✓ All required scripts found and made executable in ${SCRIPTS_PATH}"
         echo "project_tools_path=${SCRIPTS_PATH}" >> "$GITHUB_OUTPUT"

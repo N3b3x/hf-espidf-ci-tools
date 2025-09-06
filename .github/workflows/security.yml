@@ -203,6 +203,30 @@ jobs:
           # Use the resolved project tools path from the tools validation step
           SCRIPTS_PATH="${{ steps.tools-validate-codeql.outputs.project_tools_path }}"
 
+          # Debug: List scripts directory contents and check permissions
+          echo "======================================================"
+          echo "SCRIPTS DIRECTORY DEBUG INFO (CodeQL)"
+          echo "======================================================"
+          echo "Scripts path: ${SCRIPTS_PATH}"
+          echo "Current working directory: $(pwd)"
+          echo ""
+          echo "Scripts directory contents:"
+          ls -la "${SCRIPTS_PATH}" || echo "Failed to list scripts directory"
+          echo ""
+          echo "Checking script permissions:"
+          for script in build_app.sh flash_app.sh config_loader.sh generate_matrix.py; do
+            script_path="${SCRIPTS_PATH}/$script"
+            if [ -f "$script_path" ]; then
+              echo "✓ Found $script: $(ls -la "$script_path")"
+              # Ensure script is executable
+              chmod +x "$script_path" 2>/dev/null || echo "Warning: Could not chmod $script"
+            else
+              echo "✗ Missing $script"
+            fi
+          done
+          echo "======================================================"
+          echo ""
+
           if [ -f "${SCRIPTS_PATH}/build_app.sh" ]; then
             echo "Running build_app.sh for CodeQL analysis..."
             chmod +x "${SCRIPTS_PATH}/build_app.sh"

@@ -144,6 +144,31 @@ jobs:
             export APP_TYPE="${{ matrix.app_name }}"
 
             cd "${ESP32_PROJECT_PATH}"
+            
+            # Debug: List scripts directory contents and check permissions
+            echo "======================================================"
+            echo "SCRIPTS DIRECTORY DEBUG INFO"
+            echo "======================================================"
+            echo "Scripts path: ${{ needs.generate-matrix.outputs.project_tools_path }}"
+            echo "Current working directory: $(pwd)"
+            echo ""
+            echo "Scripts directory contents:"
+            ls -la "${{ needs.generate-matrix.outputs.project_tools_path }}" || echo "Failed to list scripts directory"
+            echo ""
+            echo "Checking script permissions:"
+            for script in build_app.sh flash_app.sh config_loader.sh generate_matrix.py; do
+              script_path="${{ needs.generate-matrix.outputs.project_tools_path }}/$script"
+              if [ -f "$script_path" ]; then
+                echo "✓ Found $script: $(ls -la "$script_path")"
+                # Ensure script is executable
+                chmod +x "$script_path" 2>/dev/null || echo "Warning: Could not chmod $script"
+              else
+                echo "✗ Missing $script"
+              fi
+            done
+            echo "======================================================"
+            echo ""
+            
             # Project tools directory already validated in generate-matrix job
             # Run build script with correct paths
             "${{ needs.generate-matrix.outputs.project_tools_path }}/build_app.sh" \
