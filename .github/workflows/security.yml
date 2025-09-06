@@ -250,7 +250,7 @@ jobs:
             echo "Running build_app.sh for CodeQL analysis..."
             chmod +x "${SCRIPTS_PATH}/build_app.sh"
             "${SCRIPTS_PATH}/build_app.sh" \
-              --project-path "." \
+              --project-path "${ESP32_PROJECT_PATH}" \
               "${{ matrix.app_name }}" \
               "${{ matrix.build_type }}" \
               "${{ matrix.idf_version }}"

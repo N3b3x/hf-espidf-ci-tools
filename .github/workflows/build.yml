@@ -191,7 +191,7 @@ jobs:
             # Project tools directory already validated in generate-matrix job
             # Run build script with correct paths
             "${{ needs.generate-matrix.outputs.project_tools_path }}/build_app.sh" \
-              --project-path "." \
+              --project-path "${ESP32_PROJECT_PATH}" \
               "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
             build_dir=$(ls -td build*/ 2>/dev/null | head -1)
             [ -z "$build_dir" ] && { echo "No build dir!"; exit 1; }
