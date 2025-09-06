@@ -123,8 +123,16 @@ jobs:
           check_external = true
           EOF
           
-          # Run the link checker using the action
-          python -m md_dead_link_check --config pyproject.toml
+          # Run the link checker using the GitHub Action
+          # The action will use the dynamically generated pyproject.toml
+
+      - name: Run md-dead-link-check
+        if: ${{ inputs.run_link_check }}
+        uses: AlexanderDokuchaev/md-dead-link-check@v1.2.0
+        with:
+          config: pyproject.toml
+          version: 1.2.0
+          python_version: 3.10
 
       - name: Setup Node.js (for linting)
         if: ${{ inputs.run_markdown_lint || inputs.run_spell_check }}
