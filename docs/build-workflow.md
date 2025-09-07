@@ -14,7 +14,7 @@
 
 <div align="center">
 
-[← Previous: Documentation Index](index.md) | [Next: Docs Workflow →](docs-workflow.md)
+[← Previous: Documentation Index](index.md) | [Next: Security Workflow →](security-workflow.md)
 
 </div>
 
@@ -46,6 +46,7 @@ The ESP-IDF Build workflow provides **matrix-based building** across multiple ES
 - 🛡️ **ESP-IDF Environment** - Official Espressif actions for reliable builds
 - 📊 **Size Reporting** - Automatic PR comments with firmware size analysis
 - 🔧 **Project Tools Integration** - Seamless integration with HardFOC project tools
+- 🔒 **Secure Tool Management** - Automatic tool cloning from trusted repository with validation
 
 ### **Use Cases**
 - ✅ **CI/CD for ESP32 applications** requiring multiple build configurations
@@ -68,13 +69,109 @@ The ESP-IDF Build workflow provides **matrix-based building** across multiple ES
 
 | Input | Type | Default | Description |
 |-------|------|---------|-------------|
-| `project_tools_dir` | string | Auto-detect | Path to project tools directory (contains scripts) |
+| `project_tools_dir` | string | Auto-detect | Path to project tools directory (contains scripts directly). Leave empty to auto-detect. |
 | `clean_build` | boolean | `false` | Skip caches for a clean build |
-| `auto_clone_tools` | boolean | `true` | Auto-clone tools repo if missing |
+| `auto_clone_tools` | boolean | `true` | Auto-clone tools repo if project_tools_dir is missing |
+| `max_dec_total` | string | `"0"` | Maximum total dec size in bytes for size budget enforcement (0 to disable) |
 
 ### **Path Configuration**
 
 **Important:** All paths are resolved relative to the repository root where the workflow runs.
+
+### **Secure Tool Management**
+
+The workflow includes a built-in `ensure-tools-directory` action that provides:
+
+- **🔒 Trusted Source Only**: Only clones from the verified `N3b3x/hf-espidf-project-tools` repository
+- **🛡️ Security Validation**: Validates submodule URLs and ensures scripts are from trusted sources
+- **⚡ Automatic Resolution**: Intelligently detects and resolves tool directory paths
+- **🔧 Script Validation**: Ensures all required scripts exist and are executable
+- **📁 Flexible Setup**: Supports submodules, direct clones, and custom tool locations
+- **🔄 Multi-Project Support**: Tools can be shared across multiple projects since all scripts accept `--project-path` argument
+
+### **Size Budget Enforcement**
+
+The workflow includes optional size budget enforcement to prevent firmware from exceeding specified limits:
+
+- **📊 Automatic Size Analysis**: Analyzes firmware size from all build configurations
+- **🚫 Budget Enforcement**: Fails the build if any configuration exceeds the specified limit
+- **⚙️ Configurable Limits**: Set custom size limits via `max_dec_total` parameter
+- **🔍 Detailed Reporting**: Shows which builds exceeded limits and by how much
+- **✅ Optional Feature**: Disabled by default (set to "0"), enable by setting a positive value
+
+#### **What the Size Budget Measures**
+
+The size budget is based on the **`dec` (decimal) size** from ESP-IDF's size analysis, which represents the **total memory footprint** of your firmware. This includes:
+
+- **📝 Text Segment**: Executable code, functions, and program logic
+- **📊 Data Segment**: Initialized global and static variables
+- **🗃️ BSS Segment**: Uninitialized global and static variables (zero-initialized)
+
+**Size Analysis Format:**
+```
+text    data     bss     dec     hex filename
+12345   6789     1234   20368   4f90 your_app.bin
+```
+
+Where:
+- **`text`**: Code size (instructions, functions, constants)
+- **`data`**: Initialized variables (global/static with initial values)
+- **`bss`**: Uninitialized variables (global/static set to zero)
+- **`dec`**: **Total size** = text + data + bss (this is what the budget measures)
+- **`hex`**: Same as dec but in hexadecimal format
+
+**Why Use `dec` Size:**
+- **🎯 Total Memory Usage**: Represents the complete RAM footprint
+- **📱 Device Constraints**: ESP32 devices have limited flash and RAM
+- **⚖️ Resource Management**: Helps ensure firmware fits within device capabilities
+- **🔍 Build Comparison**: Consistent metric across different build configurations
+
+#### **Common Size Budget Values**
+
+| Device | Typical Budget | Description |
+|--------|----------------|-------------|
+| **ESP32** | `1,600,000` bytes (1.6MB) | Standard ESP32 with 4MB flash |
+| **ESP32-S2** | `1,600,000` bytes (1.6MB) | ESP32-S2 with 4MB flash |
+| **ESP32-S3** | `1,600,000` bytes (1.6MB) | ESP32-S3 with 4MB flash |
+| **ESP32-C3** | `1,600,000` bytes (1.6MB) | ESP32-C3 with 4MB flash |
+| **ESP32-C6** | `1,600,000` bytes (1.6MB) | ESP32-C6 with 4MB flash |
+| **Small Flash** | `800,000` bytes (800KB) | ESP32 with 2MB flash |
+| **Large Flash** | `3,200,000` bytes (3.2MB) | ESP32 with 8MB+ flash |
+
+**Size Budget Guidelines:**
+- **🟢 Conservative**: 50-60% of available flash (leaves room for OTA updates)
+- **🟡 Moderate**: 70-80% of available flash (good balance)
+- **🔴 Aggressive**: 90%+ of available flash (minimal room for updates)
+
+**Example Size Analysis:**
+```
+text    data     bss     dec     hex filename
+456789  12345    8901   477035  746ab my_app.bin
+```
+- **Total Size**: 477,035 bytes (~466 KB)
+- **Status**: ✅ Within 1.6MB budget
+- **Remaining**: 1,122,965 bytes available
+
+#### **How Size Budget Enforcement Works**
+
+The workflow analyzes the `size.txt` files generated by ESP-IDF for each build configuration:
+
+1. **📊 Size Analysis**: Parses the `dec` value from each `size.txt` file
+2. **🔍 Comparison**: Compares each build's size against the `max_dec_total` limit
+3. **⚠️ Violation Detection**: Identifies builds that exceed the budget
+4. **📝 Error Reporting**: Reports specific builds and their sizes
+5. **🚫 Build Failure**: Fails the entire workflow if any build exceeds the limit
+
+**Error Example:**
+```
+::error file=build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5/size.txt::build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5 dec=1800000 exceeds MAX_DEC_TOTAL=1600000
+::error::Size budget exceeded in 1 build(s). Check individual errors above.
+```
+
+**Success Example:**
+```
+✅ All builds within size budget (1600000 bytes)
+```
 
 #### **Project Directory (`project_dir`)**
 - **Purpose**: Points to your ESP-IDF project directory (contains `CMakeLists.txt`, `app_config.yml`)
@@ -86,10 +183,12 @@ The ESP-IDF Build workflow provides **matrix-based building** across multiple ES
 #### **Tools Directory (`project_tools_dir`)**
 - **Purpose**: Points to directory containing the build scripts (`build_app.sh`, `generate_matrix.py`, etc.)
 - **Auto-detection**: If not specified, looks for `hf-espidf-project-tools` subdirectory in project directory
+- **Multi-Project Support**: Can be shared across multiple projects since all scripts accept `--project-path` argument
 - **Examples**:
   - `examples/esp32/scripts` (when using submodule)
   - `examples/esp32/hf-espidf-project-tools` (when cloned directly)
   - `tools/esp32-build-scripts` (custom location)
+  - `shared-tools` (shared across multiple projects)
 
 #### **Common Configuration Patterns**
 
@@ -109,7 +208,7 @@ jobs:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
     with:
       project_dir: examples/esp32
-      project_tools_dir: examples/esp32/scripts  # Points to submodule
+      project_tools_dir: examples/esp32/hf-espidf-project-tools  # Points to submodule
       # auto_clone_tools not needed - workflow respects explicit project_tools_dir
 ```
 
@@ -156,52 +255,40 @@ jobs:
       project_tools_dir: build-tools
 ```
 
----
+**Pattern 4: Shared Tools for Multiple Projects**
+```yaml
+# Repository structure:
+# your-repo/
+# ├── projects/
+# │   ├── project-a/            # ESP-IDF project A
+# │   │   ├── CMakeLists.txt
+# │   │   └── app_config.yml
+# │   └── project-b/            # ESP-IDF project B
+# │       ├── CMakeLists.txt
+# │       └── app_config.yml
+# └── shared-tools/             # Shared tools directory
+#     ├── build_app.sh
+#     └── generate_matrix.py
+#
+jobs:
+  build-project-a:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: projects/project-a
+      project_tools_dir: shared-tools  # Shared across all projects
+      
+  build-project-b:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: projects/project-b
+      project_tools_dir: shared-tools  # Same shared tools directory
+```
 
-## 🔧 Troubleshooting
-
-### **Common Issues**
-
-#### **"build_app.sh: No such file or directory"**
-
-**Cause**: Path resolution or submodule checkout issues
-
-**Solutions**:
-1. **Check Submodule Status**: Verify submodule is properly initialized
-   ```bash
-   git submodule status
-   git submodule update --init --recursive
-   ```
-2. **Verify Paths**: Check that `project_tools_dir` points to the correct location
-3. **Check Repository Structure**: Ensure the tools directory contains required scripts
-4. **For Explicit Paths**: When `project_tools_dir` is specified, the workflow uses that path directly (no auto-cloning)
-
-#### **"Project tools directory not found"**
-
-**Cause**: Incorrect path configuration or missing tools directory
-
-**Solutions**:
-1. **Verify Paths**: Ensure paths are relative to repository root
-2. **Check Auto-clone**: Set `auto_clone_tools: true` if not using submodules
-3. **Manual Setup**: Clone tools repository manually if needed
-
-#### **Submodule Detection Issues**
-
-**Symptoms**: Workflow runs but can't find scripts in submodule
-
-**Solutions**:
-1. **Specify `project_tools_dir`** - When using submodules, explicitly set the path to the submodule
-2. **Verify Submodule URL**: Ensure submodule points to correct repository
-3. **Check Submodule Commit**: Ensure submodule is at a valid commit
-4. **Auto-clone Logic**: Auto-clone only happens when `project_tools_dir` is not specified
-
-### **Debug Information**
-
-The workflow provides detailed logging to help diagnose issues:
-- Path resolution details
-- Submodule detection and validation
-- Available directory listings
-- Script validation results
+**✅ Why This Works:**
+- All scripts (`build_app.sh`, `generate_matrix.py`, etc.) accept `--project-path` argument
+- The workflow automatically passes the correct project directory to each script
+- Tools can be shared across multiple projects without duplication
+- Each project maintains its own `app_config.yml` and build configuration
 
 ---
 
@@ -212,7 +299,7 @@ The workflow provides detailed logging to help diagnose issues:
 | Output | Description |
 |--------|-------------|
 | `matrix` | JSON matrix from `generate_matrix.py` with all build combinations |
-| `project_tools_path` | Resolved path to project tools directory |
+| `project_tools_path` | Resolved path to project tools directory (from generate-matrix job) |
 
 ### **Build Artifacts**
 
@@ -249,8 +336,9 @@ Examples:
 ### **PR Integration**
 
 - 📊 **Automatic Size Reports** - PR comments with firmware size analysis
-- 📈 **Size Budget Enforcement** - Optional size limit checking
+- 📈 **Size Budget Enforcement** - Optional size limit checking with configurable limits
 - 🔍 **Build Status** - Clear success/failure indicators
+- ⚠️ **Budget Violations** - Detailed error reporting when size limits are exceeded
 
 ---
 
@@ -323,6 +411,45 @@ jobs:
       project_dir: examples/esp32
       project_tools_dir: custom-tools  # Use custom tools directory
       auto_clone_tools: false  # Don't auto-clone, use existing
+```
+
+### **Size Budget Enforcement**
+
+```yaml
+jobs:
+  build:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: examples/esp32
+      max_dec_total: "1600000"  # 1.6MB size limit (in bytes)
+```
+
+### **Advanced Configuration with Size Budget**
+
+```yaml
+name: ESP32 Build with Size Budget
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      size_limit:
+        description: 'Size limit in MB'
+        required: false
+        default: '1.6'
+        type: string
+
+jobs:
+  build:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    with:
+      project_dir: examples/esp32
+      project_tools_dir: hf-espidf-project-tools
+      clean_build: false
+      max_dec_total: ${{ github.event.inputs.size_limit != '' && format('{0}{1}', github.event.inputs.size_limit, '000000') || '1600000' }}
 ```
 
 ---
@@ -540,6 +667,75 @@ cat build-app-*/size.info
 ls -la build-app-*/size.*
 ```
 
+#### **Size Budget Violations**
+**Symptoms**: "Size budget exceeded" or build fails due to size limits
+**Solutions**:
+```yaml
+# Disable size budget enforcement temporarily
+max_dec_total: "0"
+
+# Increase size limit (in bytes)
+max_dec_total: "2000000"  # 2MB limit
+
+# Use dynamic size limits based on build type
+max_dec_total: ${{ matrix.build_type == 'Debug' && '2000000' || '1600000' }}
+```
+
+```bash
+# Check current firmware sizes
+grep -E '^\s*text\s+data\s+bss\s+dec' build-app-*/size.txt
+
+# Analyze size breakdown
+python3 -c "
+import re
+with open('build-app-*/size.txt', 'r') as f:
+    for line in f:
+        if 'dec' in line:
+            print(line.strip())
+"
+```
+
+#### **"build_app.sh: No such file or directory"**
+
+**Cause**: Path resolution or submodule checkout issues
+
+**Solutions**:
+1. **Check Submodule Status**: Verify submodule is properly initialized
+   ```bash
+   git submodule status
+   git submodule update --init --recursive
+   ```
+2. **Verify Paths**: Check that `project_tools_dir` points to the correct location
+3. **Check Repository Structure**: Ensure the tools directory contains required scripts
+4. **For Explicit Paths**: When `project_tools_dir` is specified, the workflow uses that path directly (no auto-cloning)
+
+#### **"Project tools directory not found"**
+
+**Cause**: Incorrect path configuration or missing tools directory
+
+**Solutions**:
+1. **Verify Paths**: Ensure paths are relative to repository root
+2. **Check Auto-clone**: Set `auto_clone_tools: true` if not using submodules
+3. **Manual Setup**: Clone tools repository manually if needed
+
+#### **Submodule Detection Issues**
+
+**Symptoms**: Workflow runs but can't find scripts in submodule
+
+**Solutions**:
+1. **Specify `project_tools_dir`** - When using submodules, explicitly set the path to the submodule
+2. **Verify Submodule URL**: Ensure submodule points to correct repository
+3. **Check Submodule Commit**: Ensure submodule is at a valid commit
+4. **Auto-clone Logic**: Auto-clone only happens when `project_tools_dir` is not specified
+
+### **Debug Information**
+
+The workflow provides detailed logging to help diagnose issues:
+- Path resolution details
+- Submodule detection and validation
+- Available directory listings
+- Script validation results
+
 ### **Debug Mode**
 
 Enable verbose output for debugging:
@@ -551,6 +747,14 @@ jobs:
     with:
       project_dir: examples/esp32
       clean_build: true  # Bypass caches for debugging
+```
+
+Enable debug output by setting:
+
+```yaml
+env:
+  ACTIONS_STEP_DEBUG: true
+  ACTIONS_RUNNER_DEBUG: true
 ```
 
 ### **Local Testing**
@@ -571,16 +775,13 @@ python3 hf-espidf-project-tools/generate_matrix.py --validate
 ./hf-espidf-project-tools/build_app.sh gpio_test Release
 ```
 
+
 ---
 
 ## 📚 Related Documentation
 
 - 📖 [**Main Documentation**](../README.md) - Complete CI tools overview
-- 🔧 [**Lint Workflow**](lint-workflow.md) - C/C++ linting and formatting
-- 📚 [**Docs Workflow**](docs-workflow.md) - Documentation building and deployment
 - 🛡️ [**Security Workflow**](security-workflow.md) - Security auditing and analysis
-- 🔍 [**Static Analysis**](static-analysis-workflow.md) - Code quality analysis
-- 🔗 [**Link Checker**](link-check-workflow.md) - Documentation link validation
 
 ### **Project Tools Documentation**
 
@@ -591,20 +792,8 @@ python3 hf-espidf-project-tools/generate_matrix.py --validate
 - Check cache key generation in workflow
 - Verify cache paths are accessible
 
-### Debug Mode
-
-Enable debug output by setting:
-
-```yaml
-env:
-  ACTIONS_STEP_DEBUG: true
-  ACTIONS_RUNNER_DEBUG: true
-```
-
 ## 📚 Related Workflows
 
-- **[Lint](lint-workflow.md)** - Code quality checks
-- **[Static Analysis](static-analysis-workflow.md)** - Security analysis
 - **[Security](security-workflow.md)** - Security auditing
 
 ## 🔗 Related Resources
@@ -617,7 +806,7 @@ env:
 
 <div align="center">
 
-[← Previous: Documentation Index](index.md) | [Next: Docs Workflow →](docs-workflow.md)
+[← Previous: Documentation Index](index.md) | [Next: Security Workflow →](security-workflow.md)
 
 **📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
 

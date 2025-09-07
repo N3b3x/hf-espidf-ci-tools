@@ -61,18 +61,13 @@ jobs:
     with:
       project_dir: examples/esp32
 
-  # Lint C/C++ code
-  lint:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
+  # Security audit
+  security:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
     with:
-      paths: "src/**,inc/**,examples/**"
-      auto_fix: false
-
-  # Check documentation links
-  docs-links:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/link-check.yml@v1
-    with:
-      paths: "docs/**,*.md,**/docs/**"
+      project_dir: examples/esp32
+      scan_type: "all"
+      run_codeql: true
 ```
 
 ---
@@ -139,18 +134,6 @@ jobs:
       project_tools_dir: ${{ env.TOOLS_DIR }}
       clean_build: ${{ github.event.inputs.clean_build == 'true' }}
 
-  # 🔧 Lint code
-  lint:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
-    with:
-      extensions: "c,cpp,cc,cxx,h,hpp"
-      style: "file"
-      tidy_checks: "readability-*,performance-*,modernize-*"
-      ignore: "build|.git|third_party|vendor"
-      files_changed_only: true
-      step_summary: true
-      file_annotations: true
-
   # 🛡️ Security audit
   security:
     if: ${{ github.event.inputs.run_security != 'false' }}
@@ -162,35 +145,9 @@ jobs:
       run_codeql: true
       codeql_languages: "cpp,python"
 
-  # 🔍 Static analysis
-  static-analysis:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/static-analysis.yml@v1
-    with:
-      paths: "src inc examples components"
-      std: "c++17"
-      strict: false
-
-  # 📚 Build and check documentation
-  docs:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
-    with:
-      project_dir: ${{ env.PROJECT_DIR }}
-      doxygen_config: "Doxyfile"
-      output_dir: "docs/doxygen/html"
-      run_link_check: true
-      link_check_paths: "docs/**,*.md,**/docs/**"
-      deploy_pages: ${{ github.ref == 'refs/heads/main' }}
-
-  # 🔗 Check documentation links
-  link-check:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/link-check.yml@v1
-    with:
-      paths: "docs/**,*.md,**/docs/**,README.md"
-      fail_on_errors: true
-
   # 📊 Build summary and notifications
   summary:
-    needs: [build, lint, security, static-analysis, docs, link-check]
+    needs: [build, security]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -201,11 +158,7 @@ jobs:
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| 🏗️ Build | ${{ needs.build.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔧 Lint | ${{ needs.lint.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🛡️ Security | ${{ needs.security.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔍 Static Analysis | ${{ needs.static-analysis.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📚 Docs | ${{ needs.docs.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔗 Link Check | ${{ needs.link-check.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
 ```
 
 ---
@@ -231,22 +184,13 @@ jobs:
       project_dir: examples/esp32
       clean_build: false  # Use caches for faster builds
 
-  # Lint code
-  lint:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
+  # Security audit
+  security:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
     with:
-      extensions: "c,cpp,cc,cxx,h,hpp"
-      files_changed_only: true
-      style: "file"
-      tidy_checks: "readability-*"  # Only readability checks for dev
-      ignore: "build|.git|test"
-
-  # Quick link check
-  link-check:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/link-check.yml@v1
-    with:
-      paths: "*.md,README.md"
-      fail_on_errors: false  # Don't fail on broken links in dev
+      project_dir: examples/esp32
+      scan_type: "dependencies"  # Quick dependency scan for dev
+      run_codeql: false
 ```
 
 ---
@@ -281,16 +225,6 @@ jobs:
       project_dir: ${{ env.PROJECT_DIR }}
       clean_build: true  # Clean build for release
 
-  # Strict linting for release
-  lint-release:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
-    with:
-      paths: "src/**,inc/**,examples/**,components/**"
-      auto_fix: false  # No auto-fix for release
-      style: "file"
-      tidy_checks: "readability-*,performance-*,modernize-*,cert-*"
-      strict: true
-
   # Full security audit
   security-release:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
@@ -300,27 +234,9 @@ jobs:
       run_codeql: true
       codeql_languages: "cpp,python"
 
-  # Comprehensive static analysis
-  static-analysis-release:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/static-analysis.yml@v1
-    with:
-      paths: "src inc examples components"
-      std: "c++17"
-      strict: true  # Fail on any issues
-
-  # Build and deploy documentation
-  docs-release:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
-    with:
-      project_dir: ${{ env.PROJECT_DIR }}
-      doxygen_config: "Doxyfile"
-      output_dir: "docs/doxygen/html"
-      run_link_check: true
-      deploy_pages: true
-
   # Create release artifacts
   create-release:
-    needs: [build-release, lint-release, security-release, static-analysis-release, docs-release]
+    needs: [build-release, security-release]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
@@ -402,17 +318,6 @@ jobs:
       project_dir: examples/esp32
       clean_build: true
 
-  # Strict linting with security focus
-  lint-secure:
-    needs: security-audit
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
-    with:
-      paths: "src/**,inc/**,examples/**,components/**"
-      auto_fix: false
-      style: "file"
-      tidy_checks: "cert-*,cppcoreguidelines-*,readability-*"
-      strict: true
-
   # Additional security checks
   security-scan:
     needs: security-audit
@@ -438,70 +343,6 @@ jobs:
 
 ---
 
-## 📚 Documentation Workflow
-
-**Use Case**: Documentation-focused projects with comprehensive doc checks.
-
-```yaml
-name: 📚 Documentation CI
-
-on:
-  push:
-    branches: [main, docs/*]
-  pull_request:
-    branches: [main]
-    paths: ['docs/**', '*.md', 'README.md']
-
-jobs:
-  # Build documentation
-  docs-build:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/docs.yml@v1
-    with:
-      project_dir: examples/esp32
-      doxygen_config: "Doxyfile"
-      output_dir: "docs/doxygen/html"
-      run_link_check: true
-      link_check_paths: "docs/**,*.md,**/docs/**,README.md"
-      deploy_pages: ${{ github.ref == 'refs/heads/main' }}
-
-  # Comprehensive link checking
-  link-check-comprehensive:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/link-check.yml@v1
-    with:
-      paths: "docs/**,*.md,**/docs/**,README.md,**/*.md"
-      fail_on_errors: true
-
-  # Documentation linting
-  docs-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install markdownlint
-        run: npm install -g markdownlint-cli
-
-      - name: Lint markdown files
-        run: markdownlint "**/*.md" --ignore node_modules
-
-  # Spell checking
-  spell-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup cspell
-        run: npm install -g cspell
-
-      - name: Spell check
-        run: cspell "**/*.md" --config .cspell.json
-```
-
----
 
 ## ⚡ Performance Optimized
 
@@ -528,17 +369,6 @@ jobs:
       project_dir: ${{ env.PROJECT_DIR }}
       clean_build: false  # Always use caches
 
-  # Parallel linting with minimal checks
-  lint-fast:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
-    with:
-      paths: "src/**,inc/**"
-      auto_fix: true
-      files_changed_only: true  # Only check changed files
-      lines_changed_only: true  # Only check changed lines
-      style: "file"
-      tidy_checks: "readability-*"  # Minimal checks for speed
-
   # Quick security scan
   security-quick:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
@@ -546,13 +376,6 @@ jobs:
       project_dir: ${{ env.PROJECT_DIR }}
       scan_type: "dependencies"  # Only dependency scan for speed
       run_codeql: false
-
-  # Fast link check
-  link-check-fast:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/link-check.yml@v1
-    with:
-      paths: "README.md,*.md"  # Only check main docs
-      fail_on_errors: false  # Don't fail on broken links for speed
 
   # Performance monitoring
   performance-check:
@@ -571,12 +394,11 @@ jobs:
 
 | Use Case | Recommended Workflow | Key Features |
 |----------|---------------------|--------------|
-| **Simple Projects** | Basic Workflow | Build + Lint + Link Check |
+| **Simple Projects** | Basic Workflow | Build + Security |
 | **Production Projects** | Advanced Parallel | All checks in parallel |
-| **Development** | Development Workflow | Auto-fix, relaxed checks |
+| **Development** | Development Workflow | Quick security scan |
 | **Releases** | Release Workflow | Comprehensive + artifacts |
 | **Security Critical** | Security-First | Security-first approach |
-| **Documentation Heavy** | Documentation Workflow | Doc-focused checks |
 | **Large Projects** | Performance Optimized | Maximum speed |
 
 ---
@@ -598,6 +420,10 @@ jobs:
   security:
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
+    with:
+      project_dir: examples/esp32
+      scan_type: "all"
+      run_codeql: true
 ```
 
 ### **Matrix Strategies**
@@ -628,9 +454,7 @@ strategy:
 
 For more detailed information, see the individual workflow documentation:
 - [Build Workflow](build-workflow.md)
-- [Lint Workflow](lint-workflow.md)
 - [Security Workflow](security-workflow.md)
-- [Documentation Workflow](docs-workflow.md)
 
 ---
 

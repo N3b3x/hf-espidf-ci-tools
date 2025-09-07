@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[← Previous: Static Analysis Workflow](static-analysis-workflow.md) | [Next: Example Workflows →](example-workflows.md)
+[← Previous: Build Workflow](build-workflow.md) | [Next: Example Workflows →](example-workflows.md)
 
 **🛡️ Dependencies, Secrets, CodeQL**
 
@@ -225,8 +225,6 @@ env:
 ## 📚 Related Workflows
 
 - **[Build](build-workflow.md)** - ESP-IDF application builds (uses same matrix and build process)
-- **[Static Analysis](static-analysis-workflow.md)** - Security analysis
-- **[Lint](lint-workflow.md)** - Code quality checks
 
 ## 🔗 Related Resources
 
@@ -239,7 +237,7 @@ env:
 
 <div align="center">
 
-[← Previous: Static Analysis Workflow](static-analysis-workflow.md) | [Next: Example Workflows →](example-workflows.md)
+[← Previous: Build Workflow](build-workflow.md) | [Next: Example Workflows →](example-workflows.md)
 
 **📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
 

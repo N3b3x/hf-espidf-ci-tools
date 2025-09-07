@@ -17,10 +17,6 @@ Welcome to the hf-espidf-ci-tools documentation! This guide provides comprehensi
 | Workflow | Description | Quick Start |
 |----------|-------------|-------------|
 | **[Build](build-workflow.md)** | ESP-IDF matrix builds with caching | [→ Build Guide](build-workflow.md) |
-| **[Docs](docs-workflow.md)** | Doxygen + GitHub Pages deployment | [→ Docs Guide](docs-workflow.md) |
-| **[Lint](lint-workflow.md)** | C/C++ code quality checks | [→ Lint Guide](lint-workflow.md) |
-| **[Link Check](link-check-workflow.md)** | Documentation link validation | [→ Link Check Guide](link-check-workflow.md) |
-| **[Static Analysis](static-analysis-workflow.md)** | Cppcheck security analysis | [→ Static Analysis Guide](static-analysis-workflow.md) |
 | **[Security](security-workflow.md)** | Dependencies, secrets, CodeQL | [→ Security Guide](security-workflow.md) |
 
 ## 📋 Prerequisites
@@ -73,16 +69,13 @@ jobs:
       auto_clone_tools: true
       clean_build: false
 
-  lint:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
+  security:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1
     with:
-      paths: "src/**,inc/**,examples/**"
-
-  static:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/static-analysis.yml@v1
-    with:
-      paths: "src inc examples"
-      strict: false
+      project_dir: examples/esp32
+      project_tools_dir: hf-espidf-project-tools
+      scan_type: "all"
+      run_codeql: true
 ```
 
 ## 📚 Workflow Details
@@ -94,33 +87,6 @@ jobs:
 
 [→ Full Build Guide](build-workflow.md)
 
-### Documentation Workflow
-- **Purpose**: Generate and deploy Doxygen documentation
-- **Key Features**: GitHub Pages, link checking, artifact storage
-- **Use Case**: Project documentation automation
-
-[→ Full Docs Guide](docs-workflow.md)
-
-### Linting Workflow
-- **Purpose**: C/C++ code quality enforcement
-- **Key Features**: clang-format, clang-tidy, PR annotations
-- **Use Case**: Code style consistency
-
-[→ Full Lint Guide](lint-workflow.md)
-
-### Link Check Workflow
-- **Purpose**: Documentation link validation
-- **Key Features**: External/internal link checking, anchor validation
-- **Use Case**: Documentation integrity
-
-[→ Full Link Check Guide](link-check-workflow.md)
-
-### Static Analysis Workflow
-- **Purpose**: Security and quality analysis with cppcheck
-- **Key Features**: Docker-based analysis, XML reports, configurable strictness
-- **Use Case**: Security scanning and bug detection
-
-[→ Full Static Analysis Guide](static-analysis-workflow.md)
 
 ### Security Workflow
 - **Purpose**: Comprehensive security auditing
@@ -136,16 +102,7 @@ jobs:
 # Combines all workflows for comprehensive CI
 jobs:
   build: # Matrix builds
-  lint:  # Code quality
-  static: # Security analysis
   security: # Security audit
-```
-
-### Documentation Pipeline
-```yaml
-# Documentation generation and deployment
-jobs:
-  docs: # Build and deploy docs
 ```
 
 ### Security Pipeline
@@ -153,7 +110,6 @@ jobs:
 # Security-focused workflows
 jobs:
   security: # Full security audit
-  static: # Additional static analysis
 ```
 
 ## 📖 Next Steps
