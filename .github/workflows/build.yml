@@ -111,20 +111,6 @@ jobs:
             pip install -r "${{ needs.generate-matrix.outputs.project_tools_path }}/requirements.txt"
           fi
 
-      - name: Cache ccache
-        if: ${{ !inputs.clean_build }}
-        id: ccache
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          key: >-
-            espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-
-            ${{ matrix.build_type }}-
-            ${{ hashFiles(format('{0}/**', env.ESP32_PROJECT_PATH)) }}
-          restore-keys: |
-            espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-
-            espidf-ccache-${{ runner.os }}-
-
       - name: Build (espressif/esp-idf-ci-action)
         id: build
         uses: espressif/esp-idf-ci-action@v1
@@ -133,8 +119,6 @@ jobs:
           target: ${{ matrix.target }}
           path: .
           extra_docker_args: >-
-            -v $HOME/.ccache:/root/.ccache
-            -e CCACHE_DIR=/root/.ccache
             -e IDF_CCACHE_ENABLE=1
           command: |
             set -e
