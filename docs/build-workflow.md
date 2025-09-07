@@ -464,15 +464,501 @@ Your ESP32 project must have this structure:
 your-project/
 ├── examples/
 │   └── esp32/                    # ESP-IDF project directory
-│       ├── CMakeLists.txt        # ESP-IDF project file
+│       ├── CMakeLists.txt        # Project-level CMakeLists.txt
 │       ├── app_config.yml        # Build configuration
 │       ├── main/                 # Application source code
+│       │   ├── AppTest1.cpp      # An independent application that we can build target for
+│       │   ├── AppTest2.cpp      # An independent application that we can build target for
+│       │   └── CMakeLists.txt    # Component-level CMakeLists.txt
 │       ├── components/           # Custom components
 │       └── hf-espidf-project-tools/  # Project tools (submodule)
 │           ├── generate_matrix.py    # Matrix generator
-│           ├── build_app.sh         # Application builder
-│           ├── config_loader.sh     # Configuration loader
-│           └── requirements.txt     # Python dependencies
+│           ├── build_app.sh          # Application builder
+│           ├── config_loader.sh      # Configuration loader
+│           └── requirements.txt      # Python dependencies
+```
+
+### **How the CI System Works with app_config.yml**
+
+The CI scripts are designed to capitalize on the `app_config.yml` configuration and the `hf-espidf-project-tools` submodule to enable **parallel building** of multiple applications. Here's how it works:
+
+#### **1. Configuration-Driven Matrix Generation**
+
+The `app_config.yml` file defines all available applications and their build configurations:
+
+```yaml
+# app_config.yml example
+version: "1.0"
+metadata:
+  project: "ESP32 HardFOC Interface Wrapper"
+  default_app: "ascii_art"
+  target: "esp32c6"
+  idf_versions: ["release/v5.5", "release/v5.4"]
+  build_types: [["Debug", "Release"], ["Debug"]]
+
+apps:
+  ascii_art:
+    description: "ASCII art generator example"
+    source_file: "AsciiArtComprehensiveTest.cpp"
+    category: "utility"
+    idf_versions: ["release/v5.5"]
+    build_types: ["Debug", "Release"]
+    ci_enabled: true
+    featured: true
+
+  gpio_test:
+    description: "GPIO peripheral comprehensive testing"
+    source_file: "GpioComprehensiveTest.cpp"
+    category: "peripheral"
+    idf_versions: ["release/v5.5"]
+    build_types: ["Debug", "Release"]
+    ci_enabled: true
+    featured: true
+```
+
+#### **2. Dynamic Matrix Generation**
+
+The `generate_matrix.py` script reads `app_config.yml` and creates a build matrix:
+
+```python
+# Generated matrix example
+{
+  "include": [
+    {
+      "idf_version": "release/v5.5",
+      "idf_version_docker": "v5.5",
+      "idf_version_file": "release_v5_5",
+      "build_type": "Debug",
+      "app_name": "ascii_art",
+      "target": "esp32c6",
+      "config_source": "app"
+    },
+    {
+      "idf_version": "release/v5.5",
+      "idf_version_docker": "v5.5", 
+      "idf_version_file": "release_v5_5",
+      "build_type": "Release",
+      "app_name": "ascii_art",
+      "target": "esp32c6",
+      "config_source": "app"
+    },
+    {
+      "idf_version": "release/v5.5",
+      "idf_version_docker": "v5.5",
+      "idf_version_file": "release_v5_5", 
+      "build_type": "Debug",
+      "app_name": "gpio_test",
+      "target": "esp32c6",
+      "config_source": "app"
+    }
+    // ... more combinations
+  ]
+}
+```
+
+#### **3. Two-Level CMakeLists.txt Structure**
+
+The system uses a **two-level CMakeLists.txt structure** to enable dynamic app type selection:
+
+**Level 1: Project-Level CMakeLists.txt** (in project root)
+- Sets up global variables (`APP_TYPE`, `BUILD_TYPE`)
+- Validates app types against `app_config.yml`
+- Includes ESP-IDF build system
+- Sets project name dynamically
+
+**Level 2: Component-Level CMakeLists.txt** (in main/ folder)
+- Gets source file from `app_config.yml` based on `APP_TYPE`
+- Registers component with dynamic source file
+- Sets up include paths and compile definitions
+- Handles build type-specific compiler flags
+
+**Project-Level CMakeLists.txt** (in project root):
+```cmake
+cmake_minimum_required(VERSION 3.16)
+
+# CRITICAL: Set variables BEFORE any other processing
+# This ensures they are available during component configuration
+if(DEFINED APP_TYPE)
+    message(STATUS "APP_TYPE from command line: ${APP_TYPE}")
+else()
+    set(APP_TYPE "ascii_art")
+    message(STATUS "APP_TYPE defaulting to: ${APP_TYPE}")
+endif()
+
+if(DEFINED BUILD_TYPE)
+    message(STATUS "BUILD_TYPE from command line: ${BUILD_TYPE}")
+else()
+    set(BUILD_TYPE "Release")
+    message(STATUS "BUILD_TYPE defaulting to: ${BUILD_TYPE}")
+endif()
+
+# Validate app type by reading from app_config.yml (single source of truth)
+execute_process(
+    COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/scripts/get_app_info.py" list
+    OUTPUT_VARIABLE VALID_APP_TYPES_STRING
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE APP_LIST_RESULT
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+if(NOT APP_LIST_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to read valid app types from app_config.yml")
+endif()
+
+# Convert space-separated string to CMake list
+string(REPLACE " " ";" VALID_APP_TYPES "${VALID_APP_TYPES_STRING}")
+
+if(NOT APP_TYPE IN_LIST VALID_APP_TYPES)
+    message(FATAL_ERROR "Invalid APP_TYPE: ${APP_TYPE}. Valid types: ${VALID_APP_TYPES}")
+endif()
+
+# Validate build type
+set(VALID_BUILD_TYPES "Debug;Release")
+if(NOT BUILD_TYPE IN_LIST VALID_BUILD_TYPES)
+    message(FATAL_ERROR "Invalid BUILD_TYPE: ${BUILD_TYPE}. Valid types: ${VALID_BUILD_TYPES}")
+endif()
+
+# CRITICAL: Set these as global variables for all components
+set(APP_TYPE "${APP_TYPE}" CACHE STRING "App type to build" FORCE)
+set(BUILD_TYPE "${BUILD_TYPE}" CACHE STRING "Build type (Debug/Release)" FORCE)
+
+# Include ESP-IDF build system
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+
+# Set project name based on app type
+project(esp32_iid_${APP_TYPE}_app)
+```
+
+**Component-Level CMakeLists.txt** (in main/ folder):
+```cmake
+# Flexible main component for different app types
+# Determine source file based on APP_TYPE
+
+# Get app type from parent (set by project-level CMakeLists.txt)
+if(NOT DEFINED APP_TYPE)
+    set(APP_TYPE "ascii_art")
+endif()
+
+# Get source file from centralized configuration
+execute_process(
+    COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/get_app_info.py" validate "${APP_TYPE}"
+    RESULT_VARIABLE VALIDATE_RESULT
+    OUTPUT_QUIET
+    ERROR_QUIET
+)
+
+if(NOT VALIDATE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Unknown APP_TYPE: ${APP_TYPE}")
+endif()
+
+execute_process(
+    COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/get_app_info.py" source_file "${APP_TYPE}"
+    OUTPUT_VARIABLE MAIN_SOURCE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE SOURCE_RESULT
+)
+
+if(NOT SOURCE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to get source file for APP_TYPE: ${APP_TYPE}")
+endif()
+
+# Check if source file exists and handle path resolution
+set(SOURCE_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${MAIN_SOURCE}")
+if(NOT EXISTS "${SOURCE_FILE_PATH}")
+    set(SOURCE_FILE_PATH "${CMAKE_CURRENT_LIST_DIR}/${MAIN_SOURCE}")
+    if(NOT EXISTS "${SOURCE_FILE_PATH}")
+        message(FATAL_ERROR "Source file not found: ${MAIN_SOURCE}")
+    endif()
+endif()
+
+# Determine include paths based on environment
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../inc")
+    set(INC_BASE_PATH "../inc")
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../inc")
+    set(INC_BASE_PATH "../../../inc")
+else()
+    message(FATAL_ERROR "Cannot find inc directory")
+endif()
+
+# Register component with dynamic source file
+idf_component_register(
+    SRCS "${MAIN_SOURCE}"
+    INCLUDE_DIRS "." "${INC_BASE_PATH}" "${INC_BASE_PATH}/base" "${INC_BASE_PATH}/mcu/esp32"
+    REQUIRES driver esp_timer freertos iid-espidf
+)
+
+# Set C++ standard
+target_compile_features(${COMPONENT_LIB} PRIVATE cxx_std_17)
+
+# Set compiler flags based on build type
+if(BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(${COMPONENT_LIB} PRIVATE
+        -Wall -Wextra -Wpedantic -O0 -g3 -DDEBUG
+    )
+else()
+    target_compile_options(${COMPONENT_LIB} PRIVATE
+        -Wall -Wextra -Wpedantic -O2 -g -DNDEBUG
+    )
+endif()
+
+# Add compile definitions for each example type
+target_compile_definitions(${COMPONENT_LIB} PRIVATE 
+    "EXAMPLE_TYPE_${APP_TYPE}=1"
+)
+```
+
+#### **4. Parallel Build Execution**
+
+The CI workflow executes each matrix combination in parallel:
+
+1. **Matrix Generation**: Creates build combinations from `app_config.yml`
+2. **Parallel Jobs**: Each combination runs as a separate GitHub Actions job
+3. **Dynamic Building**: Each job builds a specific app with specific settings
+4. **Artifact Collection**: All builds are collected and organized
+
+#### **5. Key Benefits of This Approach**
+
+- **🔄 Parallel Execution**: Multiple apps build simultaneously
+- **⚙️ Configuration-Driven**: All settings centralized in `app_config.yml`
+- **🎯 Flexible**: Easy to add/remove apps or build configurations
+- **🔧 Maintainable**: Single source of truth for all build settings
+- **📊 Comprehensive**: Tests all combinations automatically
+- **🚀 Scalable**: Can handle dozens of apps and configurations
+
+#### **6. CMakeLists.txt Requirements**
+
+Your CMakeLists.txt must be set up to support dynamic app selection:
+
+**Key Requirements:**
+- **Dynamic Source Selection**: Use `get_app_info.py` to get source file from `app_config.yml`
+- **APP_TYPE Variable**: Accept `APP_TYPE` from the build environment
+- **Validation**: Validate that the requested app type exists
+- **Flexible Paths**: Handle both CI and development environments
+- **Compile Definitions**: Add app-specific compile definitions
+
+**Example CMakeLists.txt Structure:**
+```cmake
+# 1. Get APP_TYPE from environment
+if(NOT DEFINED APP_TYPE)
+    set(APP_TYPE "ascii_art")
+endif()
+
+# 2. Validate app type exists
+execute_process(
+    COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/get_app_info.py" validate "${APP_TYPE}"
+    RESULT_VARIABLE VALIDATE_RESULT
+    OUTPUT_QUIET
+    ERROR_QUIET
+)
+
+# 3. Get source file from configuration
+execute_process(
+    COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/get_app_info.py" source_file "${APP_TYPE}"
+    OUTPUT_VARIABLE MAIN_SOURCE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# 4. Register component with dynamic source
+idf_component_register(
+    SRCS "${MAIN_SOURCE}"
+    INCLUDE_DIRS "." "${INC_BASE_PATH}"
+    REQUIRES driver esp_timer freertos
+)
+
+# 5. Add app-specific compile definitions
+target_compile_definitions(${COMPONENT_LIB} PRIVATE 
+    "EXAMPLE_TYPE_${APP_TYPE}=1"
+)
+```
+
+#### **7. Submodule Integration**
+
+The `hf-espidf-project-tools` submodule provides the essential scripts:
+
+**Required Scripts:**
+- **`generate_matrix.py`**: Reads `app_config.yml` and generates build matrix
+- **`build_app.sh`**: Builds specific app with given parameters
+- **`get_app_info.py`**: Extracts app information from configuration
+- **`config_loader.sh`**: Loads and validates configuration
+
+**Submodule Setup:**
+```bash
+# Add submodule
+git submodule add https://github.com/N3b3x/hf-espidf-project-tools.git examples/esp32/scripts
+
+# Initialize submodule
+git submodule update --init --recursive
+```
+
+**Directory Structure:**
+```
+your-project/
+├── examples/esp32/
+│   ├── CMakeLists.txt              # Project-level CMakeLists.txt
+│   ├── app_config.yml              # Build configuration
+│   ├── main/
+│   │   ├── AsciiArtComprehensiveTest.cpp
+│   │   ├── GpioComprehensiveTest.cpp
+│   │   ├── AdcComprehensiveTest.cpp
+│   │   └── CMakeLists.txt          # Component-level CMakeLists.txt
+│   └── scripts/  # Submodule
+│       ├── generate_matrix.py
+│       ├── build_app.sh
+│       ├── get_app_info.py
+│       └── config_loader.sh
+```
+
+#### **8. Build Process Flow**
+
+1. **Configuration Reading**: `generate_matrix.py` reads `app_config.yml`
+2. **Matrix Generation**: Creates all valid build combinations
+3. **Parallel Execution**: Each combination runs as separate job
+4. **Dynamic Building**: Each job calls `build_app.sh` with specific parameters
+5. **CMake Integration**: CMakeLists.txt uses `get_app_info.py` to get source file
+6. **Artifact Collection**: All builds are collected and organized
+
+#### **9. How App Type Selection Works**
+
+The app type selection system enables dynamic building of different applications from the same codebase:
+
+**Step 1: Command Line Input**
+```bash
+# CI builds with specific app type
+idf.py build -DAPP_TYPE=gpio_test -DBUILD_TYPE=Release
+
+# Development builds with default app type
+idf.py build  # Uses default from app_config.yml
+```
+
+**Step 2: Project-Level Validation**
+- Project-level CMakeLists.txt receives `APP_TYPE` and `BUILD_TYPE`
+- Validates `APP_TYPE` against `app_config.yml` using `get_app_info.py list`
+- Sets global variables for all components
+- Sets project name dynamically: `esp32_iid_${APP_TYPE}_app`
+
+**Step 3: Component-Level Source Selection**
+- Component-level CMakeLists.txt gets `APP_TYPE` from parent
+- Calls `get_app_info.py source_file ${APP_TYPE}` to get source file name
+- Validates source file exists in main/ directory
+- Registers component with dynamic source file
+
+**Step 4: Build Configuration**
+- Sets include paths based on environment (CI vs development)
+- Applies build type-specific compiler flags
+- Adds app-specific compile definitions: `EXAMPLE_TYPE_${APP_TYPE}=1`
+
+**Key Benefits:**
+- **Single Codebase**: All apps share the same project structure
+- **Dynamic Selection**: Build any app without code changes
+- **Validation**: Ensures app types exist in configuration
+- **Flexibility**: Easy to add new apps by updating `app_config.yml`
+- **CI Integration**: Matrix builds automatically test all combinations
+
+#### **10. app_config.yml Structure**
+
+The `app_config.yml` file is the central configuration that enables parallel building:
+
+**Global Metadata:**
+```yaml
+metadata:
+  project: "ESP32 HardFOC Interface Wrapper"
+  default_app: "ascii_art"
+  target: "esp32c6"
+  idf_versions: ["release/v5.5", "release/v5.4"]
+  build_types: [["Debug", "Release"], ["Debug"]]
+```
+
+**App Definitions:**
+```yaml
+apps:
+  ascii_art:
+    description: "ASCII art generator example"
+    source_file: "AsciiArtComprehensiveTest.cpp"
+    category: "utility"
+    idf_versions: ["release/v5.5"]
+    build_types: ["Debug", "Release"]
+    ci_enabled: true
+    featured: true
+
+  gpio_test:
+    description: "GPIO peripheral comprehensive testing"
+    source_file: "GpioComprehensiveTest.cpp"
+    category: "peripheral"
+    idf_versions: ["release/v5.5"]
+    build_types: ["Debug", "Release"]
+    ci_enabled: true
+    featured: true
+```
+
+**Key Features:**
+- **Hierarchical Configuration**: Global settings apply to all apps by default
+- **App Overrides**: Individual apps can override global settings
+- **Source File Mapping**: Each app maps to its specific source file
+- **Build Type Control**: Apps can specify which build types to use
+- **CI Integration**: `ci_enabled` flag controls which apps are built in CI
+
+#### **11. Parallel Building Benefits**
+
+This setup enables powerful parallel building capabilities:
+
+**Multiple Apps × Multiple Build Types × Multiple IDF Versions:**
+- **12 apps** × **2 build types** × **2 IDF versions** = **48 parallel builds**
+- Each build runs independently and in parallel
+- No dependency between different app builds
+- Maximum utilization of GitHub Actions runners
+
+**Example Build Matrix:**
+```
+ascii_art + Debug + v5.5     │ gpio_test + Debug + v5.5
+ascii_art + Release + v5.5   │ gpio_test + Release + v5.5
+ascii_art + Debug + v5.4     │ gpio_test + Debug + v5.4
+adc_test + Debug + v5.5      │ uart_test + Debug + v5.5
+adc_test + Release + v5.5    │ uart_test + Release + v5.5
+... (all combinations)       │ ... (all combinations)
+```
+
+**Time Savings:**
+- **Sequential**: 48 builds × 5 minutes = 4 hours
+- **Parallel**: 48 builds ÷ 20 runners = ~12 minutes
+- **Speedup**: 20x faster with parallel execution
+
+#### **12. Key Scripts and Their Roles**
+
+The `hf-espidf-project-tools` submodule provides essential scripts that enable the dynamic build system:
+
+**`generate_matrix.py`**
+- **Purpose**: Reads `app_config.yml` and generates build matrix
+- **Input**: `app_config.yml` configuration file
+- **Output**: JSON matrix with all valid build combinations
+- **Usage**: Called by CI workflow to create parallel build jobs
+
+**`get_app_info.py`**
+- **Purpose**: Extracts app information from `app_config.yml`
+- **Commands**:
+  - `list`: Returns all valid app types
+  - `validate <app_type>`: Validates app type exists
+  - `source_file <app_type>`: Returns source file name for app
+  - `info <app_type>`: Returns detailed app information
+- **Usage**: Called by CMakeLists.txt to get app-specific data
+
+**`build_app.sh`**
+- **Purpose**: Builds specific app with given parameters
+- **Parameters**: `--project-path`, app name, build type, IDF version
+- **Usage**: Called by CI workflow for each matrix combination
+
+**`config_loader.sh`**
+- **Purpose**: Loads and validates configuration
+- **Usage**: Provides configuration utilities for other scripts
+
+**Script Integration Flow:**
+```
+CI Workflow → generate_matrix.py → Build Matrix
+     ↓
+Each Build Job → build_app.sh → idf.py build
+     ↓
+CMakeLists.txt → get_app_info.py → Source File Selection
+     ↓
+ESP-IDF Build → Firmware Binary
 ```
 
 ### **Matrix Generation**
