@@ -727,23 +727,252 @@ The CI workflow executes each matrix combination in parallel:
 
 #### **6. CMakeLists.txt Requirements**
 
-Your CMakeLists.txt must be set up to support dynamic app selection:
+The CMakeLists.txt setup depends on your build approach. There are two main scenarios:
 
-**Key Requirements:**
-- **Dynamic Source Selection**: Use `get_app_info.py` to get source file from `app_config.yml`
-- **APP_TYPE Variable**: Accept `APP_TYPE` from the build environment
-- **Validation**: Validate that the requested app type exists
-- **Flexible Paths**: Handle both CI and development environments
-- **Compile Definitions**: Add app-specific compile definitions
+**Scenario A: CI-Only Builds (Minimal Setup)**
+- Uses `build_app.sh` script which handles all the complexity
+- CMakeLists.txt can be minimal since the script manages everything
+- No direct `idf.py` support needed
 
-**Example CMakeLists.txt Structure:**
+**Scenario B: Full `idf.py` Compatibility (Complete Setup)**
+- Supports both CI builds and direct `idf.py` usage
+- Requires more complex CMakeLists.txt setup
+- Enables development workflow with `idf.py build -DAPP_TYPE=app_name`
+
+Let me show both approaches:
+
+**Scenario A: Minimal CMakeLists.txt (CI-Only Builds)**
+
+If you only use `build_app.sh` for building (CI workflows), your CMakeLists.txt can be minimal:
+
+**Project-Level CMakeLists.txt** (minimal):
 ```cmake
-# 1. Get APP_TYPE from environment
+cmake_minimum_required(VERSION 3.16)
+
+# Define APP_TYPE with default value
 if(NOT DEFINED APP_TYPE)
     set(APP_TYPE "ascii_art")
 endif()
 
-# 2. Validate app type exists
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(esp32_iid_${APP_TYPE}_app)
+```
+
+**Component-Level CMakeLists.txt** (ultra-minimal):
+```cmake
+# Ultra-minimal setup - build_app.sh handles source file discovery
+# Get source file from environment variable set by build_app.sh
+if(NOT DEFINED APP_SOURCE_FILE)
+    message(FATAL_ERROR "APP_SOURCE_FILE not defined. Use build_app.sh to build.")
+endif()
+
+# Register component with source file from build_app.sh
+idf_component_register(
+    SRCS "${APP_SOURCE_FILE}"  # Source file from build_app.sh
+    INCLUDE_DIRS "."  # Add your own include directories as needed
+    REQUIRES driver esp_timer freertos  # Add your own requirements as needed
+)
+
+# Add compile definitions for each example type
+target_compile_definitions(${COMPONENT_LIB} PRIVATE 
+    "EXAMPLE_TYPE_${APP_TYPE}=1"
+)
+```
+
+**Note for Users:**
+- **INCLUDE_DIRS**: Add your own include directories (e.g., `"../inc"`, `"../lib"`)
+- **REQUIRES**: Add your own component requirements (e.g., `"your_component"`, `"esp_wifi"`)
+- **SRCS**: Only `APP_SOURCE_FILE` is required - the script handles source file selection
+- **APP_TYPE**: Only `APP_TYPE` is required - the script handles app type validation
+
+**What Gets Removed in Ultra-Minimal Setup:**
+- ❌ **App Type Validation**: No checking if `APP_TYPE` exists in `app_config.yml`
+- ❌ **Build Type Validation**: No checking if `BUILD_TYPE` is valid
+- ❌ **Advanced Variable Setting**: No `set(APP_TYPE ... CACHE ... FORCE)` or `set(BUILD_TYPE ...)`
+- ❌ **Dynamic Project Naming**: No `project(esp32_iid_${APP_TYPE}_app)`
+- ❌ **Python Dependencies**: No `execute_process` calls to `get_app_info.py`
+- ❌ **Source File Discovery**: No dynamic source file selection in CMake
+
+**What Stays in Ultra-Minimal Setup:**
+- ✅ **Basic APP_TYPE Definition**: Simple `if(NOT DEFINED APP_TYPE)` with default
+- ✅ **Dynamic Project Naming**: Still uses `project(esp32_iid_${APP_TYPE}_app)`
+- ✅ **Environment Variable Usage**: Uses `APP_SOURCE_FILE` from `build_app.sh`
+- ✅ **APP_TYPE Variable**: Still receives `APP_TYPE` from `build_app.sh`
+- ✅ **Compile Definitions**: Still adds `EXAMPLE_TYPE_${APP_TYPE}=1`
+- ✅ **Basic Component Registration**: Registers component with source from script
+
+**Why This Works:**
+- `build_app.sh` discovers source file from `app_config.yml` and sets `APP_SOURCE_FILE` environment variable
+- `build_app.sh` calls `idf.py` with `-D APP_TYPE=app_name`, `-D APP_SOURCE_FILE=source_file`, and `-D BUILD_TYPE=build_type`
+- CMakeLists.txt simply uses the `APP_SOURCE_FILE` variable provided by the script
+- `build_app.sh` handles all validation and source file discovery before calling `idf.py`
+- Perfect for CI-only workflows where script handles everything
+
+**Alternative Minimal Approach (Conditional Sources):**
+
+You can also use CMake's conditional source inclusion instead of dynamic source selection:
+
+```cmake
+# Alternative minimal approach using conditional sources
+idf_component_register(
+    SRCS
+        "common_source.cpp"
+        $<$<STREQUAL:${APP_TYPE},ascii_art>:"AsciiArtComprehensiveTest.cpp">
+        $<$<STREQUAL:${APP_TYPE},gpio_test>:"GpioComprehensiveTest.cpp">
+        $<$<STREQUAL:${APP_TYPE},adc_test>:"AdcComprehensiveTest.cpp">
+        $<$<STREQUAL:${APP_TYPE},uart_test>:"UartComprehensiveTest.cpp">
+    INCLUDE_DIRS "."
+    REQUIRES driver esp_timer freertos
+)
+
+# Add compile definitions for each example type
+target_compile_definitions(${COMPONENT_LIB} PRIVATE 
+    "EXAMPLE_TYPE_${APP_TYPE}=1"
+)
+```
+
+**Pros of Conditional Sources:**
+- ✅ **No Python Dependencies**: Doesn't need `get_app_info.py`
+- ✅ **Faster CMake**: No `execute_process` calls
+- ✅ **Explicit**: All source files are visible in CMakeLists.txt
+
+**Cons of Conditional Sources:**
+- ❌ **Manual Maintenance**: Must update CMakeLists.txt when adding new apps
+- ❌ **Not DRY**: Duplicates information from `app_config.yml`
+- ❌ **Error Prone**: Easy to forget to add new apps
+
+**Ultra-Minimal CMakeLists.txt** (no Python dependencies):
+```cmake
+cmake_minimum_required(VERSION 3.16)
+
+# Define APP_TYPE with default value
+if(NOT DEFINED APP_TYPE)
+    set(APP_TYPE "ascii_art")
+endif()
+
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(esp32_app)
+```
+
+**Ultra-Minimal Component CMakeLists.txt** (no Python dependencies):
+```cmake
+# Get source file from environment variable set by build_app.sh
+if(DEFINED ENV{APP_SOURCE_FILE})
+    set(MAIN_SOURCE $ENV{APP_SOURCE_FILE})
+else()
+    message(FATAL_ERROR "APP_SOURCE_FILE environment variable not set. Run build_app.sh instead of idf.py directly.")
+endif()
+
+# Register component with source file from environment
+idf_component_register(
+    SRCS "${MAIN_SOURCE}"
+    INCLUDE_DIRS "."
+    REQUIRES driver esp_timer freertos
+)
+
+# Add compile definitions for each example type
+target_compile_definitions(${COMPONENT_LIB} PRIVATE 
+    "EXAMPLE_TYPE_${APP_TYPE}=1"
+)
+```
+
+**Pros of Environment Variable Approach:**
+- ✅ **No Python Dependencies in CMake**: CMakeLists.txt is completely Python-free
+- ✅ **Faster CMake**: No `execute_process` calls during CMake configuration
+- ✅ **Centralized Logic**: All app selection logic in `build_app.sh`
+- ✅ **Clear Separation**: Script handles configuration, CMake handles building
+- ✅ **Error Prevention**: Prevents direct `idf.py` usage without proper setup
+
+**Cons of Environment Variable Approach:**
+- ❌ **No Direct `idf.py` Support**: Must always use `build_app.sh`
+- ❌ **Environment Dependency**: Relies on environment variables being set
+- ❌ **Script Coupling**: CMakeLists.txt is tightly coupled to `build_app.sh`
+
+**When to Use Each Approach:**
+
+| Approach | Python Deps | Direct `idf.py` | Speed | Maintainability |
+|----------|-------------|-----------------|-------|-----------------|
+| **Dynamic Source Selection** | ✅ Required | ✅ Supported | Medium | ✅ High |
+| **Conditional Sources** | ❌ None | ✅ Supported | ✅ Fast | ❌ Low |
+| **Environment Variables** | ❌ None | ❌ Not Supported | ✅ Fast | ✅ High |
+
+**Recommendation:**
+- Use **Environment Variables** for CI-only workflows where you never need direct `idf.py`
+- Use **Dynamic Source Selection** for development workflows with `idf.py` support
+- Use **Conditional Sources** only if you want to avoid Python dependencies but need `idf.py` support
+
+**Scenario B: Full `idf.py` Compatibility (Complete Setup)**
+
+If you want to support both CI builds AND direct `idf.py` usage for development, you need the full setup:
+
+**Project-Level CMakeLists.txt** (complete):
+```cmake
+cmake_minimum_required(VERSION 3.16)
+
+# CRITICAL: Set variables BEFORE any other processing
+# This ensures they are available during component configuration
+if(DEFINED APP_TYPE)
+    message(STATUS "APP_TYPE from command line: ${APP_TYPE}")
+else()
+    set(APP_TYPE "ascii_art")
+    message(STATUS "APP_TYPE defaulting to: ${APP_TYPE}")
+endif()
+
+if(DEFINED BUILD_TYPE)
+    message(STATUS "BUILD_TYPE from command line: ${BUILD_TYPE}")
+else()
+    set(BUILD_TYPE "Release")
+    message(STATUS "BUILD_TYPE defaulting to: ${BUILD_TYPE}")
+endif()
+
+# Validate app type by reading from app_config.yml (single source of truth)
+execute_process(
+    COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/scripts/get_app_info.py" list
+    OUTPUT_VARIABLE VALID_APP_TYPES_STRING
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE APP_LIST_RESULT
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+if(NOT APP_LIST_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to read valid app types from app_config.yml")
+endif()
+
+# Convert space-separated string to CMake list
+string(REPLACE " " ";" VALID_APP_TYPES "${VALID_APP_TYPES_STRING}")
+
+if(NOT APP_TYPE IN_LIST VALID_APP_TYPES)
+    message(FATAL_ERROR "Invalid APP_TYPE: ${APP_TYPE}. Valid types: ${VALID_APP_TYPES}")
+endif()
+
+# Validate build type
+set(VALID_BUILD_TYPES "Debug;Release")
+if(NOT BUILD_TYPE IN_LIST VALID_BUILD_TYPES)
+    message(FATAL_ERROR "Invalid BUILD_TYPE: ${BUILD_TYPE}. Valid types: ${VALID_BUILD_TYPES}")
+endif()
+
+# CRITICAL: Set these as global variables for all components
+set(APP_TYPE "${APP_TYPE}" CACHE STRING "App type to build" FORCE)
+set(BUILD_TYPE "${BUILD_TYPE}" CACHE STRING "Build type (Debug/Release)" FORCE)
+
+# Include ESP-IDF build system
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+
+# Set project name based on app type
+project(esp32_iid_${APP_TYPE}_app)
+```
+
+**Component-Level CMakeLists.txt** (complete):
+```cmake
+# Flexible main component for different app types
+# Determine source file based on APP_TYPE
+
+# Get app type from parent (set by project-level CMakeLists.txt)
+if(NOT DEFINED APP_TYPE)
+    set(APP_TYPE "ascii_art")
+endif()
+
+# Get source file from centralized configuration
 execute_process(
     COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/get_app_info.py" validate "${APP_TYPE}"
     RESULT_VARIABLE VALIDATE_RESULT
@@ -751,27 +980,154 @@ execute_process(
     ERROR_QUIET
 )
 
-# 3. Get source file from configuration
+if(NOT VALIDATE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Unknown APP_TYPE: ${APP_TYPE}")
+endif()
+
 execute_process(
     COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/get_app_info.py" source_file "${APP_TYPE}"
     OUTPUT_VARIABLE MAIN_SOURCE
     OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE SOURCE_RESULT
 )
 
-# 4. Register component with dynamic source
+if(NOT SOURCE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to get source file for APP_TYPE: ${APP_TYPE}")
+endif()
+
+# Check if source file exists and handle path resolution
+set(SOURCE_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${MAIN_SOURCE}")
+if(NOT EXISTS "${SOURCE_FILE_PATH}")
+    set(SOURCE_FILE_PATH "${CMAKE_CURRENT_LIST_DIR}/${MAIN_SOURCE}")
+    if(NOT EXISTS "${SOURCE_FILE_PATH}")
+        message(FATAL_ERROR "Source file not found: ${MAIN_SOURCE}")
+    endif()
+endif()
+
+# Determine include paths based on environment
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../inc")
+    set(INC_BASE_PATH "../inc")
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../inc")
+    set(INC_BASE_PATH "../../../inc")
+else()
+    message(FATAL_ERROR "Cannot find inc directory")
+endif()
+
+# Register component with dynamic source file
 idf_component_register(
     SRCS "${MAIN_SOURCE}"
-    INCLUDE_DIRS "." "${INC_BASE_PATH}"
-    REQUIRES driver esp_timer freertos
+    INCLUDE_DIRS "." "${INC_BASE_PATH}" "${INC_BASE_PATH}/base" "${INC_BASE_PATH}/mcu/esp32"
+    REQUIRES driver esp_timer freertos iid-espidf
 )
 
-# 5. Add app-specific compile definitions
+# Set C++ standard
+target_compile_features(${COMPONENT_LIB} PRIVATE cxx_std_17)
+
+# Set compiler flags based on build type
+if(BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(${COMPONENT_LIB} PRIVATE
+        -Wall -Wextra -Wpedantic -O0 -g3 -DDEBUG
+    )
+else()
+    target_compile_options(${COMPONENT_LIB} PRIVATE
+        -Wall -Wextra -Wpedantic -O2 -g -DNDEBUG
+    )
+endif()
+
+# Add compile definitions for each example type
 target_compile_definitions(${COMPONENT_LIB} PRIVATE 
     "EXAMPLE_TYPE_${APP_TYPE}=1"
 )
 ```
 
-#### **7. Submodule Integration**
+**Why This Full Setup is Needed for `idf.py` Compatibility:**
+
+1. **Command Line Support**: `idf.py build -DAPP_TYPE=gpio_test -DBUILD_TYPE=Release`
+2. **Validation**: Ensures app types exist in `app_config.yml` before building
+3. **Dynamic Source Selection**: Gets the correct source file for each app type
+4. **Project Naming**: Sets project name dynamically based on app type
+5. **Development Workflow**: Enables developers to build directly with `idf.py`
+
+**Usage Examples:**
+
+**CI Builds (both scenarios work):**
+```bash
+# Uses build_app.sh which handles everything
+./build_app.sh gpio_test Release
+```
+
+**Direct `idf.py` Usage (only Scenario B works):**
+```bash
+# Direct idf.py usage for development
+idf.py build -DAPP_TYPE=gpio_test -DBUILD_TYPE=Release
+idf.py flash -DAPP_TYPE=gpio_test -DBUILD_TYPE=Release
+idf.py monitor
+```
+
+**Recommendation:**
+- **Use Scenario A** if you only use CI workflows and never need direct `idf.py` usage
+- **Use Scenario B** if you want full development workflow support with `idf.py`
+
+#### **7. How build_app.sh Works with Both Scenarios**
+
+The `build_app.sh` script is designed to work with both CMakeLists.txt scenarios:
+
+**Key Script Features:**
+- **Automatic ESP-IDF Setup**: Sources the correct ESP-IDF version
+- **Source File Discovery**: Gets source file from `app_config.yml` and exports as `APP_SOURCE_FILE`
+- **Parameter Passing**: Calls `idf.py` with `-DAPP_TYPE`, `-DAPP_SOURCE_FILE`, and `-DBUILD_TYPE`
+- **Build Directory Management**: Creates organized build directories
+- **Size Analysis**: Generates size reports and metadata
+- **Error Handling**: Validates combinations before building
+
+**Script Call Pattern:**
+```bash
+# build_app.sh discovers source file and calls idf.py like this:
+# 1. Get source file from app_config.yml
+SOURCE_FILE=$(python3 "${SCRIPT_DIR}/get_app_info.py" source_file "${APP_TYPE}")
+export APP_SOURCE_FILE="${SOURCE_FILE}"
+
+# 2. Call idf.py with all necessary variables
+idf.py -B "$BUILD_DIR" -D CMAKE_BUILD_TYPE="$BUILD_TYPE" -D BUILD_TYPE="$BUILD_TYPE" -D APP_TYPE="$APP_TYPE" -D APP_SOURCE_FILE="$SOURCE_FILE" -D IDF_CCACHE_ENABLE="$USE_CCACHE" reconfigure
+idf.py -B "$BUILD_DIR" build
+```
+
+**How It Works with Scenario A (Ultra-Minimal CMakeLists.txt):**
+- Script discovers source file from `app_config.yml` and sets `APP_SOURCE_FILE` environment variable
+- Script passes `-DAPP_TYPE=gpio_test` and `-DAPP_SOURCE_FILE=GpioComprehensiveTest.cpp` to `idf.py`
+- CMakeLists.txt simply uses the `APP_SOURCE_FILE` variable provided by the script
+- Script handles all app selection and source file discovery logic
+- Perfect for CI-only workflows
+
+**How It Works with Scenario B (Full CMakeLists.txt):**
+- Script discovers source file from `app_config.yml` and sets `APP_SOURCE_FILE` environment variable
+- Script passes `-DAPP_TYPE=gpio_test` and `-DAPP_SOURCE_FILE=GpioComprehensiveTest.cpp` to `idf.py`
+- CMakeLists.txt can use either the script-provided `APP_SOURCE_FILE` or do its own discovery
+- Both script and CMakeLists.txt work together
+- Enables both CI and development workflows
+
+**Script Parameters:**
+```bash
+# Basic usage
+./build_app.sh gpio_test Release
+
+# With ESP-IDF version
+./build_app.sh gpio_test Release release/v5.5
+
+# With project path (for CI)
+./build_app.sh --project-path /path/to/project gpio_test Release
+
+# Clean build
+./build_app.sh gpio_test Release --clean
+
+# List available apps
+./build_app.sh list
+
+# Show app information
+./build_app.sh info gpio_test
+```
+
+#### **8. Submodule Integration**
 
 The `hf-espidf-project-tools` submodule provides the essential scripts:
 
@@ -808,16 +1164,16 @@ your-project/
 │       └── config_loader.sh
 ```
 
-#### **8. Build Process Flow**
+#### **9. Build Process Flow**
 
 1. **Configuration Reading**: `generate_matrix.py` reads `app_config.yml`
 2. **Matrix Generation**: Creates all valid build combinations
 3. **Parallel Execution**: Each combination runs as separate job
 4. **Dynamic Building**: Each job calls `build_app.sh` with specific parameters
-5. **CMake Integration**: CMakeLists.txt uses `get_app_info.py` to get source file
+5. **CMake Integration**: CMakeLists.txt uses `APP_SOURCE_FILE` from build_app.sh
 6. **Artifact Collection**: All builds are collected and organized
 
-#### **9. How App Type Selection Works**
+#### **10. How App Type Selection Works**
 
 The app type selection system enables dynamic building of different applications from the same codebase:
 
@@ -854,7 +1210,7 @@ idf.py build  # Uses default from app_config.yml
 - **Flexibility**: Easy to add new apps by updating `app_config.yml`
 - **CI Integration**: Matrix builds automatically test all combinations
 
-#### **10. app_config.yml Structure**
+#### **11. app_config.yml Structure**
 
 The `app_config.yml` file is the central configuration that enables parallel building:
 
@@ -897,7 +1253,7 @@ apps:
 - **Build Type Control**: Apps can specify which build types to use
 - **CI Integration**: `ci_enabled` flag controls which apps are built in CI
 
-#### **11. Parallel Building Benefits**
+#### **12. Parallel Building Benefits**
 
 This setup enables powerful parallel building capabilities:
 
@@ -922,7 +1278,7 @@ adc_test + Release + v5.5    │ uart_test + Release + v5.5
 - **Parallel**: 48 builds ÷ 20 runners = ~12 minutes
 - **Speedup**: 20x faster with parallel execution
 
-#### **12. Key Scripts and Their Roles**
+#### **13. Key Scripts and Their Roles**
 
 The `hf-espidf-project-tools` submodule provides essential scripts that enable the dynamic build system:
 
@@ -956,7 +1312,7 @@ CI Workflow → generate_matrix.py → Build Matrix
      ↓
 Each Build Job → build_app.sh → idf.py build
      ↓
-CMakeLists.txt → get_app_info.py → Source File Selection
+CMakeLists.txt → APP_SOURCE_FILE → Source File Selection
      ↓
 ESP-IDF Build → Firmware Binary
 ```
