@@ -236,7 +236,7 @@ jobs:
         if: always()
         with:
           name: >
-            fw-${{ matrix.app_name }}-${{ matrix.idf_version }}-
+            fw-${{ matrix.app_name }}-${{ matrix.idf_version_docker }}-
             ${{ matrix.build_type }}
           path: ${{ env.ESP32_PROJECT_PATH }}/build*
           retention-days: 7
