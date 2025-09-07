@@ -139,18 +139,14 @@ jobs:
       project_tools_dir: ${{ env.TOOLS_DIR }}
       clean_build: ${{ github.event.inputs.clean_build == 'true' }}
 
-  # 🔧 Lint and format code
+  # 🔧 Lint code
   lint:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
     with:
-      paths: "src/**,inc/**,examples/**,components/**"
-      auto_fix: true
-      commit: true
-      commit_message: "🔧 Auto-format code with clang-format"
-      git_name: "HardFOC Bot"
-      git_email: "bot@hardfoc.com"
+      extensions: "c,cpp,cc,cxx,h,hpp"
       style: "file"
       tidy_checks: "readability-*,performance-*,modernize-*"
+      ignore: "build|.git|third_party|vendor"
       files_changed_only: true
       step_summary: true
       file_annotations: true
@@ -235,17 +231,15 @@ jobs:
       project_dir: examples/esp32
       clean_build: false  # Use caches for faster builds
 
-  # Auto-fix code formatting
-  lint-fix:
+  # Lint code
+  lint:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
     with:
-      paths: "src/**,inc/**,examples/**"
-      auto_fix: true
-      commit: true
-      commit_message: "🔧 Auto-format code [skip ci]"
+      extensions: "c,cpp,cc,cxx,h,hpp"
       files_changed_only: true
       style: "file"
       tidy_checks: "readability-*"  # Only readability checks for dev
+      ignore: "build|.git|test"
 
   # Quick link check
   link-check:

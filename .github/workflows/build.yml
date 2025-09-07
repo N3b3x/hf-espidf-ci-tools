@@ -126,7 +126,6 @@ jobs:
             export IDF_TARGET="${{ matrix.target }}"
             export BUILD_TYPE="${{ matrix.build_type }}"
             export APP_TYPE="${{ matrix.app_name }}"
-            
             # Debug: List ESP32 project directory contents
             echo "======================================================"
             echo "ESP32 PROJECT DIRECTORY DEBUG INFO"
@@ -147,7 +146,6 @@ jobs:
             done
             echo "======================================================"
             echo ""
-            
             # Debug: List scripts directory contents and check permissions
             echo "======================================================"
             echo "SCRIPTS DIRECTORY DEBUG INFO"
@@ -171,13 +169,11 @@ jobs:
             done
             echo "======================================================"
             echo ""
-            
             # Project tools directory already validated in generate-matrix job
             # Run build script with correct paths
             "${{ needs.generate-matrix.outputs.project_tools_path }}/build_app.sh" \
               --project-path "${ESP32_PROJECT_PATH}" \
               "${APP_TYPE}" "${BUILD_TYPE}" "${{ matrix.idf_version }}"
-            
             # Find build directory - try multiple patterns
             echo "Looking for build directory..."
             echo "Changing to ESP-IDF project directory: ${ESP32_PROJECT_PATH}"
@@ -188,7 +184,6 @@ jobs:
             echo "Current directory contents:"
             ls -la . || echo "Failed to list current directory"
             echo ""
-            
             # Try different build directory patterns
             build_dir=""
             for pattern in "build*" "build-app-*" "build_*"; do
@@ -200,7 +195,6 @@ jobs:
                 break
               fi
             done
-            
             # If still no build directory found, list all directories
             if [ -z "$build_dir" ]; then
               echo "No build directory found with standard patterns. All directories:"
@@ -210,18 +204,15 @@ jobs:
               echo "ERROR: No build directory found!"
               exit 1
             fi
-            
+
             echo "Using build directory: $build_dir"
             # Note: Cannot set GitHub outputs from inside Docker container
             # Will use wildcard pattern for upload instead
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: >
-            fw-${{ matrix.app_name }}-${{ matrix.idf_version_docker }}-
-            ${{ matrix.build_type }}
+          name: fw-${{ matrix.app_name }}-${{ matrix.idf_version_docker }}-${{ matrix.build_type }}
           path: ${{ env.ESP32_PROJECT_PATH }}/build*
           retention-days: 7
 

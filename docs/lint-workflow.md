@@ -29,8 +29,8 @@ The C/C++ Lint workflow runs clang-format and clang-tidy using cpp-linter for co
 - clang-format for code style
 - clang-tidy for static analysis
 - PR annotations and comments
-- Configurable file patterns
-- **Auto-fix and push formatting changes**
+- Configurable file extensions
+- Configurable exclude paths
 - **Direct integration with cpp-linter/cpp-linter-action@v2**
 
 **Use Case**: Code style consistency and quality enforcement
@@ -39,16 +39,11 @@ The C/C++ Lint workflow runs clang-format and clang-tidy using cpp-linter for co
 
 | Input | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| `paths` | string | ❌ | `src/**,inc/**,examples/**` | Comma-separated globs to lint |
 | `clang_version` | string | ❌ | `20` | Clang major version |
-| `auto_fix` | boolean | ❌ | `false` | Automatically format files and push changes back to the repository |
-| `commit` | boolean | ❌ | `true` | Automatically commit and push fixes to the repository (only used when auto_fix is true) |
-| `commit_message` | string | ❌ | `"Auto-format code with clang-format"` | Commit message for auto-fix changes |
-| `git_name` | string | ❌ | `"cpp-linter-action"` | Git author name for auto-fix commits |
-| `git_email` | string | ❌ | `"cpp-linter-action@github.com"` | Git author email for auto-fix commits |
 | `style` | string | ❌ | `"file"` | clang-format style (llvm, google, webkit, or 'file' to use .clang-format) |
 | `tidy_checks` | string | ❌ | `""` | clang-tidy checks (comma-separated glob patterns, use - prefix to disable) |
-| `ignore` | string | ❌ | `"build\|.git"` | Files or directories to exclude from linting (comma-separated) |
+| `extensions` | string | ❌ | `"c,cpp,cc,cxx,h,hpp"` | File extensions to check (comma-separated) |
+| `ignore` | string | ❌ | `"build\|.git"` | Files or directories to exclude from linting (pipe-separated) |
 | `files_changed_only` | boolean | ❌ | `false` | Only lint files that have been changed in the pull request |
 | `lines_changed_only` | boolean | ❌ | `false` | Only inspect lines that have changed in the pull request |
 | `step_summary` | boolean | ❌ | `true` | Add a summary of linting results to the workflow step summary |
@@ -61,7 +56,7 @@ The C/C++ Lint workflow runs clang-format and clang-tidy using cpp-linter for co
 |--------|-------------|
 | PR annotations | File-level annotations for style issues |
 | PR comments | Summary comments with issue counts |
-| Style fixes | Automatic formatting suggestions |
+| Step summary | Workflow step summary with linting results |
 
 ## 🚀 Usage Examples
 
@@ -72,63 +67,43 @@ jobs:
   lint:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
     with:
-      paths: "src/**,inc/**,examples/**"
       clang_version: "20"
 ```
 
-### Custom Paths
+### Custom File Extensions
 
 ```yaml
 jobs:
   lint:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
     with:
-      paths: "src/**,lib/**,tests/**"
+      extensions: "c,cpp,h,hpp,cc,cxx"
       clang_version: "18"
 ```
 
-### Auto-Fix and Push Changes
+### Custom Exclude Paths
 
 ```yaml
 jobs:
   lint:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
     with:
-      paths: "src/**,inc/**,examples/**"
+      ignore: "build|.git|third_party|vendor|test"
       clang_version: "20"
-      auto_fix: true
-      commit_message: "Auto-format code with clang-format-20"
 ```
 
-### Auto-Fix on Specific Branches Only
-
-```yaml
-jobs:
-  lint:
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
-    with:
-      paths: "src/**,inc/**,examples/**"
-      auto_fix: true
-      commit_message: "Auto-format: $(date '+%Y-%m-%d %H:%M:%S')"
-```
-
-### Advanced Configuration with Custom Git Author
+### Advanced Configuration
 
 ```yaml
 jobs:
   lint:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
     with:
-      paths: "src/**,inc/**,examples/**"
       clang_version: "20"
       style: "google"  # Use Google style instead of .clang-format file
       tidy_checks: "readability-*,performance-*,modernize-*"  # Specific checks
-      auto_fix: true
-      commit: true
-      commit_message: "Auto-format with clang-format-20 (Google style)"
-      git_name: "ESP-IDF Bot"
-      git_email: "bot@espidf-project.com"
+      extensions: "c,cpp,h,hpp"
+      ignore: "build|.git|third_party"
       files_changed_only: true  # Only check changed files in PRs
       thread_comments: true     # Post collapsible thread comments
 ```
@@ -140,7 +115,6 @@ jobs:
   lint:
     uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
     with:
-      paths: "src/**,inc/**,examples/**"
       clang_version: "20"
       files_changed_only: true   # Only lint changed files
       lines_changed_only: true   # Only check changed lines
@@ -150,35 +124,22 @@ jobs:
       thread_comments: false     # Disable thread comments for performance
 ```
 
-### Disable Auto-Commit (Format Only)
+## 🔧 Linting Behavior
 
-```yaml
-jobs:
-  lint:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/lint.yml@v1
-    with:
-      paths: "src/**,inc/**,examples/**"
-      auto_fix: true
-      commit: false  # Format files but don't commit
-      # Files will be formatted but changes won't be pushed
-```
+The workflow provides:
 
-## 🔧 Auto-Fix Behavior
-
-When `auto_fix: true` is enabled:
-
-- **Automatic Formatting**: clang-format will automatically fix formatting issues
-- **Commit and Push**: Changes are automatically committed and pushed back to the repository
-- **Branch Safety**: Only works on branches where the workflow has write permissions
-- **Commit Message**: Uses the provided `commit_message` or the default message
-- **File Annotations**: Still provides PR annotations showing what was changed
+- **Code Style Checking**: clang-format checks for style violations
+- **Static Analysis**: clang-tidy performs static analysis checks
+- **PR Feedback**: Annotations and comments on pull requests
+- **Configurable Scope**: Control which files and paths are checked
+- **Performance Options**: Check only changed files/lines for faster runs
+- **File Annotations**: Provides PR annotations for linting issues
 
 ### ⚠️ Important Notes
 
-- **Permissions Required**: The workflow needs `contents: write` permission
-- **Branch Protection**: Be careful with auto-fix on protected branches
-- **Review Process**: Consider using auto-fix only on development branches
-- **Backup**: Always ensure you have backups before enabling auto-fix
+- **Permissions Required**: The workflow needs `pull-requests: write` permission for PR comments
+- **File Discovery**: The action automatically discovers C/C++ files in your repository
+- **Configuration Files**: Uses `.clang-format` and `.clang-tidy` files if present
 
 ## ⚙️ Configuration
 
