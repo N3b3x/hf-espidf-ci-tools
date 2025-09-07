@@ -69,28 +69,32 @@ jobs:
           echo "Creating pyproject.toml with paths: ${{ inputs.link_check_paths }}"
           echo "Exclude paths: ${{ inputs.link_check_exclude_paths }}"
           
-          # Convert comma-separated paths to JSON array format
+          # Convert comma-separated paths to TOML array format
           IFS=',' read -ra PATHS <<< "${{ inputs.link_check_paths }}"
           INCLUDE_PATHS=""
           for path in "${PATHS[@]}"; do
             # Trim whitespace and add quotes
             path=$(echo "$path" | xargs)
             if [ -n "$INCLUDE_PATHS" ]; then
-              INCLUDE_PATHS="$INCLUDE_PATHS,\n            \"$path\""
+              INCLUDE_PATHS="$INCLUDE_PATHS,
+              \"$path\""
             else
               INCLUDE_PATHS="\"$path\""
             fi
           done
           
-          # Convert comma-separated exclude paths to JSON array format
-          EXCLUDE_PATHS="\"node_modules/**\",\n            \".git/**\",\n            \"**/node_modules/**\""
+          # Convert comma-separated exclude paths to TOML array format
+          EXCLUDE_PATHS="\"node_modules/**\",
+            \".git/**\",
+            \"**/node_modules/**\""
           if [ -n "${{ inputs.link_check_exclude_paths }}" ]; then
             IFS=',' read -ra EXCLUDE_PATHS_ARRAY <<< "${{ inputs.link_check_exclude_paths }}"
             for path in "${EXCLUDE_PATHS_ARRAY[@]}"; do
               # Trim whitespace and add quotes
               path=$(echo "$path" | xargs)
               if [ -n "$path" ]; then
-                EXCLUDE_PATHS="$EXCLUDE_PATHS,\n            \"$path\""
+                EXCLUDE_PATHS="$EXCLUDE_PATHS,
+                \"$path\""
               fi
             done
           fi
