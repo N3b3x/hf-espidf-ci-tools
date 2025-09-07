@@ -216,10 +216,8 @@ jobs:
           path: ${{ env.ESP32_PROJECT_PATH }}/build*
           retention-days: 7
 
-  # --- NEW: PR size summary inside the same reusable workflow ---
   size-report:
     name: Firmware Size Report
-    if: github.event_name == 'pull_request'
     needs: [build]
     runs-on: ubuntu-latest
     steps:
