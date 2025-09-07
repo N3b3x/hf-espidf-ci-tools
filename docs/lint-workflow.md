@@ -14,13 +14,15 @@ The C/C++ Lint workflow runs clang-format and clang-tidy using cpp-linter for co
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
-- [Usage Examples](#usage-examples)
-- [Configuration](#configuration)
-- [Troubleshooting](#troubleshooting)
-- [Navigation](#navigation)
+- [🎯 Overview](#-overview)
+- [⚙️ Inputs](#-inputs)
+- [📤 Outputs](#-outputs)
+- [🚀 Usage Examples](#-usage-examples)
+- [🔧 Linting Behavior](#-linting-behavior)
+- [⚙️ Configuration](#-configuration)
+- [🔧 Troubleshooting](#-troubleshooting)
+- [📚 Related Workflows](#-related-workflows)
+- [🔗 Related Resources](#-related-resources)
 
 ## 🎯 Overview
 

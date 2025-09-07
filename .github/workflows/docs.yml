@@ -68,7 +68,6 @@ jobs:
           # Create temporary pyproject.toml with dynamic paths from input
           echo "Creating pyproject.toml with paths: ${{ inputs.link_check_paths }}"
           echo "Exclude paths: ${{ inputs.link_check_exclude_paths }}"
-          
           # Convert comma-separated paths to TOML array format
           IFS=',' read -ra PATHS <<< "${{ inputs.link_check_paths }}"
           INCLUDE_PATHS=""
@@ -82,7 +81,7 @@ jobs:
               INCLUDE_PATHS="\"$path\""
             fi
           done
-          
+
           # Convert comma-separated exclude paths to TOML array format
           EXCLUDE_PATHS="\"node_modules/**\",
             \".git/**\",
@@ -98,7 +97,7 @@ jobs:
               fi
             done
           fi
-          
+
           cat > pyproject.toml << EOF
           [tool.md-dead-link-check]
           # Configuration for md-dead-link-check
@@ -121,7 +120,7 @@ jobs:
           # Check external links
           check_external = true
           EOF
-          
+
           # Run the link checker using the GitHub Action
           # The action will use the dynamically generated pyproject.toml
 

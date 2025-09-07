@@ -23,13 +23,16 @@
 ## 📋 Table of Contents
 
 - [🎯 Overview](#-overview)
-- [⚙️ Inputs & Configuration](#️-inputs--configuration)
+- [⚙️ Inputs & Configuration](#-inputs--configuration)
+- [🔧 Troubleshooting](#-troubleshooting)
 - [📤 Outputs & Artifacts](#-outputs--artifacts)
 - [🚀 Usage Examples](#-usage-examples)
 - [🔧 Configuration](#-configuration)
-- [🏗️ Build Process](#️-build-process)
-- [🔍 Troubleshooting](#-troubleshooting)
+- [🏗️ Build Process](#-build-process)
+- [🔍 Advanced Troubleshooting](#-advanced-troubleshooting)
 - [📚 Related Documentation](#-related-documentation)
+- [📚 Related Workflows](#-related-workflows)
+- [🔗 Related Resources](#-related-resources)
 
 ---
 
@@ -462,7 +465,7 @@ Your `hf-espidf-project-tools` directory must contain:
 
 ---
 
-## 🔍 Troubleshooting
+## 🔍 Advanced Troubleshooting
 
 ### **Common Issues & Solutions**
 
@@ -584,10 +587,9 @@ python3 hf-espidf-project-tools/generate_matrix.py --validate
 
 ### **Project Tools Documentation**
 
-- 🏗️ [**Build System**](../hf-espidf-project-tools/docs/README_BUILD_SYSTEM.md) - Complete build system guide
-- ⚙️ [**Configuration System**](../hf-espidf-project-tools/docs/README_CONFIG_SYSTEM.md) - Configuration management
-- 🚀 [**CI Pipeline**](../hf-espidf-project-tools/docs/README_CI_PIPELINE.md) - CI/CD integration guide
-- 🔧 [**Scripts Overview**](../hf-espidf-project-tools/docs/README_SCRIPTS_OVERVIEW.md) - All available scripts
+- 🏗️ [**Project Tools Repository**](https://github.com/N3b3x/hf-espidf-project-tools) - ESP-IDF project tools and scripts
+- ⚙️ [**ESP-IDF Documentation**](https://docs.espressif.com/projects/esp-idf/) - Official ESP-IDF documentation
+- 🚀 [**GitHub Actions Documentation**](https://docs.github.com/en/actions) - GitHub Actions reference
 - Check cache key generation in workflow
 - Verify cache paths are accessible
 

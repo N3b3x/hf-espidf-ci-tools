@@ -14,13 +14,14 @@ The Static Analysis workflow runs cppcheck via Docker for comprehensive C/C++ co
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
-- [Usage Examples](#usage-examples)
-- [Configuration](#configuration)
-- [Troubleshooting](#troubleshooting)
-- [Navigation](#navigation)
+- [🎯 Overview](#-overview)
+- [⚙️ Inputs](#-inputs)
+- [📤 Outputs](#-outputs)
+- [🚀 Usage Examples](#-usage-examples)
+- [⚙️ Configuration](#-configuration)
+- [🔧 Troubleshooting](#-troubleshooting)
+- [📚 Related Workflows](#-related-workflows)
+- [🔗 Related Resources](#-related-resources)
 
 ## 🎯 Overview
 
@@ -142,7 +143,7 @@ Create a `.cppcheck-suppressions` file for false positives:
 
 - [cppcheck Documentation](https://cppcheck.sourceforge.io/)
 - [cppcheck Docker Image](https://github.com/facthunder/cppcheck)
-- [Static Analysis Best Practices](https://en.wikipedia.org/wiki/Static_program_analysis)
+- [Static Analysis Best Practices](https://owasp.org/www-community/controls/Static_Code_Analysis)
 
 ---
 

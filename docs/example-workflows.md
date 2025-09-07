@@ -19,11 +19,11 @@
 ## 📋 Table of Contents
 
 - [🎯 Overview](#-overview)
-- [🏗️ Basic Workflow](#️-basic-workflow)
+- [🏗️ Basic Workflow](#-basic-workflow)
 - [🚀 Advanced Parallel Workflow](#-advanced-parallel-workflow)
 - [🔧 Development Workflow](#-development-workflow)
 - [📦 Release Workflow](#-release-workflow)
-- [🛡️ Security-First Workflow](#️-security-first-workflow)
+- [🛡️ Security-First Workflow](#-security-first-workflow)
 - [📚 Documentation Workflow](#-documentation-workflow)
 - [⚡ Performance Optimized](#-performance-optimized)
 
@@ -31,7 +31,9 @@
 
 ## 🎯 Overview
 
-These example workflows demonstrate how to use the HardFOC ESP32 CI tools in your consumer repositories. Each workflow is designed for different use cases and can be customized to fit your project's needs.
+These example workflows demonstrate how to use the HardFOC ESP-IDF CI tools in your ESP-IDF projects. Each workflow is designed for different ESP-IDF development scenarios and can be customized to fit your project's needs.
+
+**Note**: These workflows are specifically designed for ESP-IDF projects. For general-purpose CI/CD workflows, see the separate general CI tools repository.
 
 ### **Key Features**
 - 🔄 **Parallel Execution** - Multiple jobs run simultaneously for maximum efficiency

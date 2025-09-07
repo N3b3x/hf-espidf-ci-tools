@@ -14,14 +14,15 @@ The Documentation workflow builds Doxygen documentation and optionally deploys i
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
-- [Usage Examples](#usage-examples)
-- [Configuration](#configuration)
-- [GitHub Pages Setup](#github-pages-setup)
-- [Troubleshooting](#troubleshooting)
-- [Navigation](#navigation)
+- [🎯 Overview](#-overview)
+- [⚙️ Inputs](#-inputs)
+- [📤 Outputs](#-outputs)
+- [🚀 Usage Examples](#-usage-examples)
+- [⚙️ Configuration](#-configuration)
+- [🌐 GitHub Pages Setup](#-github-pages-setup)
+- [🔧 Troubleshooting](#-troubleshooting)
+- [📚 Related Workflows](#-related-workflows)
+- [🔗 Related Resources](#-related-resources)
 
 ## 🎯 Overview
 

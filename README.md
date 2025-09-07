@@ -1,4 +1,4 @@
-# 🔧 HardFOC ESP32 CI Tools
+# 🔧 HardFOC ESP-IDF CI Tools
 
 <div align="center">
 
@@ -6,9 +6,9 @@
 ![ESP-IDF](https://img.shields.io/badge/ESP--IDF-Matrix%20Builds-green?style=for-the-badge&logo=espressif)
 ![HardFOC](https://img.shields.io/badge/HardFOC-ESP32-orange?style=for-the-badge&logo=espressif)
 
-**🚀 Advanced CI/CD Tools for HardFOC ESP32 Projects**
+**🚀 Specialized CI/CD Tools for ESP-IDF Development**
 
-*Comprehensive GitHub Actions workflows for ESP-IDF development with matrix builds, security auditing, and automated documentation*
+*Dedicated GitHub Actions workflows for ESP-IDF projects with matrix builds, security auditing, and automated documentation*
 
 </div>
 
@@ -32,25 +32,37 @@
 
 ## 🎯 What This Repository Provides
 
-### **Reusable GitHub Actions Workflows**
+### **ESP-IDF Specialized Workflows**
 - ✅ **Matrix-based ESP-IDF builds** across multiple versions and configurations
-- ✅ **Automated code linting and formatting** with clang-format and clang-tidy
-- ✅ **Comprehensive security auditing** with CodeQL and dependency scanning
-- ✅ **Documentation building and deployment** with Doxygen and GitHub Pages
-- ✅ **Static code analysis** with Cppcheck for security and quality
-- ✅ **Link validation** for documentation integrity
+- ✅ **ESP-IDF optimized linting** with clang-format and clang-tidy for C/C++
+- ✅ **ESP-IDF security auditing** with CodeQL and dependency scanning
+- ✅ **ESP-IDF documentation** with Doxygen and GitHub Pages deployment
+- ✅ **ESP-IDF static analysis** with Cppcheck for embedded C/C++ code
+- ✅ **Documentation link validation** for ESP-IDF project docs
 
-### **Smart Project Tools Integration**
-- ✅ **Single composite action** for project tools directory management
-- ✅ **Automatic tool cloning** with security validation
-- ✅ **Dynamic matrix generation** from project configuration
-- ✅ **Intelligent caching** for faster builds
+### **ESP-IDF Project Tools Integration**
+- ✅ **ESP-IDF project tools management** with automatic cloning
+- ✅ **ESP-IDF matrix generation** from project configuration files
+- ✅ **ESP-IDF build caching** for faster compilation times
+- ✅ **ESP-IDF artifact management** with size reporting
 
-### **HardFOC Project Support**
+### **HardFOC ESP32 Project Support**
 - ✅ **ESP32-C6 optimized** for HardFOC interface projects
-- ✅ **Multi-application support** with YAML configuration
-- ✅ **Parallel execution** for maximum CI efficiency
-- ✅ **Comprehensive documentation** with examples and troubleshooting
+- ✅ **Multi-application ESP-IDF support** with YAML configuration
+- ✅ **Parallel ESP-IDF builds** for maximum CI efficiency
+- ✅ **ESP-IDF specific documentation** with examples and troubleshooting
+
+---
+
+## 📝 Repository Focus
+
+This repository contains **ESP-IDF specific CI tools only**. For general-purpose CI/CD workflows and tools, see the separate general CI tools repository.
+
+**This repository provides:**
+- ESP-IDF build workflows with matrix support
+- ESP-IDF specific linting and static analysis
+- ESP-IDF documentation generation and deployment
+- ESP-IDF security auditing and dependency scanning
 
 ---
 

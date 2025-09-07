@@ -14,15 +14,16 @@ The Security workflow provides comprehensive security auditing including depende
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Security Features](#security-features)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
-- [Usage Examples](#usage-examples)
-- [Configuration](#configuration)
-- [Security Best Practices](#security-best-practices)
-- [Troubleshooting](#troubleshooting)
-- [Navigation](#navigation)
+- [🎯 Overview](#-overview)
+- [🔒 Security Features](#-security-features)
+- [⚙️ Inputs](#-inputs)
+- [📤 Outputs](#-outputs)
+- [🚀 Usage Examples](#-usage-examples)
+- [⚙️ Configuration](#-configuration)
+- [🛡️ Security Best Practices](#-security-best-practices)
+- [🔧 Troubleshooting](#-troubleshooting)
+- [📚 Related Workflows](#-related-workflows)
+- [🔗 Related Resources](#-related-resources)
 
 ## 🎯 Overview
 

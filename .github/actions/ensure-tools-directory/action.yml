@@ -27,13 +27,13 @@ runs:
       shell: bash
       run: |
         set -e
-        
+
         # Use hardcoded trusted repository URL and main branch
         TOOLS_REPO_URL="https://github.com/N3b3x/hf-espidf-project-tools.git"
         TOOLS_BRANCH="main"
         TOOLS_DIR_NAME=$(basename "${TOOLS_REPO_URL}" .git)
         echo "Tools directory name: ${TOOLS_DIR_NAME}"
-        
+
         # Resolve project tools path using consistent logic - always output relative paths
         if [ -n "${{ inputs.project_tools_dir }}" ]; then
           # Use the input as-is if it's already relative, or make it relative if absolute
@@ -52,7 +52,7 @@ runs:
         fi
 
         echo "Resolved project tools path (relative): ${SCRIPTS_PATH}"
-        
+
         # Also resolve project directory path to absolute
         if [[ "${{ inputs.project_dir }}" == /* ]]; then
           PROJECT_PATH="${{ inputs.project_dir }}"
@@ -60,13 +60,13 @@ runs:
           PROJECT_PATH="$(pwd)/${{ inputs.project_dir }}"
         fi
         echo "Resolved project path: ${PROJECT_PATH}"
-        
+
         # Check if directory exists and handle accordingly
         if [ ! -d "${SCRIPTS_PATH}" ]; then
           # Only auto-clone if project_tools_dir was not explicitly provided
           if [ -z "${{ inputs.project_tools_dir }}" ] && [ "${{ inputs.auto_clone_tools }}" = "true" ]; then
             echo "Auto-cloning tools repo to ${SCRIPTS_PATH}"
-            
+
             # Security: Using hardcoded trusted repository URL and main branch
             echo "Cloning from trusted source: ${TOOLS_REPO_URL} (${TOOLS_BRANCH} branch)"
             git clone --depth 1 --branch "${TOOLS_BRANCH}" \
@@ -88,7 +88,7 @@ runs:
           fi
         else
           echo "Tools directory exists: ${SCRIPTS_PATH}"
-          
+
           # Check if this looks like a submodule (has .git file or directory)
           if [ -f "${SCRIPTS_PATH}/.git" ] || [ -d "${SCRIPTS_PATH}/.git" ]; then
             echo "Detected submodule at ${SCRIPTS_PATH}"
@@ -115,7 +115,7 @@ runs:
         ls -la "${SCRIPTS_PATH}" || echo "Failed to list directory"
         echo ""
         echo "Checking script permissions:"
-        
+
         # Validate required scripts exist and ensure they're executable
         REQUIRED_SCRIPTS=("generate_matrix.py" "build_app.sh" "config_loader.sh")
         for script in "${REQUIRED_SCRIPTS[@]}"; do

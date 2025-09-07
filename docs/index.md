@@ -10,7 +10,9 @@
 
 ---
 
-Welcome to the hf-espidf-ci-tools documentation! This guide provides comprehensive coverage of all reusable workflows and how to integrate them into your ESP-IDF projects.
+Welcome to the hf-espidf-ci-tools documentation! This guide provides comprehensive coverage of ESP-IDF specialized workflows and how to integrate them into your ESP-IDF projects.
+
+**Note**: This repository contains ESP-IDF specific CI tools only. For general-purpose CI/CD workflows, see the separate general CI tools repository.
 
 ## 🚀 Quick Navigation
 
