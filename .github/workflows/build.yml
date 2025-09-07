@@ -223,7 +223,7 @@ jobs:
   size-report:
     name: Firmware Size Report
     needs: [build]
-    if: always()
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Download all firmware artifacts
@@ -237,7 +237,7 @@ jobs:
         id: mk
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
           OUT="size-summary.md"
           echo "## 📦 Firmware Size Summary" > "$OUT"
           echo "" >> "$OUT"
@@ -256,9 +256,9 @@ jobs:
             bld=$(grep -E '^BUILD='  "$info" | cut -d= -f2- || echo "-")
 
             if [[ -f "$dir/size.txt" ]]; then
-              summary="$(grep -E 'Total|text\s+data\s+bss' "$dir/size.txt" | \
+              summary="$(grep -E 'Total|text\s+data\s+bss' "$dir/size.txt" 2>/dev/null | \
                         head -2 | tr -s ' ' ' ' | sed 's/^/`/;s/$/`/' | \
-                        paste -sd '<br/>' -)"
+                        paste -sd '<br/>' - 2>/dev/null || echo '`size.txt parse error`')"
             else
               summary="`size.txt missing`"
             fi
@@ -279,9 +279,9 @@ jobs:
               idf="-"; tgt="-"
               bld="$(echo "$parent" | grep -Eo '(Debug|Release)' || \
                   echo '-')"
-              summary="$(grep -E 'Total|text\s+data\s+bss' "$st" | \
+              summary="$(grep -E 'Total|text\s+data\s+bss' "$st" 2>/dev/null | \
                         head -2 | tr -s ' ' ' ' | sed 's/^/`/;s/$/`/' | \
-                        paste -sd '<br/>' -)"
+                        paste -sd '<br/>' - 2>/dev/null || echo '`size.txt parse error`')"
               echo "| $app | $idf | $tgt | $bld |" \
                    " ${summary:-\`See size.txt\`} |" \
                    >> "$OUT"
@@ -300,6 +300,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            // Only create comment if we have a valid issue number
+            if (!context.issue || !context.issue.number) {
+              console.log('No issue number available, skipping PR comment');
+              return;
+            }
+            
             const fs = require('fs');
             const body = fs.readFileSync('${{ steps.mk.outputs.file }}',
                                         'utf8');
@@ -317,17 +323,19 @@ jobs:
         env:
           MAX_DEC_TOTAL: ${{ inputs.max_dec_total }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           echo "Enforcing size budget: MAX_DEC_TOTAL=${MAX_DEC_TOTAL} bytes"
           vio=0
           while IFS= read -r -d '' st; do
-            dec=$(grep -E '^\s*text\s+data\s+bss\s+dec' -A1 "$st" | \
-                  tail -1 | awk '{print $4}' || echo 0)
+            dec=$(grep -E '^\s*text\s+data\s+bss\s+dec' -A1 "$st" 2>/dev/null | \
+                  tail -1 | awk '{print $4}' 2>/dev/null || echo 0)
             dir="$(dirname "$st")"
             if [[ "${dec:-0}" -gt "$MAX_DEC_TOTAL" ]]; then
               echo "::error file=${st}::${dir} dec=${dec} exceeds" \
                    "MAX_DEC_TOTAL=${MAX_DEC_TOTAL}"
               vio=$((vio+1))
+            elif [[ "${dec:-0}" -eq 0 ]]; then
+              echo "::warning file=${st}::Could not parse size information from ${dir}"
             fi
           done < <(find fw_artifacts -type f -name "size.txt" -print0)
           if [[ $vio -gt 0 ]]; then
