@@ -120,7 +120,7 @@ jobs:
           key: >-
             espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-
             ${{ matrix.build_type }}-
-            ${{ hashFiles('src/**','inc/**','examples/**') }}
+            ${{ hashFiles(format('{0}/**', env.ESP32_PROJECT_PATH)) }}
           restore-keys: |
             espidf-ccache-${{ runner.os }}-${{ matrix.idf_version_docker }}-
             espidf-ccache-${{ runner.os }}-
