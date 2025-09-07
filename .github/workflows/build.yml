@@ -228,7 +228,8 @@ jobs:
             fi
             
             echo "Using build directory: $build_dir"
-            echo "build_dir=${build_dir%/}" >> "$GITHUB_OUTPUT"
+            # Note: Cannot set GitHub outputs from inside Docker container
+            # Will use wildcard pattern for upload instead
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -237,7 +238,7 @@ jobs:
           name: >
             fw-${{ matrix.app_name }}-${{ matrix.idf_version }}-
             ${{ matrix.build_type }}
-          path: ${{ env.ESP32_PROJECT_PATH }}/${{ steps.build.outputs.build_dir }}
+          path: ${{ env.ESP32_PROJECT_PATH }}/build*
           retention-days: 7
 
   # --- NEW: PR size summary inside the same reusable workflow ---
