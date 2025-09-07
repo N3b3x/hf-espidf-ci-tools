@@ -153,12 +153,49 @@ jobs:
           path: gitleaks-report.json
           retention-days: 30
 
-  codeql:
-    if: >
-      ${{ (inputs.scan_type == 'all' || inputs.scan_type == 'codeql') &&
-      inputs.run_codeql == 'true' }}
+  check-codeql:
     runs-on: ubuntu-latest
-    needs: generate-matrix
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Check CodeQL conditions
+        id: check
+        run: |
+          echo "Input values:"
+          echo "  scan_type: '${{ inputs.scan_type }}'"
+          echo "  run_codeql: '${{ inputs.run_codeql }}'"
+          
+          # Check scan_type
+          if [[ "${{ inputs.scan_type }}" == "all" || "${{ inputs.scan_type }}" == "codeql" ]]; then
+            echo "✓ scan_type allows CodeQL"
+            scan_ok=true
+          else
+            echo "✗ scan_type does not allow CodeQL"
+            scan_ok=false
+          fi
+          
+          # Check run_codeql - be very explicit
+          if [[ "${{ inputs.run_codeql }}" == "true" ]]; then
+            echo "✓ run_codeql is explicitly 'true'"
+            codeql_ok=true
+          else
+            echo "✗ run_codeql is not 'true' (actual value: '${{ inputs.run_codeql }}')"
+            codeql_ok=false
+          fi
+          
+          # Final decision
+          if [[ "$scan_ok" == "true" && "$codeql_ok" == "true" ]]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "✅ CodeQL should run"
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "❌ CodeQL should NOT run"
+          fi
+
+  codeql:
+    if: ${{ needs.check-codeql.outputs.should_run == 'true' }}
+    runs-on: ubuntu-latest
+    needs: [generate-matrix, check-codeql]
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
