@@ -33,7 +33,7 @@ jobs:
       link_check_paths: "**/*.md"
       verbose: true
 
-      # Markdown linting
+      # Markdown linting - false for now
       run_markdown_lint: false
       markdown_lint_paths: "**/*.md"
 
