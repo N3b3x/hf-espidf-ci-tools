@@ -1,0 +1,76 @@
+# Jekyll Configuration for HardFOC ESP32 CI Tools Documentation
+
+# Site settings
+title: "🔧 HardFOC ESP32 CI Tools"
+description: "Advanced CI/CD Tools for HardFOC ESP32 Projects - Comprehensive GitHub Actions workflows for ESP-IDF development with matrix builds, security auditing, and automated documentation"
+url: "https://n3b3x.github.io"
+baseurl: "/hf-espidf-ci-tools"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: just-the-docs
+
+# Just the Docs theme settings
+search_enabled: true
+search_heading_level: 2
+search_boost_heading_level: 1
+search_boost_content: 1
+search_boost_title: 2
+search_boost_href: 1.5
+search_boost_relative: 1
+
+# Navigation
+aux_links:
+  "GitHub Repository":
+    - "https://github.com/N3b3x/hf-espidf-ci-tools"
+
+# Footer content
+footer_content: "Built with <a href=\"https://github.com/just-the-docs/just-the-docs\">Just the Docs</a>, a Jekyll theme for documentation sites."
+
+# Color scheme
+color_scheme: light
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude files from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - hf-espidf-project-tools/
+  - path/
+  - .github/
+  - README.md
+
+# Include files
+include:
+  - _pages
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:path/
+
+# Default front matter
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+      parent: "Documentation"
