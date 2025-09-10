@@ -1626,10 +1626,7 @@ python3 hf-espidf-project-tools/generate_matrix.py --validate
 
 ### **Project Tools Documentation**
 
-- 🏗️ [**Build System**](../hf-espidf-project-tools/docs/README_BUILD_SYSTEM.md) - Complete build system guide
-- ⚙️ [**Configuration System**](../hf-espidf-project-tools/docs/README_CONFIG_SYSTEM.md) - Configuration management
-- 🚀 [**CI Pipeline**](../hf-espidf-project-tools/docs/README_CI_PIPELINE.md) - CI/CD integration guide
-- 🔧 [**Scripts Overview**](../hf-espidf-project-tools/docs/README_SCRIPTS_OVERVIEW.md) - All available scripts
+- 🏗️ [**Build System**](https://github.com/N3b3x/hf-espidf-project-tools) - Complete build system guide
 - Check cache key generation in workflow
 - Verify cache paths are accessible
 
