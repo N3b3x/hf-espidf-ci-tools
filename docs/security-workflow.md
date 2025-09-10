@@ -9,8 +9,6 @@ permalink: /docs/security-workflow/
 
 # Security Workflow Guide
 
-[← Previous: Build Workflow](build-workflow.md) | [Next: Example Workflows →](example-workflows.md)
-
 **🛡️ Dependencies, Secrets, CodeQL**
 
 ---
@@ -19,15 +17,15 @@ The Security workflow provides comprehensive security auditing including depende
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Security Features](#security-features)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
-- [Usage Examples](#usage-examples)
-- [Configuration](#configuration)
-- [Security Best Practices](#security-best-practices)
-- [Troubleshooting](#troubleshooting)
-- [Navigation](#navigation)
+- [🎯 Overview](#-overview)
+- [🔒 Security Features](#-security-features)
+- [⚙️ Inputs](#-inputs)
+- [📤 Outputs](#-outputs)
+- [🚀 Usage Examples](#-usage-examples)
+- [⚙️ Configuration](#-configuration)
+- [🛡️ Security Best Practices](#-security-best-practices)
+- [🔧 Troubleshooting](#-troubleshooting)
+- [📚 Related Workflows](#-related-workflows)
 
 ## 🎯 Overview
 

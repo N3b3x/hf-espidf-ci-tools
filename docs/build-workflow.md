@@ -9,8 +9,6 @@ permalink: /docs/build-workflow/
 
 # 🏗️ ESP-IDF Build Workflow Guide
 
-<div align="center">
-
 ![Build](https://img.shields.io/badge/Build-Matrix%20ESP--IDF-blue?style=for-the-badge&logo=espressif)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-orange?style=for-the-badge&logo=github)
 ![Matrix](https://img.shields.io/badge/Matrix-Parallel%20Builds-green?style=for-the-badge&logo=matrix)
@@ -18,14 +16,6 @@ permalink: /docs/build-workflow/
 **🚀 Advanced ESP32 Build System for HardFOC Projects**
 
 *Matrix-based building across multiple ESP-IDF versions, build types, and applications with intelligent caching and artifact management*
-
-</div>
-
-<div align="center">
-
-[← Previous: Documentation Index](index.md) | [Next: Security Workflow →](security-workflow.md)
-
-</div>
 
 ---
 
@@ -1655,11 +1645,6 @@ python3 hf-espidf-project-tools/generate_matrix.py --validate
 
 ---
 
-<div align="center">
-
 [← Previous: Documentation Index](index.md) | [Next: Security Workflow →](security-workflow.md)
 
 **📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
-
-</div>
-

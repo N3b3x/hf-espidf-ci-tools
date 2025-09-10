@@ -9,26 +9,20 @@ permalink: /docs/example-workflows/
 
 # 🚀 Example Workflows for Consumer Repositories
 
-![Examples](https://img.shields.io/badge/Examples-Consumer%20Workflows-blue?style=for-the-badge&logo=github)
-![Parallel](https://img.shields.io/badge/Parallel-Jobs-green?style=for-the-badge&logo=github-actions)
-![HardFOC](https://img.shields.io/badge/HardFOC-ESP32-orange?style=for-the-badge&logo=espressif)
-
 **📋 Complete Workflow Examples for HardFOC ESP32 Projects**
 
 *Ready-to-use GitHub Actions workflows that leverage all CI tools in parallel*
-
-[← Previous: Security Workflow](security-workflow.md) | [Next: Documentation Index →](index.md)
 
 ---
 
 ## 📋 Table of Contents
 
 - [🎯 Overview](#-overview)
-- [🏗️ Basic Workflow](#️-basic-workflow)
+- [🏗️ Basic Workflow](#-basic-workflow)
 - [🚀 Advanced Parallel Workflow](#-advanced-parallel-workflow)
 - [🔧 Development Workflow](#-development-workflow)
 - [📦 Release Workflow](#-release-workflow)
-- [🛡️ Security-First Workflow](#️-security-first-workflow)
+- [🛡️ Security-First Workflow](#-security-first-workflow)
 - [📚 Documentation Workflow](#-documentation-workflow)
 - [⚡ Performance Optimized](#-performance-optimized)
 
