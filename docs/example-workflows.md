@@ -3,7 +3,7 @@ layout: default
 title: "🚀 Example Workflows for Consumer Repositories"
 description: "Complete workflow examples for HardFOC ESP32 projects - Ready-to-use GitHub Actions workflows that leverage all CI tools in parallel"
 nav_order: 5
-parent: "Documentation"
+parent: "📚 Documentation"
 permalink: /docs/example-workflows/
 ---
 

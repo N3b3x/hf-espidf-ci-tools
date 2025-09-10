@@ -3,7 +3,7 @@ layout: default
 title: "🛡️ Security Workflow Guide"
 description: "Comprehensive security auditing for HardFOC ESP32 projects - Dependencies, secrets, and CodeQL analysis with automatic requirements discovery"
 nav_order: 4
-parent: "Documentation"
+parent: "📚 Documentation"
 permalink: /docs/security-workflow/
 ---
 
