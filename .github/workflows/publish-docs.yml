@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   publish-docs:
-    uses: ./.github/workflows/docs.yml
+    uses: N3b3x/nt-general-ci-tools/.github/workflows/docs.yml@main
     with:
       # Jekyll configuration for this repo's docs
       jekyll_enabled: true

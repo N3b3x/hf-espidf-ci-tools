@@ -11,7 +11,7 @@ on:
 jobs:
   yamllint:
     name: YAML Lint
-    uses: N3b3x/nt-general-ci-tools/.github/workflows/yamllint-reusable.yml
+    uses: N3b3x/nt-general-ci-tools/.github/workflows/yamllint-reusable.yml@main
     with:
       paths: '.github/workflows/*.yml,**/*.yml,**/*.yaml'
       config_file: '.yamllint'
