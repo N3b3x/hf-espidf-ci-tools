@@ -14,10 +14,10 @@ author:
   url: "https://github.com/n3b3x"
 
 # Directory configuration
-includes_dir: _includes
-layouts_dir: _layouts
+includes_dir: docs/_includes
+layouts_dir: docs/_layouts
 sass:
-  sass_dir: _sass
+  sass_dir: docs/_sass
 
 # Theme and plugins
 remote_theme: just-the-docs/just-the-docs
@@ -127,9 +127,9 @@ just_the_docs:
 
   # Custom CSS and JS
   custom_css:
-    - assets/css/custom.css
+    - docs/assets/css/custom.css
   custom_js:
-    - assets/js/custom.js
+    - docs/assets/js/custom.js
 
 # Exclude files from processing
 exclude:
@@ -147,10 +147,10 @@ exclude:
 
 # Include files that are normally excluded
 include:
-  - _pages
+  - docs/_pages
   - ../README.md
   - ../LICENSE
-  - assets/
+  - docs/assets/
 
 # Enhanced SEO settings
 seo:
