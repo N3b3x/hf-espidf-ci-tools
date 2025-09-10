@@ -20,7 +20,7 @@ permalink: /
 
 ## 📚 Documentation
 
-**🌐 [Live Documentation Site](https://n3b3x.github.io/hf-espidf-project-tools/)**  
+**🌐 [Live Documentation Site](https://n3b3x.github.io/hf-espidf-ci-tools/)**  
 *Published documentation with enhanced navigation and search*
 
 | Workflow | Purpose | Key Features | Documentation |
