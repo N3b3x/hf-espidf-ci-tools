@@ -458,7 +458,7 @@ jobs:
       project_dir: examples/esp32
       project_tools_dir: hf-espidf-project-tools
       clean_build: false
-      max_dec_total: ${{ github.event.inputs.size_limit != '' && format('{0}{1}', github.event.inputs.size_limit, '000000') || '1600000' }}
+      max_dec_total: ${% raw %}{{ github.event.inputs.size_limit != '' && format('{0}{1}', github.event.inputs.size_limit, '000000') || '1600000' }}{% endraw %}
 ```
 
 ---
