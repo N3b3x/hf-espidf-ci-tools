@@ -50,6 +50,9 @@ exclude:
   - path/
   - .github/
   - README.md
+  - ../README.md
+  - ../hf-espidf-project-tools/
+  - ../path/
 
 # Include files
 include:
@@ -73,4 +76,8 @@ defaults:
       type: "docs"
     values:
       layout: "default"
-      parent: "Documentation"
+      parent: "📚 Documentation"
+
+# Custom layouts and includes
+layouts_dir: _layouts
+includes_dir: _includes
