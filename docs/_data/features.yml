@@ -1,6 +1,9 @@
+---
 # Features data for the HardFOC ESP32 CI Tools
 - title: "Matrix-based ESP-IDF builds"
-  description: "Parallel builds across multiple ESP-IDF versions, build types, and applications with intelligent caching and artifact management"
+  description: >
+    Parallel builds across multiple ESP-IDF versions, build types, and applications with intelligent
+    caching and artifact management
   icon: "fas fa-cogs"
   badges:
     - text: "Core Feature"
@@ -9,7 +12,8 @@
       type: "info"
 
 - title: "Comprehensive security auditing"
-  description: "Dependencies, secrets, and CodeQL analysis with automatic requirements discovery for mixed-language projects"
+  description: >
+    Dependencies, secrets, and CodeQL analysis with automatic requirements discovery for mixed-language projects
   icon: "fas fa-shield-alt"
   badges:
     - text: "Security"
@@ -18,7 +22,8 @@
       type: "info"
 
 - title: "Smart project tools integration"
-  description: "Single composite action for project tools directory management with automatic tool cloning and security validation"
+  description: >
+    Single composite action for project tools directory management with automatic tool cloning and security validation
   icon: "fas fa-tools"
   badges:
     - text: "Automation"

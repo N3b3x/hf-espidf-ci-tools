@@ -305,7 +305,7 @@ jobs:
               console.log('No issue number available, skipping PR comment');
               return;
             }
-            
+
             const fs = require('fs');
             const body = fs.readFileSync('${{ steps.mk.outputs.file }}',
                                         'utf8');

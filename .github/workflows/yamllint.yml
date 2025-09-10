@@ -1,5 +1,5 @@
 ---
-name: YAML Lint
+name: 📚 YAML Lint
 
 on:
   push:
@@ -11,31 +11,9 @@ on:
 jobs:
   yamllint:
     name: YAML Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install yamllint
-        run: |
-          python -m pip install --upgrade pip
-          pip install yamllint
-
-      - name: Run yamllint on workflow files
-        run: |
-          echo "Checking .github/workflows/*.yml files..."
-          yamllint .github/workflows/*.yml
-
-      - name: Run yamllint on all YAML files
-        run: |
-          echo "Checking all YAML files in repository..."
-          find . -name "*.yml" -o -name "*.yaml" | grep -v ".git/" | xargs yamllint || true
-
-      - name: Check for yamllint configuration
-        run: |
-          if [ -f ".yamllint" ]; then
-            echo "✅ .yamllint configuration file found"
-            cat .yamllint
-          else
-            echo "❌ No .yamllint configuration file found"
-          fi
+    uses: N3b3x/nt-general-ci-tools/.github/workflows/yamllint-reusable.yml
+    with:
+      paths: '.github/workflows/*.yml,**/*.yml,**/*.yaml'
+      config_file: '.yamllint'
+      strict_mode: true
+      exclude_patterns: '.git/**,node_modules/**,venv/**,.venv/**,_site/**'

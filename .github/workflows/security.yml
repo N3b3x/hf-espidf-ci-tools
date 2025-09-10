@@ -164,7 +164,7 @@ jobs:
           echo "Input values:"
           echo "  scan_type: '${{ inputs.scan_type }}'"
           echo "  run_codeql: '${{ inputs.run_codeql }}'"
-          
+
           # Check scan_type
           if [[ "${{ inputs.scan_type }}" == "all" || "${{ inputs.scan_type }}" == "codeql" ]]; then
             echo "✓ scan_type allows CodeQL"
@@ -173,7 +173,7 @@ jobs:
             echo "✗ scan_type does not allow CodeQL"
             scan_ok=false
           fi
-          
+
           # Check run_codeql - be very explicit
           if [[ "${{ inputs.run_codeql }}" == "true" ]]; then
             echo "✓ run_codeql is explicitly 'true'"
@@ -182,7 +182,7 @@ jobs:
             echo "✗ run_codeql is not 'true' (actual value: '${{ inputs.run_codeql }}')"
             codeql_ok=false
           fi
-          
+
           # Final decision
           if [[ "$scan_ok" == "true" && "$codeql_ok" == "true" ]]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
