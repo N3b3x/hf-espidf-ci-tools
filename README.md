@@ -20,6 +20,9 @@ permalink: /
 
 ## 📚 Documentation
 
+**🌐 [Live Documentation Site](https://n3b3x.github.io/hf-espidf-project-tools/)**  
+*Published documentation with enhanced navigation and search*
+
 | Workflow | Purpose | Key Features | Documentation |
 |----------|---------|--------------|---------------|
 | **🏗️ Build** | Matrix ESP-IDF builds | Parallel builds, caching, size reports | [Build Guide](docs/build-workflow.md) |
