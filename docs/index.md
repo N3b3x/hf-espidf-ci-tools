@@ -1,3 +1,12 @@
+---
+layout: default
+title: "📚 Documentation"
+description: "Complete documentation navigation and setup guide for HardFOC ESP32 CI Tools"
+nav_order: 2
+has_children: true
+permalink: /docs/
+---
+
 # Documentation Index
 
 <div align="center">

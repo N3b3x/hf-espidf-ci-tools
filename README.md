@@ -1,3 +1,11 @@
+---
+layout: default
+title: "🔧 HardFOC ESP32 CI Tools"
+description: "Advanced CI/CD Tools for HardFOC ESP32 Projects - Comprehensive GitHub Actions workflows for ESP-IDF development with matrix builds, security auditing, and automated documentation"
+nav_order: 1
+permalink: /
+---
+
 # 🔧 HardFOC ESP32 CI Tools
 
 <div align="center">

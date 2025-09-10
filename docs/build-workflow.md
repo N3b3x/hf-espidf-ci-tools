@@ -1,3 +1,12 @@
+---
+layout: default
+title: "🏗️ ESP-IDF Build Workflow Guide"
+description: "Advanced ESP32 Build System for HardFOC Projects - Matrix-based building across multiple ESP-IDF versions, build types, and applications with intelligent caching and artifact management"
+nav_order: 3
+parent: "📚 Documentation"
+permalink: /docs/build-workflow/
+---
+
 # 🏗️ ESP-IDF Build Workflow Guide
 
 <div align="center">
