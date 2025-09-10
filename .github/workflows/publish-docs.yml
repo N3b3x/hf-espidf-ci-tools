@@ -23,7 +23,7 @@ jobs:
     with:
       # Jekyll configuration for this repo's docs
       jekyll_enabled: true
-      jekyll_config: "docs/_config.yml"
+      jekyll_config: "_config.yml"
       jekyll_source: "."
       jekyll_destination: "_site"
       jekyll_layouts_dir: "docs/_layouts"

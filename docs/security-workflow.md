@@ -9,13 +9,9 @@ permalink: /docs/security-workflow/
 
 # Security Workflow Guide
 
-<div align="center">
-
 [← Previous: Build Workflow](build-workflow.md) | [Next: Example Workflows →](example-workflows.md)
 
 **🛡️ Dependencies, Secrets, CodeQL**
-
-</div>
 
 ---
 
@@ -244,11 +240,7 @@ env:
 
 ---
 
-<div align="center">
-
 [← Previous: Build Workflow](build-workflow.md) | [Next: Example Workflows →](example-workflows.md)
 
 **📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
-
-</div>
 

@@ -9,8 +9,6 @@ permalink: /docs/example-workflows/
 
 # 🚀 Example Workflows for Consumer Repositories
 
-<div align="center">
-
 ![Examples](https://img.shields.io/badge/Examples-Consumer%20Workflows-blue?style=for-the-badge&logo=github)
 ![Parallel](https://img.shields.io/badge/Parallel-Jobs-green?style=for-the-badge&logo=github-actions)
 ![HardFOC](https://img.shields.io/badge/HardFOC-ESP32-orange?style=for-the-badge&logo=espressif)
@@ -20,8 +18,6 @@ permalink: /docs/example-workflows/
 *Ready-to-use GitHub Actions workflows that leverage all CI tools in parallel*
 
 [← Previous: Security Workflow](security-workflow.md) | [Next: Documentation Index →](index.md)
-
-</div>
 
 ---
 
@@ -467,10 +463,7 @@ For more detailed information, see the individual workflow documentation:
 
 ---
 
-<div align="center">
-
 [← Previous: Security Workflow](security-workflow.md) | [Next: Documentation Index →](index.md)
 
 **📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
 
-</div>

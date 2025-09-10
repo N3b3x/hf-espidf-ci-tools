@@ -9,13 +9,9 @@ permalink: /docs/
 
 # Documentation Index
 
-<div align="center">
-
 [← Previous: Example Workflows](example-workflows.md) | [Next: Build Workflow →](build-workflow.md)
 
 **📋 Documentation Index and Navigation**
-
-</div>
 
 ---
 
@@ -137,10 +133,7 @@ jobs:
 
 ---
 
-<div align="center">
-
 [← Previous: Example Workflows](example-workflows.md) | [Next: Build Workflow →](build-workflow.md)
 
 **📚 [All Documentation](index.md)** | **🏠 [Main README](../README.md)**
 
-</div>

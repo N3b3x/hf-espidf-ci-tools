@@ -8,8 +8,6 @@ permalink: /
 
 # 🔧 HardFOC ESP32 CI Tools
 
-<div align="center">
-
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-blue?style=for-the-badge&logo=github-actions)
 ![ESP-IDF](https://img.shields.io/badge/ESP--IDF-Matrix%20Builds-green?style=for-the-badge&logo=espressif)
 ![HardFOC](https://img.shields.io/badge/HardFOC-ESP32-orange?style=for-the-badge&logo=espressif)
@@ -17,8 +15,6 @@ permalink: /
 **🚀 Advanced CI/CD Tools for HardFOC ESP32 Projects**
 
 *Comprehensive GitHub Actions workflows for ESP-IDF development with matrix builds, security auditing, and automated documentation*
-
-</div>
 
 ---
 
