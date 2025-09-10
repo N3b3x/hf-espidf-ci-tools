@@ -14,8 +14,8 @@ author:
   url: "https://github.com/n3b3x"
 
 # Directory configuration
-includes_dir: _includes
-layouts_dir: _layouts
+includes_dir: docs/_includes
+layouts_dir: docs/_layouts
 
 # Theme and plugins
 remote_theme: just-the-docs/just-the-docs
@@ -145,10 +145,10 @@ exclude:
 
 # Include files that are normally excluded
 include:
-  - _pages
+  - docs/_pages
   - ../README.md
   - ../LICENSE
-  - assets/
+  - docs/assets/
 
 # Enhanced SEO settings
 seo:
