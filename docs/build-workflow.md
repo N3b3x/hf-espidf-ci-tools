@@ -635,7 +635,7 @@ project(esp32_iid_${APP_TYPE}_app)
 
 # Get app type from parent (set by project-level CMakeLists.txt)
 if(NOT DEFINED APP_TYPE)
-    set(APP_TYPE "ascii_art")
+    set(APP_TYPE "main")
 endif()
 
 # Get source file from centralized configuration
@@ -750,7 +750,7 @@ cmake_minimum_required(VERSION 3.16)
 
 # Define APP_TYPE with default value
 if(NOT DEFINED APP_TYPE)
-    set(APP_TYPE "ascii_art")
+    set(APP_TYPE "main")
 endif()
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
@@ -846,7 +846,7 @@ cmake_minimum_required(VERSION 3.16)
 
 # Define APP_TYPE with default value
 if(NOT DEFINED APP_TYPE)
-    set(APP_TYPE "ascii_art")
+    set(APP_TYPE "main")
 endif()
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
@@ -968,7 +968,7 @@ project(esp32_iid_${APP_TYPE}_app)
 
 # Get app type from parent (set by project-level CMakeLists.txt)
 if(NOT DEFINED APP_TYPE)
-    set(APP_TYPE "ascii_art")
+    set(APP_TYPE "main")
 endif()
 
 # Get source file from centralized configuration

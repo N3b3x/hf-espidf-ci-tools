@@ -128,3 +128,5 @@ jobs:
 ---
 
 📖 **Next**: [Documentation Index](docs/index.md) - Complete navigation and examples
+
+> **🧪 [Test 404 Page](nonexistent-page)** - (on live documentation) Click this link to test our custom 404 page!
