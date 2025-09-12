@@ -123,7 +123,7 @@ just_the_docs:
       url: https://github.com/n3b3x/nt-espidf-ci-tools/issues
 
   # Custom head content
-  head_custom: _includes/head_custom.html
+  head_custom: docs/_includes/head_custom.html
 
   # Custom CSS and JS
   custom_css:
