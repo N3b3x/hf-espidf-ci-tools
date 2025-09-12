@@ -12,10 +12,10 @@ permalink: /
 
 ---
 
-[![Publish Docs](https://github.com/n3b3x/nt-espidf-ci-tools/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/n3b3x/nt-espidf-ci-tools/actions/workflows/publish-docs.yml)
-![ESP-IDF](https://img.shields.io/badge/ESP--IDF-Matrix%20Builds-green?style=for-the-badge&logo=espressif)
+[![Publish Docs](https://github.com/n3b3x/hf-espidf-ci-tools/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/n3b3x/hf-espidf-ci-tools/actions/workflows/publish-docs.yml)
+[![ESP-IDF](https://img.shields.io/badge/ESP--IDF-Matrix%20Builds-green?logo=espressif)](https://docs.espressif.com/projects/esp-idf/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://n3b3x.github.io/nt-espidf-ci-tools)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://n3b3x.github.io/hf-espidf-ci-tools)
 
 
 *Comprehensive GitHub Actions workflows for ESP-IDF development with matrix builds, security auditing, and automated documentation*

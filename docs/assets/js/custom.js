@@ -1,4 +1,4 @@
-// Custom JavaScript for nt-espidf-ci-tools documentation
+// Custom JavaScript for hf-espidf-ci-tools documentation
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize any custom functionality here
