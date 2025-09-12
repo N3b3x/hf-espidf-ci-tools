@@ -9,9 +9,9 @@ permalink: /docs/build-workflow/
 
 # 🏗️ ESP-IDF Build Workflow Guide
 
-![Build](https://img.shields.io/badge/Build-Matrix%20ESP--IDF-blue?style=for-the-badge&logo=espressif)
-![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-orange?style=for-the-badge&logo=github)
-![Matrix](https://img.shields.io/badge/Matrix-Parallel%20Builds-green?style=for-the-badge&logo=matrix)
+[![Build](https://img.shields.io/badge/Build-Matrix%20ESP--IDF-blue?logo=espressif)](https://docs.espressif.com/projects/esp-idf/)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-orange?logo=github)
+![Matrix](https://img.shields.io/badge/Matrix-Parallel%20Builds-green?logo=matrix)
 
 **🚀 Advanced ESP32 Build System for HardFOC Projects**
 
@@ -22,11 +22,11 @@ permalink: /docs/build-workflow/
 ## 📋 Table of Contents
 
 - [🎯 Overview](#-overview)
-- [⚙️ Inputs & Configuration](#️-inputs--configuration)
+- [⚙️ Inputs & Configuration](#-inputs--configuration)
 - [📤 Outputs & Artifacts](#-outputs--artifacts)
 - [🚀 Usage Examples](#-usage-examples)
 - [🔧 Configuration](#-configuration)
-- [🏗️ Build Process](#️-build-process)
+- [🏗️ Build Process](#-build-process)
 - [🔍 Troubleshooting](#-troubleshooting)
 - [📚 Related Documentation](#-related-documentation)
 
