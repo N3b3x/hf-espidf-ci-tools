@@ -56,7 +56,7 @@ on:
 jobs:
   # Build firmware across multiple configurations
   build:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1
     with:
       project_dir: examples/esp32
 
@@ -127,7 +127,7 @@ jobs:
   # 🏗️ Build firmware (parallel matrix)
   build:
     needs: validate
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1
     with:
       project_dir: ${{ env.PROJECT_DIR }}
       project_tools_dir: ${{ env.TOOLS_DIR }}
@@ -178,7 +178,7 @@ on:
 jobs:
   # Quick build for development
   build-dev:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1
     with:
       project_dir: examples/esp32
       clean_build: false  # Use caches for faster builds
@@ -219,7 +219,7 @@ env:
 jobs:
   # Comprehensive build for release
   build-release:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1
     with:
       project_dir: ${{ env.PROJECT_DIR }}
       clean_build: true  # Clean build for release
@@ -312,7 +312,7 @@ jobs:
   # Build only if security passes
   build-secure:
     needs: security-audit
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1
     with:
       project_dir: examples/esp32
       clean_build: true
@@ -363,7 +363,7 @@ env:
 jobs:
   # Optimized build with aggressive caching
   build-fast:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1
     with:
       project_dir: ${{ env.PROJECT_DIR }}
       clean_build: false  # Always use caches
