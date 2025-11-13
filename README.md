@@ -31,6 +31,7 @@ permalink: /
 |----------|---------|--------------|---------------|
 | **🏗️ Build** | Matrix ESP-IDF builds | Parallel builds, caching, size reports | [Build Guide](docs/build-workflow.md) |
 | **🛡️ Security** | Security auditing | CodeQL, dependency scan, secrets | [Security Guide](docs/security-workflow.md) |
+| **📦 Release** | Firmware releases with artifacts | Auto artifacts, ESP32 binaries, GitHub releases | [Release Guide](docs/release-workflow.md) |
 
 📖 **Start here**: [Documentation Index](docs/index.md) - Complete guide with examples and navigation  
 🚀 **Examples**: [Example Workflows](docs/example-workflows.md) - Ready-to-use workflow templates
@@ -95,6 +96,17 @@ jobs:
       project_dir: examples/esp32
       scan_type: "all"
       run_codeql: true
+
+  # Release with firmware artifacts (on tags)
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build]
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1
+    with:
+      build_workflow: "esp32-examples-build-ci.yml"
+      artifact_pattern: "fw-.*"
+    permissions:
+      contents: write
 ```
 
 ### **3. Complete Examples**

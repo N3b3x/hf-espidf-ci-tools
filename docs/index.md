@@ -21,6 +21,7 @@ Welcome to the hf-espidf-ci-tools documentation! This guide provides comprehensi
 |----------|-------------|-------------|
 | **[Build](build-workflow.md)** | ESP-IDF matrix builds with caching | [→ Build Guide](build-workflow.md) |
 | **[Security](security-workflow.md)** | Dependencies, secrets, CodeQL | [→ Security Guide](security-workflow.md) |
+| **[Release](release-workflow.md)** | Firmware releases with build artifacts | [→ Release Guide](release-workflow.md) |
 
 ## 📋 Prerequisites
 
@@ -98,6 +99,13 @@ jobs:
 
 [→ Full Security Guide](security-workflow.md)
 
+### Release Workflow
+- **Purpose**: Automated firmware releases with build artifacts
+- **Key Features**: GitHub releases, firmware binaries, auto-generated notes
+- **Use Case**: Version releases with ESP32 firmware artifacts
+
+[→ Full Release Guide](release-workflow.md)
+
 ## 🔄 Workflow Combinations
 
 ### Full CI Pipeline
@@ -106,6 +114,7 @@ jobs:
 jobs:
   build: # Matrix builds
   security: # Security audit
+  release: # Firmware release (on tags)
 ```
 
 ### Security Pipeline
