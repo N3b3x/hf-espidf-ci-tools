@@ -4,17 +4,17 @@
 # Exclude patterns for files/directories
 # Note: These patterns are relative to the repository root
 exclude = [
-    "_config/_includes/**",  # Jekyll includes (moved from docs/)
-    "_config/_layouts/**",  # Jekyll layouts (moved from docs/)
-    "_config/_pages/**",  # Jekyll pages (moved from docs/)
-    "_config/_sass/**",  # Jekyll SASS (moved from docs/)
-    "_config/_data/**",  # Jekyll data (moved from docs/)
-    "**/404.html",  # Contains Jekyll template syntax (match anywhere)
-    "**/robots.txt",  # Contains sitemap URLs that may not exist
-    "**/_config.yml",  # Contains base URLs that may 404 (match anywhere)
-    "_config/_config.yml",  # Jekyll config (moved from docs/)
-    "docs/404.html",  # Explicit path
-    "docs/robots.txt",  # Explicit path
+    "_config/_includes",
+    "_config/_layouts",
+    "_config/_pages",
+    "_config/_sass",
+    "_config/_data",
+    "404.html",
+    "robots.txt",
+    "_config.yml",
+    "_config/_config.yml",
+    "docs/404.html",
+    "docs/robots.txt",
 ]
 
 # Exclude specific URLs (regex patterns)
