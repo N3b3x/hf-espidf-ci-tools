@@ -71,7 +71,7 @@
   },"10": {
     "doc": "🔧 HardFOC ESP32 CI Tools",
     "title": "Consumer usage (examples)",
-    "content": "CI combining build + security: . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . | name: CI on: push: { branches: [ main ] } pull_request: { branches: [ main ] } jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 # Change to where your esp32 project directory is project_tools_dir: hf-espidf-project-tools auto_clone_tools: true clean_build: false security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools scan_type: \"all\" run_codeql: true codeql_languages: \"cpp\" . | . 📖 Next: Documentation Index - Complete navigation and examples . 🧪 Test 404 Page - (on live documentation) Click this link to test our custom 404 page! . ",
+    "content": "CI combining build + security: . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . | name: CI on: push: { branches: [ main ] } pull_request: { branches: [ main ] } jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 # Change to where your esp32 project directory is project_tools_dir: hf-espidf-project-tools auto_clone_tools: true clean_build: false security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools scan_type: \"all\" run_codeql: true codeql_languages: \"cpp\" . | . 📖 Next: Documentation Index - Complete navigation and examples . ",
     "url": "/hf-espidf-ci-tools/development/#consumer-usage-examples",
     
     "relUrl": "/#consumer-usage-examples"
