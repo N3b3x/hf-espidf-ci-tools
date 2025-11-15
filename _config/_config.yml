@@ -14,10 +14,10 @@ author:
   url: "https://github.com/n3b3x"
 
 # Directory configuration
-includes_dir: docs/_includes
-layouts_dir: docs/_layouts
+includes_dir: _config/_includes
+layouts_dir: _config/_layouts
 sass:
-  sass_dir: docs/_sass
+  sass_dir: _config/_sass
 
 # Theme and plugins
 remote_theme: just-the-docs/just-the-docs
@@ -123,7 +123,7 @@ just_the_docs:
       url: https://github.com/n3b3x/hf-espidf-ci-tools/issues
 
   # Custom head content
-  head_custom: docs/_includes/head_custom.html
+  head_custom: _config/_includes/head_custom.html
 
   # Custom CSS and JS
   custom_css:
@@ -147,7 +147,7 @@ exclude:
 
 # Include files that are normally excluded
 include:
-  - docs/_pages
+  - _config/_pages
   - ../README.md
   - ../LICENSE
   - docs/assets/

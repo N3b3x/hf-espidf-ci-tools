@@ -14,7 +14,7 @@ jobs:
     uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-docs-linkcheck.yml@main
     with:
       checkout_recursive: true
-      paths: "docs/** *.md **/*.md"
+      paths: "docs/**/*.md *.md"
       fail_on_errors: false
       timeout: "30"
       max_retries: "3"

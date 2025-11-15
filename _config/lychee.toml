@@ -2,12 +2,19 @@
 # See https://github.com/lycheeverse/lychee for documentation
 
 # Exclude patterns for files/directories
+# Note: These patterns are relative to the repository root
 exclude = [
-    "docs/_includes/**",
-    "docs/_layouts/**",
-    "docs/404.html",  # Contains Jekyll template syntax
-    "docs/robots.txt",  # Contains sitemap URLs that may not exist
-    "docs/_config.yml",  # Contains base URLs that may 404
+    "_config/_includes/**",  # Jekyll includes (moved from docs/)
+    "_config/_layouts/**",  # Jekyll layouts (moved from docs/)
+    "_config/_pages/**",  # Jekyll pages (moved from docs/)
+    "_config/_sass/**",  # Jekyll SASS (moved from docs/)
+    "_config/_data/**",  # Jekyll data (moved from docs/)
+    "**/404.html",  # Contains Jekyll template syntax (match anywhere)
+    "**/robots.txt",  # Contains sitemap URLs that may not exist
+    "**/_config.yml",  # Contains base URLs that may 404 (match anywhere)
+    "_config/_config.yml",  # Jekyll config (moved from docs/)
+    "docs/404.html",  # Explicit path
+    "docs/robots.txt",  # Explicit path
 ]
 
 # Exclude specific URLs (regex patterns)
