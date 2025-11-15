@@ -1,5 +1,5 @@
 ---
-name: ✅ YAML Lint CI
+name: 📝 YAML Lint CI
 
 on:
   push:

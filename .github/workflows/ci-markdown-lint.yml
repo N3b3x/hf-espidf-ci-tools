@@ -13,7 +13,7 @@ jobs:
     name: Markdown Lint
     uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-markdown-lint.yml@main
     with:
-      paths: '**/*.md'
+      globs: '**/*.md'
       config_file: '_config/.markdownlint.json'
-      fix_errors: false
+      fix: false
       exclude_patterns: '.git/**,node_modules/**,venv/**,.venv/**,_site/**,**/hf-espidf-project-tools/**'
