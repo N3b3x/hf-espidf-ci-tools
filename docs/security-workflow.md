@@ -13,7 +13,8 @@ permalink: /docs/security-workflow/
 
 ---
 
-The Security workflow provides comprehensive security auditing including dependency scanning, secret detection, and optional CodeQL analysis.
+The Security workflow provides comprehensive security auditing including dependency scanning, secret
+detection, and optional CodeQL analysis.
 
 ## 📋 Table of Contents
 
@@ -30,7 +31,8 @@ The Security workflow provides comprehensive security auditing including depende
 ## 🎯 Overview
 
 **Purpose**: Comprehensive security auditing  
-**Key Features**: 
+**Key Features**:
+
 - **Automatic Requirements Discovery**: Finds all `requirements.txt` and `requirements.in` files automatically
 - **Python dependency vulnerability scanning**: Uses pip-audit and safety
 - **Secret and credential detection**: Uses gitleaks to find accidentally committed secrets
@@ -42,17 +44,20 @@ The Security workflow provides comprehensive security auditing including depende
 ## 🔒 Security Features
 
 ### Repository Security
+
 - **Trusted Source Only**: Tools are only cloned from the trusted N3b3x/hf-espidf-project-tools repository
 - **No External URLs**: Users cannot specify arbitrary repository URLs, preventing supply chain attacks
 - **Main Branch Only**: Always uses the main branch for consistency and stability
 - **Shallow Cloning**: Uses `--depth 1` to minimize attack surface and reduce clone time
 
 ### Input Validation
+
 - **Path Sanitization**: All file paths are validated and sanitized
 - **Parameter Validation**: Input parameters are validated before use
 - **Error Handling**: Secure error messages that don't leak sensitive information
 
 ### Automatic Discovery
+
 - **Requirements Files**: Automatically finds all `requirements*.txt` and `requirements*.in` files
 - **No Manual Configuration**: Scans entire repository without user input
 - **Comprehensive Coverage**: Covers all Python dependencies in the project
@@ -144,12 +149,14 @@ The workflow automatically generates the same build matrix as your build workflo
 4. **Build consistency**: Each matrix job uses the exact same build configuration
 
 **Matrix Parameters Used**:
+
 - `matrix.app_name` - Application name
 - `matrix.build_type` - Build type (debug/release)
 - `matrix.idf_version` - ESP-IDF version
 - `matrix.target` - Target chip (esp32, esp32c6, etc.)
 
 **Example Integration**:
+
 ```yaml
 # In your CI workflow, ensure consistency:
 jobs:
@@ -172,24 +179,28 @@ jobs:
 ## 🛡️ Security Best Practices
 
 ### For Production Environments
+
 1. **Disable auto-clone**: Set `auto_clone_tools: false` and include tools in your repository
 2. **Regular updates**: Periodically update the tools in your repository after reviewing changes
 3. **Version control**: Track tool versions in your project's dependency management
 4. **Code review**: Review all tool updates before applying them
 
 ### For Development Environments
+
 1. **Enable auto-clone**: Set `auto_clone_tools: true` for convenience
 2. **Monitor changes**: Keep track of tool updates and security advisories
 3. **Test updates**: Verify tool updates don't break your build process
 4. **Use staging**: Test changes in staging before production
 
 ### For CI/CD Pipelines
+
 1. **Audit trail**: Log which tools version is being used
 2. **Dependency scanning**: Use tools like Dependabot to monitor for vulnerabilities
 3. **Access controls**: Limit who can modify the tools repository
 4. **Regular updates**: Keep tools up to date with security patches
 
 ### Requirements File Management
+
 - **Use specific versions**: Pin dependencies to specific versions in `requirements.txt`
 - **Regular updates**: Update dependencies regularly and test thoroughly
 - **Security scanning**: Run the security workflow regularly to catch vulnerabilities
@@ -200,16 +211,19 @@ jobs:
 ### Common Issues
 
 **Dependency Scan Fails**
+
 - Check Python version compatibility
 - Verify requirements files exist
 - Review pip installation logs
 
 **Secret Detection Issues**
+
 - Ensure full git history is available
 - Check gitleaks installation
 - Review false positive suppressions
 
 **CodeQL Analysis Fails**
+
 - Verify `project_dir` and `scripts_dir` are correct
 - Check `build_app.sh` exists in scripts directory
 - Ensure matrix generation works (same as build workflow)

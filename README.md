@@ -41,16 +41,19 @@ permalink: /
 ## 🎯 What This Repository Provides
 
 ### **Reusable GitHub Actions Workflows**
+
 - ✅ **Matrix-based ESP-IDF builds** across multiple versions and configurations
 - ✅ **Comprehensive security auditing** with CodeQL and dependency scanning
 
 ### **Smart Project Tools Integration**
+
 - ✅ **Single composite action** for project tools directory management
 - ✅ **Automatic tool cloning** with security validation
 - ✅ **Dynamic matrix generation** from project configuration
 - ✅ **Intelligent caching** for faster builds
 
 ### **HardFOC Project Support**
+
 - ✅ **ESP32-C6 optimized** for HardFOC interface projects
 - ✅ **Multi-application support** with YAML configuration
 - ✅ **Parallel execution** for maximum CI efficiency
@@ -116,6 +119,7 @@ For comprehensive examples including development, release, and security-focused 
 ### Consumer usage (examples)
 
 CI combining build + security:
+
 ```yaml
 name: CI
 on:
@@ -145,4 +149,5 @@ jobs:
 
 📖 **Next**: [Documentation Index](docs/index.md) - Complete navigation and examples
 
-> **🧪 [Test 404 Page](https://n3b3x.github.io/hf-espidf-ci-tools/nonexistent-page)** - (on live documentation) Click this link to test our custom 404 page!
+> **🧪 [Test 404 Page](https://n3b3x.github.io/hf-espidf-ci-tools/nonexistent-page)** -
+> (on live documentation) Click this link to test our custom 404 page!

@@ -43,26 +43,31 @@ The documentation will be available at `http://localhost:4000`.
 ## Custom Components
 
 ### Alerts
+
 ```liquid
 {% include alert.html type="info" title="Note" content="Important information" %}
 ```
 
 ### Badges
+
 ```liquid
 {% include badge.html text="New" type="success" %}
 ```
 
 ### Cards
+
 ```liquid
 {% include card.html title="Card Title" content="Card content" %}
 ```
 
 ### Feature Lists
+
 ```liquid
 {% include feature_list.html features=site.data.features %}
 ```
 
 ### Workflow Status
+
 ```liquid
 {% include workflow_status.html status="success" message="Build completed" %}
 ```
@@ -70,6 +75,7 @@ The documentation will be available at `http://localhost:4000`.
 ## Configuration
 
 The `_config.yml` file contains all Jekyll configuration including:
+
 - Site metadata
 - Just the Docs theme settings
 - Navigation structure

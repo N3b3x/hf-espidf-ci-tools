@@ -30,9 +30,12 @@ permalink: /docs/example-workflows/
 
 ## 🎯 Overview
 
-These example workflows demonstrate how to use the HardFOC ESP32 CI tools in your consumer repositories. Each workflow is designed for different use cases and can be customized to fit your project's needs.
+These example workflows demonstrate how to use the HardFOC ESP32 CI tools in your consumer
+repositories. Each workflow is designed for different use cases and can be customized to fit your
+project's needs.
 
 ### **Key Features**
+
 - 🔄 **Parallel Execution** - Multiple jobs run simultaneously for maximum efficiency
 - 🛡️ **Comprehensive Coverage** - Build, lint, test, security, and documentation
 - 📊 **Smart Caching** - Optimized for fast builds and minimal resource usage
@@ -405,6 +408,7 @@ jobs:
 ## 🔧 Customization Tips
 
 ### **Environment Variables**
+
 ```yaml
 env:
   PROJECT_DIR: examples/esp32
@@ -414,6 +418,7 @@ env:
 ```
 
 ### **Conditional Execution**
+
 ```yaml
 jobs:
   security:
@@ -426,6 +431,7 @@ jobs:
 ```
 
 ### **Matrix Strategies**
+
 ```yaml
 strategy:
   fail-fast: false  # Don't stop on first failure
@@ -433,6 +439,7 @@ strategy:
 ```
 
 ### **Cache Optimization**
+
 ```yaml
 - name: Cache ESP-IDF
   uses: actions/cache@v4
@@ -452,6 +459,7 @@ strategy:
 5. **Monitor and optimize** based on your build times and requirements
 
 For more detailed information, see the individual workflow documentation:
+
 - [Build Workflow](build-workflow.md)
 - [Security Workflow](security-workflow.md)
 

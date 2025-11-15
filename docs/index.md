@@ -13,7 +13,8 @@ permalink: /docs/
 
 ---
 
-Welcome to the hf-espidf-ci-tools documentation! This guide provides comprehensive coverage of all reusable workflows and how to integrate them into your ESP-IDF projects.
+Welcome to the hf-espidf-ci-tools documentation! This guide provides comprehensive coverage of all
+reusable workflows and how to integrate them into your ESP-IDF projects.
 
 ## 🚀 Quick Navigation
 
@@ -85,6 +86,7 @@ jobs:
 ## 📚 Workflow Details
 
 ### Build Workflow
+
 - **Purpose**: Matrix builds across ESP-IDF versions and build types
 - **Key Features**: Caching, artifact uploads, matrix generation
 - **Use Case**: CI/CD for ESP32 applications
@@ -93,6 +95,7 @@ jobs:
 
 
 ### Security Workflow
+
 - **Purpose**: Comprehensive security auditing
 - **Key Features**: Dependencies, secrets, CodeQL analysis
 - **Use Case**: Security compliance and vulnerability detection
@@ -100,6 +103,7 @@ jobs:
 [→ Full Security Guide](security-workflow.md)
 
 ### Release Workflow
+
 - **Purpose**: Automated firmware releases with build artifacts
 - **Key Features**: GitHub releases, firmware binaries, auto-generated notes
 - **Use Case**: Version releases with ESP32 firmware artifacts
@@ -109,6 +113,7 @@ jobs:
 ## 🔄 Workflow Combinations
 
 ### Full CI Pipeline
+
 ```yaml
 # Combines all workflows for comprehensive CI
 jobs:
@@ -118,6 +123,7 @@ jobs:
 ```
 
 ### Security Pipeline
+
 ```yaml
 # Security-focused workflows
 jobs:
