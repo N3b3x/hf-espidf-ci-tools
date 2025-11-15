@@ -21,9 +21,6 @@ exclude_urls = [
     # Badge images (may not exist yet)
     "^https://github\\.com/n3b3x/hf-espidf-ci-tools/actions/workflows/publish-docs\\.yml/badge\\.svg$",
     
-    # Jekyll template variables (URL-encoded Liquid syntax like %7B%7B = {{)
-    "^file://.*%7B%7B.*%7D%7D",
-    
     # Intentional test links
     "nonexistent-page$",
     "^https://n3b3x\\.github\\.io/hf-espidf-ci-tools/nonexistent-page$",
