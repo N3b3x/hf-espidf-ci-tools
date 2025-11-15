@@ -1,5 +1,5 @@
 ---
-name: Security Audit (Reusable)
+name: [RU] Security Audit
 
 on:
   workflow_call:
