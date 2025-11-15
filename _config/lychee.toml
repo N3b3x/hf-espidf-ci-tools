@@ -13,7 +13,7 @@ exclude = [
     "robots.txt",
     "_config.yml",
     "_config/_config.yml",
-    "docs/404.html",
+    "_config/404.html",
     "docs/robots.txt",
 ]
 
