@@ -250,7 +250,8 @@
 
 <p><strong>🚀 Advanced ESP32 Build System for HardFOC Projects</strong></p>
 
-<p><em>Matrix-based building across multiple ESP-IDF versions, build types, and applications with intelligent caching and artifact management</em></p><hr />
+<p><em>Matrix-based building across multiple ESP-IDF versions, build types, and applications with
+intelligent caching and artifact management</em></p><hr />
 <h2 id="-table-of-contents">
   
   
@@ -286,7 +287,10 @@
   
 </h3>
     
-<p>The ESP-IDF Build workflow provides <strong>matrix-based building</strong> across multiple ESP-IDF versions, build types, and applications with intelligent caching and artifact management for HardFOC ESP32 projects.</p>
+
+<p>The ESP-IDF Build workflow provides <strong>matrix-based building</strong> across multiple ESP-IDF versions,
+build types, and applications with intelligent caching and artifact management for HardFOC ESP32
+projects.</p>
 <h3 id="key-features">
   
   
@@ -295,6 +299,7 @@
   
 </h3>
     
+
 <ul>
   <li>🔄 <strong>Dynamic Matrix Generation</strong> - From your project’s <code class="language-plaintext highlighter-rouge">app_config.yml</code> configuration</li>
   <li>🚀 <strong>Parallel Execution</strong> - Multiple builds run simultaneously for maximum efficiency</li>
@@ -313,6 +318,7 @@
   
 </h3>
     
+
 <ul>
   <li>✅ <strong>CI/CD for ESP32 applications</strong> requiring multiple build configurations</li>
   <li>✅ <strong>Multi-version testing</strong> across different ESP-IDF releases</li>
@@ -456,7 +462,8 @@
 </h4>
     
 
-<p>The size budget is based on the <strong><code class="language-plaintext highlighter-rouge">dec</code> (decimal) size</strong> from ESP-IDF’s size analysis, which represents the <strong>total memory footprint</strong> of your firmware. This includes:</p>
+<p>The size budget is based on the <strong><code class="language-plaintext highlighter-rouge">dec</code> (decimal) size</strong> from ESP-IDF’s size analysis, which
+represents the <strong>total memory footprint</strong> of your firmware. This includes:</p>
 
 <ul>
   <li><strong>📝 Text Segment</strong>: Executable code, functions, and program logic</li>
@@ -465,6 +472,7 @@
 </ul>
 
 <p><strong>Size Analysis Format:</strong></p>
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>text    data     bss     dec     hex filename
@@ -472,6 +480,7 @@
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p>Where:</p>
+
 <ul>
   <li><strong><code class="language-plaintext highlighter-rouge">text</code></strong>: Code size (instructions, functions, constants)</li>
   <li><strong><code class="language-plaintext highlighter-rouge">data</code></strong>: Initialized variables (global/static with initial values)</li>
@@ -481,6 +490,7 @@
 </ul>
 
 <p><strong>Why Use <code class="language-plaintext highlighter-rouge">dec</code> Size:</strong></p>
+
 <ul>
   <li><strong>🎯 Total Memory Usage</strong>: Represents the complete RAM footprint</li>
   <li><strong>📱 Device Constraints</strong>: ESP32 devices have limited flash and RAM</li>
@@ -544,6 +554,7 @@
 </table></div>
 
 <p><strong>Size Budget Guidelines:</strong></p>
+
 <ul>
   <li><strong>🟢 Conservative</strong>: 50-60% of available flash (leaves room for OTA updates)</li>
   <li><strong>🟡 Moderate</strong>: 70-80% of available flash (good balance)</li>
@@ -551,11 +562,13 @@
 </ul>
 
 <p><strong>Example Size Analysis:</strong></p>
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>text    data     bss     dec     hex filename
 456789  12345    8901   477035  746ab my_app.bin
 </pre></td></tr></tbody></table></div></code></pre></div></div>
+
 <ul>
   <li><strong>Total Size</strong>: 477,035 bytes (~466 KB)</li>
   <li><strong>Status</strong>: ✅ Within 1.6MB budget</li>
@@ -581,6 +594,7 @@
 </ol>
 
 <p><strong>Error Example:</strong></p>
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>::error file=build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5/size.txt::build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5 dec=1800000 exceeds MAX_DEC_TOTAL=1600000
@@ -588,6 +602,7 @@
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Success Example:</strong></p>
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>✅ All builds within size budget (1600000 bytes)
 </pre></td></tr></tbody></table></div></code></pre></div></div>
@@ -599,6 +614,7 @@
   
 </h4>
     
+
 <ul>
   <li><strong>Purpose</strong>: Points to your ESP-IDF project directory (contains <code class="language-plaintext highlighter-rouge">CMakeLists.txt</code>, <code class="language-plaintext highlighter-rouge">app_config.yml</code>)</li>
   <li><strong>Examples</strong>:
@@ -617,6 +633,7 @@
   
 </h4>
     
+
 <ul>
   <li><strong>Purpose</strong>: Points to directory containing the build scripts (<code class="language-plaintext highlighter-rouge">build_app.sh</code>, <code class="language-plaintext highlighter-rouge">generate_matrix.py</code>, etc.)</li>
   <li><strong>Auto-detection</strong>: If not specified, looks for <code class="language-plaintext highlighter-rouge">hf-espidf-project-tools</code> subdirectory in project directory</li>
@@ -640,6 +657,7 @@
     
 
 <p><strong>Pattern 1: Submodule Setup (Recommended)</strong></p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -675,6 +693,7 @@
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>✅ Automatic Behavior:</strong></p>
+
 <ul>
   <li>When <code class="language-plaintext highlighter-rouge">project_tools_dir</code> is specified, the workflow uses that path directly</li>
   <li>No auto-cloning occurs when explicit path is provided</li>
@@ -682,6 +701,7 @@
 </ul>
 
 <p><strong>Pattern 2: Direct Clone Setup</strong></p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -715,6 +735,7 @@
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Pattern 3: Custom Tools Location</strong></p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -748,6 +769,7 @@
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Pattern 4: Shared Tools for Multiple Projects</strong></p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -801,6 +823,7 @@
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>✅ Why This Works:</strong></p>
+
 <ul>
   <li>All scripts (<code class="language-plaintext highlighter-rouge">build_app.sh</code>, <code class="language-plaintext highlighter-rouge">generate_matrix.py</code>, etc.) accept <code class="language-plaintext highlighter-rouge">--project-path</code> argument</li>
   <li>The workflow automatically passes the correct project directory to each script</li>
@@ -907,6 +930,7 @@
 </table></div>
 
 <p><strong>Artifact Structure:</strong></p>
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -931,6 +955,7 @@
 The build directory follows the pattern: <code class="language-plaintext highlighter-rouge">build-app-{app_type}-type-{build_type}-target-{target}-idf-{idf_version}</code></p>
 
 <p>Examples:</p>
+
 <ul>
   <li><code class="language-plaintext highlighter-rouge">build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5</code></li>
   <li><code class="language-plaintext highlighter-rouge">build-app-adc_test-type-Debug-target-esp32c6-idf-release_v5_4</code></li>
@@ -1233,7 +1258,9 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </h3>
     
 
-<p>The CI scripts are designed to capitalize on the <code class="language-plaintext highlighter-rouge">app_config.yml</code> configuration and the <code class="language-plaintext highlighter-rouge">hf-espidf-project-tools</code> submodule to enable <strong>parallel building</strong> of multiple applications. Here’s how it works:</p>
+<p>The CI scripts are designed to capitalize on the <code class="language-plaintext highlighter-rouge">app_config.yml</code> configuration and the
+<code class="language-plaintext highlighter-rouge">hf-espidf-project-tools</code> submodule to enable <strong>parallel building</strong> of multiple applications.
+Here’s how it works:</p>
 <h4 id="1-configuration-driven-matrix-generation">
   
   
@@ -1390,6 +1417,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 <p>The system uses a <strong>two-level CMakeLists.txt structure</strong> to enable dynamic app type selection:</p>
 
 <p><strong>Level 1: Project-Level CMakeLists.txt</strong> (in project root)</p>
+
 <ul>
   <li>Sets up global variables (<code class="language-plaintext highlighter-rouge">APP_TYPE</code>, <code class="language-plaintext highlighter-rouge">BUILD_TYPE</code>)</li>
   <li>Validates app types against <code class="language-plaintext highlighter-rouge">app_config.yml</code></li>
@@ -1398,6 +1426,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>Level 2: Component-Level CMakeLists.txt</strong> (in main/ folder)</p>
+
 <ul>
   <li>Gets source file from <code class="language-plaintext highlighter-rouge">app_config.yml</code> based on <code class="language-plaintext highlighter-rouge">APP_TYPE</code></li>
   <li>Registers component with dynamic source file</li>
@@ -1406,6 +1435,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>Project-Level CMakeLists.txt</strong> (in project root):</p>
+
 <div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1515,6 +1545,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Component-Level CMakeLists.txt</strong> (in main/ folder):</p>
+
 <div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1710,6 +1741,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 <p>The CMakeLists.txt setup depends on your build approach. There are two main scenarios:</p>
 
 <p><strong>Scenario A: CI-Only Builds (Minimal Setup)</strong></p>
+
 <ul>
   <li>Uses <code class="language-plaintext highlighter-rouge">build_app.sh</code> script which handles all the complexity</li>
   <li>CMakeLists.txt can be minimal since the script manages everything</li>
@@ -1717,6 +1749,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>Scenario B: Full <code class="language-plaintext highlighter-rouge">idf.py</code> Compatibility (Complete Setup)</strong></p>
+
 <ul>
   <li>Supports both CI builds and direct <code class="language-plaintext highlighter-rouge">idf.py</code> usage</li>
   <li>Requires more complex CMakeLists.txt setup</li>
@@ -1730,6 +1763,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 <p>If you only use <code class="language-plaintext highlighter-rouge">build_app.sh</code> for building (CI workflows), your CMakeLists.txt can be minimal:</p>
 
 <p><strong>Project-Level CMakeLists.txt</strong> (minimal):</p>
+
 <div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1751,6 +1785,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Component-Level CMakeLists.txt</strong> (ultra-minimal):</p>
+
 <div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1788,6 +1823,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Note for Users:</strong></p>
+
 <ul>
   <li><strong>INCLUDE_DIRS</strong>: Add your own include directories (e.g., <code class="language-plaintext highlighter-rouge">"../inc"</code>, <code class="language-plaintext highlighter-rouge">"../lib"</code>)</li>
   <li><strong>REQUIRES</strong>: Add your own component requirements (e.g., <code class="language-plaintext highlighter-rouge">"your_component"</code>, <code class="language-plaintext highlighter-rouge">"esp_wifi"</code>)</li>
@@ -1796,6 +1832,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>What Gets Removed in Ultra-Minimal Setup:</strong></p>
+
 <ul>
   <li>❌ <strong>App Type Validation</strong>: No checking if <code class="language-plaintext highlighter-rouge">APP_TYPE</code> exists in <code class="language-plaintext highlighter-rouge">app_config.yml</code></li>
   <li>❌ <strong>Build Type Validation</strong>: No checking if <code class="language-plaintext highlighter-rouge">BUILD_TYPE</code> is valid</li>
@@ -1806,6 +1843,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>What Stays in Ultra-Minimal Setup:</strong></p>
+
 <ul>
   <li>✅ <strong>Basic APP_TYPE Definition</strong>: Simple <code class="language-plaintext highlighter-rouge">if(NOT DEFINED APP_TYPE)</code> with default</li>
   <li>✅ <strong>Dynamic Project Naming</strong>: Still uses <code class="language-plaintext highlighter-rouge">project(esp32_iid_${APP_TYPE}_app)</code></li>
@@ -1816,6 +1854,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>Why This Works:</strong></p>
+
 <ul>
   <li><code class="language-plaintext highlighter-rouge">build_app.sh</code> discovers source file from <code class="language-plaintext highlighter-rouge">app_config.yml</code> and sets <code class="language-plaintext highlighter-rouge">APP_SOURCE_FILE</code> environment variable</li>
   <li><code class="language-plaintext highlighter-rouge">build_app.sh</code> calls <code class="language-plaintext highlighter-rouge">idf.py</code> with <code class="language-plaintext highlighter-rouge">-D APP_TYPE=app_name</code>, <code class="language-plaintext highlighter-rouge">-D APP_SOURCE_FILE=source_file</code>, and <code class="language-plaintext highlighter-rouge">-D BUILD_TYPE=build_type</code></li>
@@ -1863,6 +1902,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Pros of Conditional Sources:</strong></p>
+
 <ul>
   <li>✅ <strong>No Python Dependencies</strong>: Doesn’t need <code class="language-plaintext highlighter-rouge">get_app_info.py</code></li>
   <li>✅ <strong>Faster CMake</strong>: No <code class="language-plaintext highlighter-rouge">execute_process</code> calls</li>
@@ -1870,6 +1910,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>Cons of Conditional Sources:</strong></p>
+
 <ul>
   <li>❌ <strong>Manual Maintenance</strong>: Must update CMakeLists.txt when adding new apps</li>
   <li>❌ <strong>Not DRY</strong>: Duplicates information from <code class="language-plaintext highlighter-rouge">app_config.yml</code></li>
@@ -1877,6 +1918,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>Ultra-Minimal CMakeLists.txt</strong> (no Python dependencies):</p>
+
 <div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1898,6 +1940,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Ultra-Minimal Component CMakeLists.txt</strong> (no Python dependencies):</p>
+
 <div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1937,6 +1980,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Pros of Environment Variable Approach:</strong></p>
+
 <ul>
   <li>✅ <strong>No Python Dependencies in CMake</strong>: CMakeLists.txt is completely Python-free</li>
   <li>✅ <strong>Faster CMake</strong>: No <code class="language-plaintext highlighter-rouge">execute_process</code> calls during CMake configuration</li>
@@ -1946,6 +1990,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </ul>
 
 <p><strong>Cons of Environment Variable Approach:</strong></p>
+
 <ul>
   <li>❌ <strong>No Direct <code class="language-plaintext highlighter-rouge">idf.py</code> Support</strong>: Must always use <code class="language-plaintext highlighter-rouge">build_app.sh</code></li>
   <li>❌ <strong>Environment Dependency</strong>: Relies on environment variables being set</li>
@@ -1990,6 +2035,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </table></div>
 
 <p><strong>Recommendation:</strong></p>
+
 <ul>
   <li>Use <strong>Environment Variables</strong> for CI-only workflows where you never need direct <code class="language-plaintext highlighter-rouge">idf.py</code></li>
   <li>Use <strong>Dynamic Source Selection</strong> for development workflows with <code class="language-plaintext highlighter-rouge">idf.py</code> support</li>
@@ -2001,6 +2047,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 <p>If you want to support both CI builds AND direct <code class="language-plaintext highlighter-rouge">idf.py</code> usage for development, you need the full setup:</p>
 
 <p><strong>Project-Level CMakeLists.txt</strong> (complete):</p>
+
 <div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2110,6 +2157,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Component-Level CMakeLists.txt</strong> (complete):</p>
+
 <div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2273,6 +2321,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 <p><strong>Usage Examples:</strong></p>
 
 <p><strong>CI Builds (both scenarios work):</strong></p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre><span class="c"># Uses build_app.sh which handles everything</span>
@@ -2280,6 +2329,7 @@ The build directory follows the pattern: <code class="language-plaintext highlig
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Direct <code class="language-plaintext highlighter-rouge">idf.py</code> Usage (only Scenario B works):</strong></p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2291,6 +2341,7 @@ idf.py monitor
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Recommendation:</strong></p>
+
 <ul>
   <li><strong>Use Scenario A</strong> if you only use CI workflows and never need direct <code class="language-plaintext highlighter-rouge">idf.py</code> usage</li>
   <li><strong>Use Scenario B</strong> if you want full development workflow support with <code class="language-plaintext highlighter-rouge">idf.py</code></li>
@@ -2307,6 +2358,7 @@ idf.py monitor
 <p>The <code class="language-plaintext highlighter-rouge">build_app.sh</code> script is designed to work with both CMakeLists.txt scenarios:</p>
 
 <p><strong>Key Script Features:</strong></p>
+
 <ul>
   <li><strong>Automatic ESP-IDF Setup</strong>: Sources the correct ESP-IDF version</li>
   <li><strong>Source File Discovery</strong>: Gets source file from <code class="language-plaintext highlighter-rouge">app_config.yml</code> and exports as <code class="language-plaintext highlighter-rouge">APP_SOURCE_FILE</code></li>
@@ -2317,6 +2369,7 @@ idf.py monitor
 </ul>
 
 <p><strong>Script Call Pattern:</strong></p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2336,6 +2389,7 @@ idf.py <span class="nt">-B</span> <span class="s2">"</span><span class="nv">$BUI
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>How It Works with Scenario A (Ultra-Minimal CMakeLists.txt):</strong></p>
+
 <ul>
   <li>Script discovers source file from <code class="language-plaintext highlighter-rouge">app_config.yml</code> and sets <code class="language-plaintext highlighter-rouge">APP_SOURCE_FILE</code> environment variable</li>
   <li>Script passes <code class="language-plaintext highlighter-rouge">-DAPP_TYPE=gpio_test</code> and <code class="language-plaintext highlighter-rouge">-DAPP_SOURCE_FILE=GpioComprehensiveTest.cpp</code> to <code class="language-plaintext highlighter-rouge">idf.py</code></li>
@@ -2345,6 +2399,7 @@ idf.py <span class="nt">-B</span> <span class="s2">"</span><span class="nv">$BUI
 </ul>
 
 <p><strong>How It Works with Scenario B (Full CMakeLists.txt):</strong></p>
+
 <ul>
   <li>Script discovers source file from <code class="language-plaintext highlighter-rouge">app_config.yml</code> and sets <code class="language-plaintext highlighter-rouge">APP_SOURCE_FILE</code> environment variable</li>
   <li>Script passes <code class="language-plaintext highlighter-rouge">-DAPP_TYPE=gpio_test</code> and <code class="language-plaintext highlighter-rouge">-DAPP_SOURCE_FILE=GpioComprehensiveTest.cpp</code> to <code class="language-plaintext highlighter-rouge">idf.py</code></li>
@@ -2354,6 +2409,7 @@ idf.py <span class="nt">-B</span> <span class="s2">"</span><span class="nv">$BUI
 </ul>
 
 <p><strong>Script Parameters:</strong></p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2401,6 +2457,7 @@ idf.py <span class="nt">-B</span> <span class="s2">"</span><span class="nv">$BUI
 <p>The <code class="language-plaintext highlighter-rouge">hf-espidf-project-tools</code> submodule provides the essential scripts:</p>
 
 <p><strong>Required Scripts:</strong></p>
+
 <ul>
   <li><strong><code class="language-plaintext highlighter-rouge">generate_matrix.py</code></strong>: Reads <code class="language-plaintext highlighter-rouge">app_config.yml</code> and generates build matrix</li>
   <li><strong><code class="language-plaintext highlighter-rouge">build_app.sh</code></strong>: Builds specific app with given parameters</li>
@@ -2409,6 +2466,7 @@ idf.py <span class="nt">-B</span> <span class="s2">"</span><span class="nv">$BUI
 </ul>
 
 <p><strong>Submodule Setup:</strong></p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2422,6 +2480,7 @@ git submodule update <span class="nt">--init</span> <span class="nt">--recursive
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Directory Structure:</strong></p>
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2480,6 +2539,7 @@ git submodule update <span class="nt">--init</span> <span class="nt">--recursive
 <p>The app type selection system enables dynamic building of different applications from the same codebase:</p>
 
 <p><strong>Step 1: Command Line Input</strong></p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2493,6 +2553,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Step 2: Project-Level Validation</strong></p>
+
 <ul>
   <li>Project-level CMakeLists.txt receives <code class="language-plaintext highlighter-rouge">APP_TYPE</code> and <code class="language-plaintext highlighter-rouge">BUILD_TYPE</code></li>
   <li>Validates <code class="language-plaintext highlighter-rouge">APP_TYPE</code> against <code class="language-plaintext highlighter-rouge">app_config.yml</code> using <code class="language-plaintext highlighter-rouge">get_app_info.py list</code></li>
@@ -2501,6 +2562,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 </ul>
 
 <p><strong>Step 3: Component-Level Source Selection</strong></p>
+
 <ul>
   <li>Component-level CMakeLists.txt gets <code class="language-plaintext highlighter-rouge">APP_TYPE</code> from parent</li>
   <li>Calls <code class="language-plaintext highlighter-rouge">get_app_info.py source_file ${APP_TYPE}</code> to get source file name</li>
@@ -2509,6 +2571,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 </ul>
 
 <p><strong>Step 4: Build Configuration</strong></p>
+
 <ul>
   <li>Sets include paths based on environment (CI vs development)</li>
   <li>Applies build type-specific compiler flags</li>
@@ -2516,6 +2579,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 </ul>
 
 <p><strong>Key Benefits:</strong></p>
+
 <ul>
   <li><strong>Single Codebase</strong>: All apps share the same project structure</li>
   <li><strong>Dynamic Selection</strong>: Build any app without code changes</li>
@@ -2535,6 +2599,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 <p>The <code class="language-plaintext highlighter-rouge">app_config.yml</code> file is the central configuration that enables parallel building:</p>
 
 <p><strong>Global Metadata:</strong></p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2550,6 +2615,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>App Definitions:</strong></p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2589,6 +2655,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Key Features:</strong></p>
+
 <ul>
   <li><strong>Hierarchical Configuration</strong>: Global settings apply to all apps by default</li>
   <li><strong>App Overrides</strong>: Individual apps can override global settings</li>
@@ -2608,6 +2675,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 <p>This setup enables powerful parallel building capabilities:</p>
 
 <p><strong>Multiple Apps × Multiple Build Types × Multiple IDF Versions:</strong></p>
+
 <ul>
   <li><strong>12 apps</strong> × <strong>2 build types</strong> × <strong>2 IDF versions</strong> = <strong>48 parallel builds</strong></li>
   <li>Each build runs independently and in parallel</li>
@@ -2616,6 +2684,7 @@ idf.py build  <span class="c"># Uses default from app_config.yml</span>
 </ul>
 
 <p><strong>Example Build Matrix:</strong></p>
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2631,6 +2700,7 @@ adc_test + Release + v5.5    │ uart_test + Release + v5.5
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 
 <p><strong>Time Savings:</strong></p>
+
 <ul>
   <li><strong>Sequential</strong>: 48 builds × 5 minutes = 4 hours</li>
   <li><strong>Parallel</strong>: 48 builds ÷ 20 runners = ~12 minutes</li>
@@ -2648,6 +2718,7 @@ adc_test + Release + v5.5    │ uart_test + Release + v5.5
 <p>The <code class="language-plaintext highlighter-rouge">hf-espidf-project-tools</code> submodule provides essential scripts that enable the dynamic build system:</p>
 
 <p><strong><code class="language-plaintext highlighter-rouge">generate_matrix.py</code></strong></p>
+
 <ul>
   <li><strong>Purpose</strong>: Reads <code class="language-plaintext highlighter-rouge">app_config.yml</code> and generates build matrix</li>
   <li><strong>Input</strong>: <code class="language-plaintext highlighter-rouge">app_config.yml</code> configuration file</li>
@@ -2656,6 +2727,7 @@ adc_test + Release + v5.5    │ uart_test + Release + v5.5
 </ul>
 
 <p><strong><code class="language-plaintext highlighter-rouge">get_app_info.py</code></strong></p>
+
 <ul>
   <li><strong>Purpose</strong>: Extracts app information from <code class="language-plaintext highlighter-rouge">app_config.yml</code></li>
   <li><strong>Commands</strong>:
@@ -2670,6 +2742,7 @@ adc_test + Release + v5.5    │ uart_test + Release + v5.5
 </ul>
 
 <p><strong><code class="language-plaintext highlighter-rouge">build_app.sh</code></strong></p>
+
 <ul>
   <li><strong>Purpose</strong>: Builds specific app with given parameters</li>
   <li><strong>Parameters</strong>: <code class="language-plaintext highlighter-rouge">--project-path</code>, app name, build type, IDF version</li>
@@ -2677,12 +2750,14 @@ adc_test + Release + v5.5    │ uart_test + Release + v5.5
 </ul>
 
 <p><strong><code class="language-plaintext highlighter-rouge">config_loader.sh</code></strong></p>
+
 <ul>
   <li><strong>Purpose</strong>: Loads and validates configuration</li>
   <li><strong>Usage</strong>: Provides configuration utilities for other scripts</li>
 </ul>
 
 <p><strong>Script Integration Flow:</strong></p>
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2796,6 +2871,7 @@ ESP-IDF Build → Firmware Binary
   
 </h3>
     
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2813,6 +2889,7 @@ ESP-IDF Build → Firmware Binary
   
 </h3>
     
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2870,6 +2947,7 @@ ESP-IDF Build → Firmware Binary
   
 </h3>
     
+
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2956,8 +3034,10 @@ ESP-IDF Build → Firmware Binary
   
 </h4>
     
+
 <p><strong>Symptoms</strong>: “Matrix generation failed” or “No matrix entries found”
 <strong>Solutions</strong>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -2987,8 +3067,10 @@ pip <span class="nb">install </span>pyyaml jq
   
 </h4>
     
+
 <p><strong>Symptoms</strong>: “Build failed” or “ESP-IDF not found”
 <strong>Solutions</strong>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -3016,8 +3098,10 @@ python3 hf-espidf-project-tools/generate_matrix.py <span class="nt">--validate</
   
 </h4>
     
+
 <p><strong>Symptoms</strong>: “Cache miss” or “Build too slow”
 <strong>Solutions</strong>:</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -3037,8 +3121,10 @@ python3 hf-espidf-project-tools/generate_matrix.py <span class="nt">--validate</
   
 </h4>
     
+
 <p><strong>Symptoms</strong>: “Artifact upload failed” or “No artifacts found”
 <strong>Solutions</strong>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -3070,8 +3156,10 @@ find build-app-<span class="k">*</span>/ <span class="nt">-name</span> <span cla
   
 </h4>
     
+
 <p><strong>Symptoms</strong>: “No size artifacts found” or “Size data missing”
 <strong>Solutions</strong>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -3099,8 +3187,10 @@ find build-app-<span class="k">*</span>/ <span class="nt">-name</span> <span cla
   
 </h4>
     
+
 <p><strong>Symptoms</strong>: “Size budget exceeded” or build fails due to size limits
 <strong>Solutions</strong>:</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -3154,8 +3244,11 @@ with open('build-app-*/size.txt', 'r') as f:
 <p><strong>Cause</strong>: Path resolution or submodule checkout issues</p>
 
 <p><strong>Solutions</strong>:</p>
+
 <ol>
-  <li><strong>Check Submodule Status</strong>: Verify submodule is properly initialized
+  <li>
+    <p><strong>Check Submodule Status</strong>: Verify submodule is properly initialized</p>
+
     <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>git submodule status
@@ -3178,6 +3271,7 @@ git submodule update <span class="nt">--init</span> <span class="nt">--recursive
 <p><strong>Cause</strong>: Incorrect path configuration or missing tools directory</p>
 
 <p><strong>Solutions</strong>:</p>
+
 <ol>
   <li><strong>Verify Paths</strong>: Ensure paths are relative to repository root</li>
   <li><strong>Check Auto-clone</strong>: Set <code class="language-plaintext highlighter-rouge">auto_clone_tools: true</code> if not using submodules</li>
@@ -3195,6 +3289,7 @@ git submodule update <span class="nt">--init</span> <span class="nt">--recursive
 <p><strong>Symptoms</strong>: Workflow runs but can’t find scripts in submodule</p>
 
 <p><strong>Solutions</strong>:</p>
+
 <ol>
   <li><strong>Specify <code class="language-plaintext highlighter-rouge">project_tools_dir</code></strong> - When using submodules, explicitly set the path to the submodule</li>
   <li><strong>Verify Submodule URL</strong>: Ensure submodule points to correct repository</li>
@@ -3211,6 +3306,7 @@ git submodule update <span class="nt">--init</span> <span class="nt">--recursive
     
 
 <p>The workflow provides detailed logging to help diagnose issues:</p>
+
 <ul>
   <li>Path resolution details</li>
   <li>Submodule detection and validation</li>

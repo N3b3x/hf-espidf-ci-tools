@@ -246,7 +246,8 @@
 
 <p><strong>🛡️ Dependencies, Secrets, CodeQL</strong></p><hr />
 
-<p>The Security workflow provides comprehensive security auditing including dependency scanning, secret detection, and optional CodeQL analysis.</p>
+<p>The Security workflow provides comprehensive security auditing including dependency scanning, secret
+detection, and optional CodeQL analysis.</p>
 <h2 id="-table-of-contents">
   
   
@@ -278,6 +279,7 @@
 
 <p><strong>Purpose</strong>: Comprehensive security auditing<br />
 <strong>Key Features</strong>:</p>
+
 <ul>
   <li><strong>Automatic Requirements Discovery</strong>: Finds all <code class="language-plaintext highlighter-rouge">requirements.txt</code> and <code class="language-plaintext highlighter-rouge">requirements.in</code> files automatically</li>
   <li><strong>Python dependency vulnerability scanning</strong>: Uses pip-audit and safety</li>
@@ -303,6 +305,7 @@
   
 </h3>
     
+
 <ul>
   <li><strong>Trusted Source Only</strong>: Tools are only cloned from the trusted N3b3x/hf-espidf-project-tools repository</li>
   <li><strong>No External URLs</strong>: Users cannot specify arbitrary repository URLs, preventing supply chain attacks</li>
@@ -317,6 +320,7 @@
   
 </h3>
     
+
 <ul>
   <li><strong>Path Sanitization</strong>: All file paths are validated and sanitized</li>
   <li><strong>Parameter Validation</strong>: Input parameters are validated before use</li>
@@ -330,6 +334,7 @@
   
 </h3>
     
+
 <ul>
   <li><strong>Requirements Files</strong>: Automatically finds all <code class="language-plaintext highlighter-rouge">requirements*.txt</code> and <code class="language-plaintext highlighter-rouge">requirements*.in</code> files</li>
   <li><strong>No Manual Configuration</strong>: Scans entire repository without user input</li>
@@ -578,6 +583,7 @@
 </ol>
 
 <p><strong>Matrix Parameters Used</strong>:</p>
+
 <ul>
   <li><code class="language-plaintext highlighter-rouge">matrix.app_name</code> - Application name</li>
   <li><code class="language-plaintext highlighter-rouge">matrix.build_type</code> - Build type (debug/release)</li>
@@ -586,6 +592,7 @@
 </ul>
 
 <p><strong>Example Integration</strong>:</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -635,6 +642,7 @@
   
 </h3>
     
+
 <ol>
   <li><strong>Disable auto-clone</strong>: Set <code class="language-plaintext highlighter-rouge">auto_clone_tools: false</code> and include tools in your repository</li>
   <li><strong>Regular updates</strong>: Periodically update the tools in your repository after reviewing changes</li>
@@ -649,6 +657,7 @@
   
 </h3>
     
+
 <ol>
   <li><strong>Enable auto-clone</strong>: Set <code class="language-plaintext highlighter-rouge">auto_clone_tools: true</code> for convenience</li>
   <li><strong>Monitor changes</strong>: Keep track of tool updates and security advisories</li>
@@ -663,6 +672,7 @@
   
 </h3>
     
+
 <ol>
   <li><strong>Audit trail</strong>: Log which tools version is being used</li>
   <li><strong>Dependency scanning</strong>: Use tools like Dependabot to monitor for vulnerabilities</li>
@@ -677,6 +687,7 @@
   
 </h3>
     
+
 <ul>
   <li><strong>Use specific versions</strong>: Pin dependencies to specific versions in <code class="language-plaintext highlighter-rouge">requirements.txt</code></li>
   <li><strong>Regular updates</strong>: Update dependencies regularly and test thoroughly</li>
@@ -701,6 +712,7 @@
     
 
 <p><strong>Dependency Scan Fails</strong></p>
+
 <ul>
   <li>Check Python version compatibility</li>
   <li>Verify requirements files exist</li>
@@ -708,6 +720,7 @@
 </ul>
 
 <p><strong>Secret Detection Issues</strong></p>
+
 <ul>
   <li>Ensure full git history is available</li>
   <li>Check gitleaks installation</li>
@@ -715,6 +728,7 @@
 </ul>
 
 <p><strong>CodeQL Analysis Fails</strong></p>
+
 <ul>
   <li>Verify <code class="language-plaintext highlighter-rouge">project_dir</code> and <code class="language-plaintext highlighter-rouge">scripts_dir</code> are correct</li>
   <li>Check <code class="language-plaintext highlighter-rouge">build_app.sh</code> exists in scripts directory</li>
