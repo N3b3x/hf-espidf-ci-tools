@@ -1,26 +1,37 @@
----
-# Jekyll configuration for hf-espidf-ci-tools documentation
+# =============================================================================
+# Standardized Jekyll Configuration for HardFOC CI Tools Documentation
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Site Identity
+# -----------------------------------------------------------------------------
 title: "hf-espidf-ci-tools"
 description: >
-  Advanced CI/CD Tools for HardFOC ESP32 Projects - Comprehensive GitHub Actions workflows
-  for ESP-IDF development with matrix builds, security auditing, and automated documentation
-baseurl: "/hf-espidf-ci-tools"  # GitHub Pages subpath
+  CI/CD Tools for HardFOC ESP32 Projects - GitHub Actions workflows for ESP-IDF
+  development with matrix builds, security auditing, and automated documentation
+
+baseurl: "/hf-espidf-ci-tools"
 url: "https://n3b3x.github.io"
 
-# Author and social information
+# -----------------------------------------------------------------------------
+# Author Information
+# -----------------------------------------------------------------------------
 author:
   name: "N3b3x"
   email: "n3b3x@example.com"
   url: "https://github.com/n3b3x"
 
-# Directory configuration
-includes_dir: _config/_includes
+# -----------------------------------------------------------------------------
+# Directory Configuration
+# -----------------------------------------------------------------------------
 layouts_dir: _config/_layouts
-sass:
-  sass_dir: _config/_sass
+includes_dir: _config/_includes
 
-# Theme and plugins
+# -----------------------------------------------------------------------------
+# Theme and Plugins
+# -----------------------------------------------------------------------------
 remote_theme: just-the-docs/just-the-docs
+
 plugins:
   - jekyll-feed
   - jekyll-sitemap
@@ -29,12 +40,17 @@ plugins:
   - jekyll-redirect-from
   - jekyll-optional-front-matter
 
-# Navigation settings
+# -----------------------------------------------------------------------------
+# Navigation Settings
+# -----------------------------------------------------------------------------
 nav_next_prev: true
 
-# Markdown and syntax highlighting
+# -----------------------------------------------------------------------------
+# Markdown Processing
+# -----------------------------------------------------------------------------
 markdown: kramdown
 highlighter: rouge
+
 kramdown:
   input: GFM
   syntax_highlighter: rouge
@@ -46,12 +62,16 @@ kramdown:
       line_numbers: true
       start_line: 1
 
-# Site settings
+# -----------------------------------------------------------------------------
+# Site Settings
+# -----------------------------------------------------------------------------
 timezone: UTC
 encoding: utf-8
 lang: en
 
-# Just the Docs configuration
+# -----------------------------------------------------------------------------
+# Just the Docs Theme Configuration
+# -----------------------------------------------------------------------------
 search_enabled: true
 search:
   heading_level: 3
@@ -62,7 +82,6 @@ search:
   rel_url: true
   button: true
 
-# Navigation and UI enhancements
 nav_enabled: true
 heading_anchors: true
 breadcrumbs: true
@@ -70,7 +89,6 @@ toc:
   min_level: 2
   max_level: 4
 
-# Callouts for better content presentation
 callouts:
   note:
     title: Note
@@ -85,12 +103,13 @@ callouts:
     title: Important
     color: red
 
-# Visual enhancements
 color_scheme: dark
 toggle_color_scheme: true
 toggle_auto_mode: true
 
-# Auxiliary links with better organization
+# -----------------------------------------------------------------------------
+# Auxiliary Links (Top Navigation)
+# -----------------------------------------------------------------------------
 aux_links:
   "📚 GitHub Repository":
     - "https://github.com/n3b3x/hf-espidf-ci-tools"
@@ -99,39 +118,36 @@ aux_links:
   "⭐ Star on GitHub":
     - "https://github.com/n3b3x/hf-espidf-ci-tools/stargazers"
 
-# Footer customization
+# -----------------------------------------------------------------------------
+# Footer Customization
+# -----------------------------------------------------------------------------
 footer_content: >
   Built with ❤️ using <a href='https://just-the-docs.github.io/just-the-docs/'>Just the Docs</a> •
   <a href='https://github.com/n3b3x/hf-espidf-ci-tools/blob/main/LICENSE'>MIT License</a> •
   <a href='https://github.com/n3b3x/hf-espidf-ci-tools'>View on GitHub</a>
 
-# Collections for better organization
-collections:
-  docs:
-    permalink: "/:collection/:path/"
-    output: true
-    sort_by: nav_order
-
-# Just the Docs configuration
+# -----------------------------------------------------------------------------
+# Just the Docs Advanced Configuration
+# -----------------------------------------------------------------------------
 just_the_docs:
-  # Navigation configuration
   nav_fold: true
+
   nav_external_links:
     - title: "📚 GitHub Repository"
-      url: https://github.com/n3b3x/hf-espidf-ci-tools
+      url: "https://github.com/n3b3x/hf-espidf-ci-tools"
     - title: "🐛 Issues"
-      url: https://github.com/n3b3x/hf-espidf-ci-tools/issues
+      url: "https://github.com/n3b3x/hf-espidf-ci-tools/issues"
 
-  # Custom head content
-  head_custom: _config/_includes/head_custom.html
+  head_custom: _includes/head_custom.html
 
-  # Custom CSS and JS
   custom_css:
-    - docs/assets/css/custom.css
+    - assets/css/custom.css
   custom_js:
-    - docs/assets/js/custom.js
+    - assets/js/custom.js
 
-# Exclude files from processing
+# -----------------------------------------------------------------------------
+# File Exclusions
+# -----------------------------------------------------------------------------
 exclude:
   - Gemfile
   - Gemfile.lock
@@ -144,21 +160,26 @@ exclude:
   - .sass-cache
   - .jekyll-cache
   - .jekyll-metadata
+  - hf-espidf-project-tools/
 
-# Include files that are normally excluded
+# -----------------------------------------------------------------------------
+# File Inclusions
+# -----------------------------------------------------------------------------
 include:
-  - _config/_pages
   - ../README.md
   - ../LICENSE
-  - docs/assets/
+  - assets/
+  - _config/404.html
 
-# Enhanced SEO settings
+# -----------------------------------------------------------------------------
+# SEO Configuration
+# -----------------------------------------------------------------------------
 seo:
-  type: "Organization"
+  type: "SoftwareApplication"
   name: "hf-espidf-ci-tools"
   description: >
-    Advanced CI/CD Tools for HardFOC ESP32 Projects - Comprehensive GitHub Actions workflows
-    for ESP-IDF development with matrix builds, security auditing, and automated documentation
+    CI/CD Tools for HardFOC ESP32 Projects - GitHub Actions workflows for ESP-IDF
+    development with matrix builds, security auditing, and automated documentation
   url: "https://n3b3x.github.io/hf-espidf-ci-tools"
   twitter:
     card: "summary_large_image"
@@ -167,22 +188,20 @@ seo:
     type: "website"
     locale: "en_US"
 
-# Social media and sharing
+# -----------------------------------------------------------------------------
+# Social Media Links
+# -----------------------------------------------------------------------------
 social:
   name: "hf-espidf-ci-tools"
   links:
     - "https://github.com/n3b3x/hf-espidf-ci-tools"
     - "https://github.com/n3b3x"
 
-# Analytics (uncomment and configure if needed)
-# ga_tracking: UA-XXXXXXXXX-X
-# ga_tracking_anonymize_ip: true
-
-# Performance optimizations
+# -----------------------------------------------------------------------------
+# HTML Compression (Performance Optimization)
+# -----------------------------------------------------------------------------
 compress_html:
   clippings: all
   comments: all
   endings: all
   startings: [html, head, body]
-  ignore:
-    envs: all
