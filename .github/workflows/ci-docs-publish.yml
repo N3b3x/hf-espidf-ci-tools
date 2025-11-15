@@ -33,6 +33,7 @@ jobs:
       run_link_check: true
       link_check_paths: "**/*.md"
       verbose: true
+      link_check_config: '_config/lychee.toml'
 
       # Markdown linting - false for now
       run_markdown_lint: false
