@@ -14,6 +14,7 @@ exclude = [
 exclude_urls = [
     # Base URL (404s are expected for root path)
     "^https://n3b3x\\.github\\.io/?$",
+    "^https://n3b3x\\.github\\.io$",
     
     # Sitemap files (may not exist)
     "^https://n3b3x\\.github\\.io/hf-espidf-ci-tools/sitemap",
@@ -27,6 +28,12 @@ exclude_urls = [
     
     # Documentation site URLs (may not be published yet)
     "^https://n3b3x\\.github\\.io/hf-tmc9660-driver/.*",
+    
+    # Jekyll template variables (URL-encoded Liquid syntax like %7B%7B = {{)
+    "^file://.*%7B%7B.*%7D%7D",
+    "^file://.*\\{\\{.*\\}\\}",
+    ".*%7B%7B.*%7D%7D",  # Match URL-encoded Jekyll syntax anywhere
+    ".*\\{\\{.*\\}\\}",  # Match Jekyll syntax anywhere
     
 ]
 
