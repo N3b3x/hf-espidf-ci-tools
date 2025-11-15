@@ -1,5 +1,5 @@
 ---
-name: [RU] Security Audit
+name: Security Audit
 
 on:
   workflow_call:
