@@ -15,7 +15,6 @@ jobs:
     with:
       checkout_recursive: true
       paths: "docs/** *.md **/*.md"
-      exclude_paths: "docs/404.html,docs/_config.yml,docs/robots.txt,docs/_includes/**,docs/_layouts/**"
       fail_on_errors: false
       timeout: "30"
       max_retries: "3"
