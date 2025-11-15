@@ -16,7 +16,7 @@ on:
         type: string
         required: false
       clean_build:
-        description: "Skip caches for a clean build"
+        description: "Skip caches for a clean build."
         type: boolean
         default: false
       auto_clone_tools:
