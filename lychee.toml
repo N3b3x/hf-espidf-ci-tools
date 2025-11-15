@@ -5,16 +5,29 @@
 exclude = [
     "docs/_includes/**",
     "docs/_layouts/**",
-    "docs/404.html",
+    "docs/404.html",  # Contains Jekyll template syntax
+    "docs/robots.txt",  # Contains sitemap URLs that may not exist
+    "docs/_config.yml",  # Contains base URLs that may 404
 ]
 
-# Exclude specific URLs
+# Exclude specific URLs (regex patterns)
 exclude_urls = [
-    "https://n3b3x.github.io/",
-    "https://n3b3x.github.io/hf-general-ci-tools/sitemap.*",
-    "https://github.com/n3b3x/hf-espidf-ci-tools/actions/workflows/publish-docs.yml/badge.svg",
-    "file://.*%7B%7B.*%7D%7D",  # Jekyll template variables (URL-encoded)
-    "nonexistent-page",  # Intentional test link
+    # Base URL (404s are expected for root path)
+    "^https://n3b3x\\.github\\.io/?$",
+    
+    # Sitemap files (may not exist)
+    "^https://n3b3x\\.github\\.io/hf-espidf-ci-tools/sitemap",
+    
+    # Badge images (may not exist yet)
+    "^https://github\\.com/n3b3x/hf-espidf-ci-tools/actions/workflows/publish-docs\\.yml/badge\\.svg$",
+    
+    # Jekyll template variables (URL-encoded Liquid syntax like %7B%7B = {{)
+    "^file://.*%7B%7B.*%7D%7D",
+    
+    # Intentional test links
+    "nonexistent-page$",
+    "^https://n3b3x\\.github\\.io/hf-espidf-ci-tools/nonexistent-page$",
+    
 ]
 
 # Exclude private URLs

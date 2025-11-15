@@ -53,7 +53,8 @@ jobs:
 
       - name: Ensure tools directory present
         id: tools-validate
-        uses: N3b3x/hf-espidf-ci-tools/.github/actions/ensure-tools-directory@main
+        uses:
+          N3b3x/hf-espidf-ci-tools/.github/actions/ensure-tools-directory@main
         with:
           project_tools_dir: ${{ env.PROJECT_TOOLS_DIR }}
           project_dir: ${{ env.ESP32_PROJECT_PATH }}
@@ -72,7 +73,8 @@ jobs:
         id: gen
         run: |
           set -e
-          MATRIX=$(python3 "${{ steps.tools-validate.outputs.project_tools_path }}/generate_matrix.py")
+          MATRIX=$(python3 \
+            "${{ steps.tools-validate.outputs.project_tools_path }}/generate_matrix.py")
           echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
           echo "$MATRIX" | python3 -m json.tool
 
@@ -136,9 +138,8 @@ jobs:
           fetch-depth: 0
       - name: Install gitleaks
         run: |
-          curl -sSL \
-            "https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz" \
-            -o gitleaks.tar.gz
+          GITLEAKS_URL="https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz"
+          curl -sSL "$GITLEAKS_URL" -o gitleaks.tar.gz
           tar -xzf gitleaks.tar.gz gitleaks && chmod +x gitleaks
           sudo mv gitleaks /usr/local/bin/
       - name: Run gitleaks
@@ -166,7 +167,8 @@ jobs:
           echo "  run_codeql: '${{ inputs.run_codeql }}'"
 
           # Check scan_type
-          if [[ "${{ inputs.scan_type }}" == "all" || "${{ inputs.scan_type }}" == "codeql" ]]; then
+          if [[ "${{ inputs.scan_type }}" == "all" || \
+                "${{ inputs.scan_type }}" == "codeql" ]]; then
             echo "✓ scan_type allows CodeQL"
             scan_ok=true
           else
@@ -179,7 +181,8 @@ jobs:
             echo "✓ run_codeql is explicitly 'true'"
             codeql_ok=true
           else
-            echo "✗ run_codeql is not 'true' (actual value: '${{ inputs.run_codeql }}')"
+            echo "✗ run_codeql is not 'true'"
+            echo "(actual value: '${{ inputs.run_codeql }}')"
             codeql_ok=false
           fi
 
@@ -210,7 +213,8 @@ jobs:
 
       - name: Ensure tools directory present
         id: tools-validate-codeql
-        uses: N3b3x/hf-espidf-ci-tools/.github/actions/ensure-tools-directory@main
+        uses:
+          N3b3x/hf-espidf-ci-tools/.github/actions/ensure-tools-directory@main
         with:
           project_tools_dir: ${{ env.PROJECT_TOOLS_DIR }}
           project_dir: ${{ env.ESP32_PROJECT_PATH }}
@@ -236,7 +240,8 @@ jobs:
           echo "Target: ${{ matrix.target }}"
 
           # Use the resolved project tools path from the tools validation step
-          SCRIPTS_PATH="${{ steps.tools-validate-codeql.outputs.project_tools_path }}"
+          SCRIPTS_PATH=\
+            "${{ steps.tools-validate-codeql.outputs.project_tools_path }}"
 
           # Debug: List ESP32 project directory contents
           echo "======================================================"
@@ -251,7 +256,8 @@ jobs:
           echo "Looking for key files:"
           for file in CMakeLists.txt app_config.yml main components; do
             if [ -e "./${ESP32_PROJECT_PATH}/${file}" ]; then
-              echo "✓ Found ${file}: $(ls -la "./${ESP32_PROJECT_PATH}/${file}")"
+              echo "✓ Found ${file}:"
+              echo "  $(ls -la "./${ESP32_PROJECT_PATH}/${file}")"
             else
               echo "✗ Missing ${file}"
             fi
@@ -270,7 +276,8 @@ jobs:
           ls -la "${SCRIPTS_PATH}" || echo "Failed to list scripts directory"
           echo ""
           echo "Checking script permissions:"
-          for script in build_app.sh flash_app.sh config_loader.sh generate_matrix.py; do
+          for script in build_app.sh flash_app.sh config_loader.sh \
+            generate_matrix.py; do
             script_path="${SCRIPTS_PATH}/$script"
             if [ -f "$script_path" ]; then
               echo "✓ Found $script: $(ls -la "$script_path")"

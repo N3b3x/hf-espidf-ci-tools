@@ -16,4 +16,5 @@ jobs:
       globs: '**/*.md'
       config_file: '_config/markdownlint.json'
       fix: false
-      exclude_patterns: '.git/**,node_modules/**,venv/**,.venv/**,_site/**,**/hf-espidf-project-tools/**'
+      exclude_patterns: >
+        '.git/**,node_modules/**,venv/**,.venv/**,_site/**,**/hf-espidf-project-tools/**'
