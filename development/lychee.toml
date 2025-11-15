@@ -23,9 +23,6 @@ exclude_all_private = true
 # Exclude mailto links
 exclude_mail = true
 
-# Verbose output
-verbose = true
-
 # Timeout settings
 timeout = 30
 max_retries = 3
