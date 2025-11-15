@@ -1,5 +1,5 @@
 ---
-name: ESP-IDF Build (Reusable)
+name: [RU] ESP-IDF Build
 
 on:
   workflow_call:
