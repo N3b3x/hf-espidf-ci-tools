@@ -1,5 +1,5 @@
 ---
-name: 📦 [RU] ESP-IDF Build
+name: 🏗️ [RU] ESP-IDF Build
 
 on:
   workflow_call:
