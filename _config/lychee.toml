@@ -15,6 +15,7 @@ exclude_urls = [
     # Base URL (404s are expected for root path)
     "^https://n3b3x\\.github\\.io/?$",
     "^https://n3b3x\\.github\\.io$",
+    "^https://n3b3x\\.github\\.io/\\s*$",  # With trailing whitespace
     
     # Sitemap files (may not exist)
     "^https://n3b3x\\.github\\.io/hf-espidf-ci-tools/sitemap",
@@ -30,10 +31,13 @@ exclude_urls = [
     "^https://n3b3x\\.github\\.io/hf-tmc9660-driver/.*",
     
     # Jekyll template variables (URL-encoded Liquid syntax like %7B%7B = {{)
-    "^file://.*%7B%7B.*%7D%7D",
-    "^file://.*\\{\\{.*\\}\\}",
+    "^file://.*%7B%7B.*%7D%7D",  # Any file:// URL with URL-encoded {{ }}
+    "^file://.*\\{\\{.*\\}\\}",  # Any file:// URL with {{ }}
     ".*%7B%7B.*%7D%7D",  # Match URL-encoded Jekyll syntax anywhere
     ".*\\{\\{.*\\}\\}",  # Match Jekyll syntax anywhere
+    ".*%7B%7B.*relative_url.*%7D%7D",  # Match relative_url filter
+    ".*%7B%7B.*%27/%27.*%7D%7D",  # Match {{ '/' | ... }} (URL-encoded)
+    ".*%7B%7B.*%27/docs/%27.*%7D%7D",  # Match {{ '/docs/' | ... }} (URL-encoded)
     
 ]
 
