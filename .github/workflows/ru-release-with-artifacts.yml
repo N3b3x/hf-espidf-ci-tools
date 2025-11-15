@@ -1,5 +1,5 @@
 ---
-name: 📦 Reusable Release with Artifacts
+name: 📦 [RU] Release with Artifacts
 
 on:
   workflow_call:
