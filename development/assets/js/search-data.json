@@ -8,7 +8,7 @@
   },"1": {
     "doc": "🔧 HardFOC ESP32 CI Tools",
     "title": "📚 Documentation",
-    "content": "🌐 Live Documentation Site Published documentation with enhanced navigation and search . | Workflow | Purpose | Key Features | Documentation | . | 🏗️ Build | Matrix ESP-IDF builds | Parallel builds, caching, size reports | Build Guide | . | 🛡️ Security | Security auditing | CodeQL, dependency scan, secrets | Security Guide | . 📖 Start here: Documentation Index - Complete guide with examples and navigation 🚀 Examples: Example Workflows - Ready-to-use workflow templates . ",
+    "content": "🌐 Live Documentation Site Published documentation with enhanced navigation and search . | Workflow | Purpose | Key Features | Documentation | . | 🏗️ Build | Matrix ESP-IDF builds | Parallel builds, caching, size reports | Build Guide | . | 🛡️ Security | Security auditing | CodeQL, dependency scan, secrets | Security Guide | . | 📦 Release | Firmware releases with artifacts | Auto artifacts, ESP32 binaries, GitHub releases | Release Guide | . 📖 Start here: Documentation Index - Complete guide with examples and navigation 🚀 Examples: Example Workflows - Ready-to-use workflow templates . ",
     "url": "/hf-espidf-ci-tools/development/#-documentation",
     
     "relUrl": "/#-documentation"
@@ -50,14 +50,14 @@
   },"7": {
     "doc": "🔧 HardFOC ESP32 CI Tools",
     "title": "1. Basic Usage",
-    "content": "| 1 2 3 4 5 6 7 8 9 10 . | # .github/workflows/ci.yml name: ESP32 CI on: [push, pull_request] jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 . | . ",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 . | # .github/workflows/ci.yml name: ESP32 CI on: [push, pull_request] jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 . | . ",
     "url": "/hf-espidf-ci-tools/development/#1-basic-usage",
     
     "relUrl": "/#1-basic-usage"
   },"8": {
     "doc": "🔧 HardFOC ESP32 CI Tools",
     "title": "2. Advanced Parallel Workflow",
-    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 . | name: 🚀 Advanced ESP32 CI on: [push, pull_request] jobs: # Build firmware across multiple configurations build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 # Security audit security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scan_type: \"all\" run_codeql: true . | . ",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 . | name: 🚀 Advanced ESP32 CI on: [push, pull_request] jobs: # Build firmware across multiple configurations build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 # Security audit security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scan_type: \"all\" run_codeql: true # Release with firmware artifacts (on tags) release: if: startsWith(github.ref, 'refs/tags/') needs: [build] uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: build_workflow: \"esp32-examples-build-ci.yml\" artifact_pattern: \"fw-.*\" permissions: contents: write . | . ",
     "url": "/hf-espidf-ci-tools/development/#2-advanced-parallel-workflow",
     
     "relUrl": "/#2-advanced-parallel-workflow"
@@ -71,7 +71,7 @@
   },"10": {
     "doc": "🔧 HardFOC ESP32 CI Tools",
     "title": "Consumer usage (examples)",
-    "content": "CI combining build + security: . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . | name: CI on: push: { branches: [ main ] } pull_request: { branches: [ main ] } jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 # Change to where your esp32 project directory is project_tools_dir: hf-espidf-project-tools auto_clone_tools: true clean_build: false security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools scan_type: \"all\" run_codeql: true codeql_languages: \"cpp\" . | . 📖 Next: Documentation Index - Complete navigation and examples . 🧪 Test 404 Page - (on live documentation) Click this link to test our custom 404 page! . ",
+    "content": "CI combining build + security: . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . | name: CI on: push: { branches: [ main ] } pull_request: { branches: [ main ] } jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 # Change to where your esp32 project directory is project_tools_dir: hf-espidf-project-tools auto_clone_tools: true clean_build: false security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools scan_type: \"all\" run_codeql: true codeql_languages: \"cpp\" . | . 📖 Next: Documentation Index - Complete navigation and examples . 🧪 Test 404 Page - (on live documentation) Click this link to test our custom 404 page! . ",
     "url": "/hf-espidf-ci-tools/development/#consumer-usage-examples",
     
     "relUrl": "/#consumer-usage-examples"
@@ -155,7 +155,7 @@
   },"22": {
     "doc": "🏗️ ESP-IDF Build Workflow Guide",
     "title": "Size Budget Enforcement",
-    "content": "The workflow includes optional size budget enforcement to prevent firmware from exceeding specified limits: . | 📊 Automatic Size Analysis: Analyzes firmware size from all build configurations | 🚫 Budget Enforcement: Fails the build if any configuration exceeds the specified limit | ⚙️ Configurable Limits: Set custom size limits via max_dec_total parameter | 🔍 Detailed Reporting: Shows which builds exceeded limits and by how much | ✅ Optional Feature: Disabled by default (set to “0”), enable by setting a positive value | . What the Size Budget Measures . The size budget is based on the dec (decimal) size from ESP-IDF’s size analysis, which represents the total memory footprint of your firmware. This includes: . | 📝 Text Segment: Executable code, functions, and program logic | 📊 Data Segment: Initialized global and static variables | 🗃️ BSS Segment: Uninitialized global and static variables (zero-initialized) | . Size Analysis Format: . | 1 2 . | text data bss dec hex filename 12345 6789 1234 20368 4f90 your_app.bin . | . Where: . | text: Code size (instructions, functions, constants) | data: Initialized variables (global/static with initial values) | bss: Uninitialized variables (global/static set to zero) | dec: Total size = text + data + bss (this is what the budget measures) | hex: Same as dec but in hexadecimal format | . Why Use dec Size: . | 🎯 Total Memory Usage: Represents the complete RAM footprint | 📱 Device Constraints: ESP32 devices have limited flash and RAM | ⚖️ Resource Management: Helps ensure firmware fits within device capabilities | 🔍 Build Comparison: Consistent metric across different build configurations | . Common Size Budget Values . | Device | Typical Budget | Description | . | ESP32 | 1,600,000 bytes (1.6MB) | Standard ESP32 with 4MB flash | . | ESP32-S2 | 1,600,000 bytes (1.6MB) | ESP32-S2 with 4MB flash | . | ESP32-S3 | 1,600,000 bytes (1.6MB) | ESP32-S3 with 4MB flash | . | ESP32-C3 | 1,600,000 bytes (1.6MB) | ESP32-C3 with 4MB flash | . | ESP32-C6 | 1,600,000 bytes (1.6MB) | ESP32-C6 with 4MB flash | . | Small Flash | 800,000 bytes (800KB) | ESP32 with 2MB flash | . | Large Flash | 3,200,000 bytes (3.2MB) | ESP32 with 8MB+ flash | . Size Budget Guidelines: . | 🟢 Conservative: 50-60% of available flash (leaves room for OTA updates) | 🟡 Moderate: 70-80% of available flash (good balance) | 🔴 Aggressive: 90%+ of available flash (minimal room for updates) | . Example Size Analysis: . | 1 2 . | text data bss dec hex filename 456789 12345 8901 477035 746ab my_app.bin . | . | Total Size: 477,035 bytes (~466 KB) | Status: ✅ Within 1.6MB budget | Remaining: 1,122,965 bytes available | . How Size Budget Enforcement Works . The workflow analyzes the size.txt files generated by ESP-IDF for each build configuration: . | 📊 Size Analysis: Parses the dec value from each size.txt file | 🔍 Comparison: Compares each build’s size against the max_dec_total limit | ⚠️ Violation Detection: Identifies builds that exceed the budget | 📝 Error Reporting: Reports specific builds and their sizes | 🚫 Build Failure: Fails the entire workflow if any build exceeds the limit | . Error Example: . | 1 2 . | ::error file=build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5/size.txt::build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5 dec=1800000 exceeds MAX_DEC_TOTAL=1600000 ::error::Size budget exceeded in 1 build(s). Check individual errors above. | . Success Example: . | 1 . | ✅ All builds within size budget (1600000 bytes) . | . Project Directory (project_dir) . | Purpose: Points to your ESP-IDF project directory (contains CMakeLists.txt, app_config.yml) | Examples: . | examples/esp32 (most common) | firmware/esp32-project | src/esp32-app | . | . Tools Directory (project_tools_dir) . | Purpose: Points to directory containing the build scripts (build_app.sh, generate_matrix.py, etc.) | Auto-detection: If not specified, looks for hf-espidf-project-tools subdirectory in project directory | Multi-Project Support: Can be shared across multiple projects since all scripts accept --project-path argument | Examples: . | examples/esp32/scripts (when using submodule) | examples/esp32/hf-espidf-project-tools (when cloned directly) | tools/esp32-build-scripts (custom location) | shared-tools (shared across multiple projects) | . | . Common Configuration Patterns . Pattern 1: Submodule Setup (Recommended) . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 . | # Repository structure: # your-repo/ # ├── examples/esp32/ # ESP-IDF project # │ ├── CMakeLists.txt # │ ├── app_config.yml # │ └── hf-espidf-project-tools/ # Submodule containing project tools # │ ├── build_app.sh # │ └── generate_matrix.py jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: examples/esp32/hf-espidf-project-tools # Points to submodule # auto_clone_tools not needed - workflow respects explicit project_tools_dir . | . ✅ Automatic Behavior: . | When project_tools_dir is specified, the workflow uses that path directly | No auto-cloning occurs when explicit path is provided | Submodule detection and validation happens automatically | . Pattern 2: Direct Clone Setup . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 . | # Repository structure: # your-repo/ # ├── examples/esp32/ # ESP-IDF project # │ ├── CMakeLists.txt # │ ├── app_config.yml # │ └── hf-espidf-project-tools/ # Cloned directly # │ ├── build_app.sh # │ └── generate_matrix.py jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 # project_tools_dir not needed - auto-detects hf-espidf-project-tools . | . Pattern 3: Custom Tools Location . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 . | # Repository structure: # your-repo/ # ├── firmware/esp32/ # ESP-IDF project # │ ├── CMakeLists.txt # │ └── app_config.yml # └── build-tools/ # Custom tools location # ├── build_app.sh # └── generate_matrix.py jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: firmware/esp32 project_tools_dir: build-tools . | . Pattern 4: Shared Tools for Multiple Projects . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 . | # Repository structure: # your-repo/ # ├── projects/ # │ ├── project-a/ # ESP-IDF project A # │ │ ├── CMakeLists.txt # │ │ └── app_config.yml # │ └── project-b/ # ESP-IDF project B # │ ├── CMakeLists.txt # │ └── app_config.yml # └── shared-tools/ # Shared tools directory # ├── build_app.sh # └── generate_matrix.py # jobs: build-project-a: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: projects/project-a project_tools_dir: shared-tools # Shared across all projects build-project-b: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: projects/project-b project_tools_dir: shared-tools # Same shared tools directory . | . ✅ Why This Works: . | All scripts (build_app.sh, generate_matrix.py, etc.) accept --project-path argument | The workflow automatically passes the correct project directory to each script | Tools can be shared across multiple projects without duplication | Each project maintains its own app_config.yml and build configuration | . ",
+    "content": "The workflow includes optional size budget enforcement to prevent firmware from exceeding specified limits: . | 📊 Automatic Size Analysis: Analyzes firmware size from all build configurations | 🚫 Budget Enforcement: Fails the build if any configuration exceeds the specified limit | ⚙️ Configurable Limits: Set custom size limits via max_dec_total parameter | 🔍 Detailed Reporting: Shows which builds exceeded limits and by how much | ✅ Optional Feature: Disabled by default (set to “0”), enable by setting a positive value | . What the Size Budget Measures . The size budget is based on the dec (decimal) size from ESP-IDF’s size analysis, which represents the total memory footprint of your firmware. This includes: . | 📝 Text Segment: Executable code, functions, and program logic | 📊 Data Segment: Initialized global and static variables | 🗃️ BSS Segment: Uninitialized global and static variables (zero-initialized) | . Size Analysis Format: . | 1 2 . | text data bss dec hex filename 12345 6789 1234 20368 4f90 your_app.bin . | . Where: . | text: Code size (instructions, functions, constants) | data: Initialized variables (global/static with initial values) | bss: Uninitialized variables (global/static set to zero) | dec: Total size = text + data + bss (this is what the budget measures) | hex: Same as dec but in hexadecimal format | . Why Use dec Size: . | 🎯 Total Memory Usage: Represents the complete RAM footprint | 📱 Device Constraints: ESP32 devices have limited flash and RAM | ⚖️ Resource Management: Helps ensure firmware fits within device capabilities | 🔍 Build Comparison: Consistent metric across different build configurations | . Common Size Budget Values . | Device | Typical Budget | Description | . | ESP32 | 1,600,000 bytes (1.6MB) | Standard ESP32 with 4MB flash | . | ESP32-S2 | 1,600,000 bytes (1.6MB) | ESP32-S2 with 4MB flash | . | ESP32-S3 | 1,600,000 bytes (1.6MB) | ESP32-S3 with 4MB flash | . | ESP32-C3 | 1,600,000 bytes (1.6MB) | ESP32-C3 with 4MB flash | . | ESP32-C6 | 1,600,000 bytes (1.6MB) | ESP32-C6 with 4MB flash | . | Small Flash | 800,000 bytes (800KB) | ESP32 with 2MB flash | . | Large Flash | 3,200,000 bytes (3.2MB) | ESP32 with 8MB+ flash | . Size Budget Guidelines: . | 🟢 Conservative: 50-60% of available flash (leaves room for OTA updates) | 🟡 Moderate: 70-80% of available flash (good balance) | 🔴 Aggressive: 90%+ of available flash (minimal room for updates) | . Example Size Analysis: . | 1 2 . | text data bss dec hex filename 456789 12345 8901 477035 746ab my_app.bin . | . | Total Size: 477,035 bytes (~466 KB) | Status: ✅ Within 1.6MB budget | Remaining: 1,122,965 bytes available | . How Size Budget Enforcement Works . The workflow analyzes the size.txt files generated by ESP-IDF for each build configuration: . | 📊 Size Analysis: Parses the dec value from each size.txt file | 🔍 Comparison: Compares each build’s size against the max_dec_total limit | ⚠️ Violation Detection: Identifies builds that exceed the budget | 📝 Error Reporting: Reports specific builds and their sizes | 🚫 Build Failure: Fails the entire workflow if any build exceeds the limit | . Error Example: . | 1 2 . | ::error file=build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5/size.txt::build-app-gpio_test-type-Release-target-esp32c6-idf-release_v5_5 dec=1800000 exceeds MAX_DEC_TOTAL=1600000 ::error::Size budget exceeded in 1 build(s). Check individual errors above. | . Success Example: . | 1 . | ✅ All builds within size budget (1600000 bytes) . | . Project Directory (project_dir) . | Purpose: Points to your ESP-IDF project directory (contains CMakeLists.txt, app_config.yml) | Examples: . | examples/esp32 (most common) | firmware/esp32-project | src/esp32-app | . | . Tools Directory (project_tools_dir) . | Purpose: Points to directory containing the build scripts (build_app.sh, generate_matrix.py, etc.) | Auto-detection: If not specified, looks for hf-espidf-project-tools subdirectory in project directory | Multi-Project Support: Can be shared across multiple projects since all scripts accept --project-path argument | Examples: . | examples/esp32/scripts (when using submodule) | examples/esp32/hf-espidf-project-tools (when cloned directly) | tools/esp32-build-scripts (custom location) | shared-tools (shared across multiple projects) | . | . Common Configuration Patterns . Pattern 1: Submodule Setup (Recommended) . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 . | # Repository structure: # your-repo/ # ├── examples/esp32/ # ESP-IDF project # │ ├── CMakeLists.txt # │ ├── app_config.yml # │ └── hf-espidf-project-tools/ # Submodule containing project tools # │ ├── build_app.sh # │ └── generate_matrix.py jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: examples/esp32/hf-espidf-project-tools # Points to submodule # auto_clone_tools not needed - workflow respects explicit project_tools_dir . | . ✅ Automatic Behavior: . | When project_tools_dir is specified, the workflow uses that path directly | No auto-cloning occurs when explicit path is provided | Submodule detection and validation happens automatically | . Pattern 2: Direct Clone Setup . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 . | # Repository structure: # your-repo/ # ├── examples/esp32/ # ESP-IDF project # │ ├── CMakeLists.txt # │ ├── app_config.yml # │ └── hf-espidf-project-tools/ # Cloned directly # │ ├── build_app.sh # │ └── generate_matrix.py jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 # project_tools_dir not needed - auto-detects hf-espidf-project-tools . | . Pattern 3: Custom Tools Location . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 . | # Repository structure: # your-repo/ # ├── firmware/esp32/ # ESP-IDF project # │ ├── CMakeLists.txt # │ └── app_config.yml # └── build-tools/ # Custom tools location # ├── build_app.sh # └── generate_matrix.py jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: firmware/esp32 project_tools_dir: build-tools . | . Pattern 4: Shared Tools for Multiple Projects . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 . | # Repository structure: # your-repo/ # ├── projects/ # │ ├── project-a/ # ESP-IDF project A # │ │ ├── CMakeLists.txt # │ │ └── app_config.yml # │ └── project-b/ # ESP-IDF project B # │ ├── CMakeLists.txt # │ └── app_config.yml # └── shared-tools/ # Shared tools directory # ├── build_app.sh # └── generate_matrix.py # jobs: build-project-a: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: projects/project-a project_tools_dir: shared-tools # Shared across all projects build-project-b: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: projects/project-b project_tools_dir: shared-tools # Same shared tools directory . | . ✅ Why This Works: . | All scripts (build_app.sh, generate_matrix.py, etc.) accept --project-path argument | The workflow automatically passes the correct project directory to each script | Tools can be shared across multiple projects without duplication | Each project maintains its own app_config.yml and build configuration | . ",
     "url": "/hf-espidf-ci-tools/development/docs/build-workflow/#size-budget-enforcement",
     
     "relUrl": "/docs/build-workflow/#size-budget-enforcement"
@@ -197,42 +197,42 @@
   },"28": {
     "doc": "🏗️ ESP-IDF Build Workflow Guide",
     "title": "Basic Usage",
-    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 . | name: Build ESP32 Firmware on: push: branches: [main, develop] pull_request: branches: [main] jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 . | . ",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 . | name: Build ESP32 Firmware on: push: branches: [main, develop] pull_request: branches: [main] jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/build-workflow/#basic-usage",
     
     "relUrl": "/docs/build-workflow/#basic-usage"
   },"29": {
     "doc": "🏗️ ESP-IDF Build Workflow Guide",
     "title": "Advanced Configuration",
-    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 . | name: Advanced ESP32 Build on: push: branches: [main] pull_request: branches: [main] workflow_dispatch: inputs: clean_build: description: 'Clean build (no cache)' required: false default: false type: boolean jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools clean_build: $ auto_clone_tools: true . | . ",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 . | name: Advanced ESP32 Build on: push: branches: [main] pull_request: branches: [main] workflow_dispatch: inputs: clean_build: description: 'Clean build (no cache)' required: false default: false type: boolean jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools clean_build: $ auto_clone_tools: true . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/build-workflow/#advanced-configuration",
     
     "relUrl": "/docs/build-workflow/#advanced-configuration"
   },"30": {
     "doc": "🏗️ ESP-IDF Build Workflow Guide",
     "title": "Clean Build (No Caching)",
-    "content": "| 1 2 3 4 5 6 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 clean_build: true # Skip all caches for fresh build . | . ",
+    "content": "| 1 2 3 4 5 6 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 clean_build: true # Skip all caches for fresh build . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/build-workflow/#clean-build-no-caching",
     
     "relUrl": "/docs/build-workflow/#clean-build-no-caching"
   },"31": {
     "doc": "🏗️ ESP-IDF Build Workflow Guide",
     "title": "Custom Tools Directory",
-    "content": "| 1 2 3 4 5 6 7 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: custom-tools # Use custom tools directory auto_clone_tools: false # Don't auto-clone, use existing . | . ",
+    "content": "| 1 2 3 4 5 6 7 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: custom-tools # Use custom tools directory auto_clone_tools: false # Don't auto-clone, use existing . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/build-workflow/#custom-tools-directory",
     
     "relUrl": "/docs/build-workflow/#custom-tools-directory"
   },"32": {
     "doc": "🏗️ ESP-IDF Build Workflow Guide",
     "title": "Size Budget Enforcement",
-    "content": "| 1 2 3 4 5 6 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 max_dec_total: \"1600000\" # 1.6MB size limit (in bytes) . | . ",
+    "content": "| 1 2 3 4 5 6 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 max_dec_total: \"1600000\" # 1.6MB size limit (in bytes) . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/build-workflow/#size-budget-enforcement-1",
     
     "relUrl": "/docs/build-workflow/#size-budget-enforcement-1"
   },"33": {
     "doc": "🏗️ ESP-IDF Build Workflow Guide",
     "title": "Advanced Configuration with Size Budget",
-    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 . | name: ESP32 Build with Size Budget on: push: branches: [main] pull_request: branches: [main] workflow_dispatch: inputs: size_limit: description: 'Size limit in MB' required: false default: '1.6' type: string jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools clean_build: false max_dec_total: ${{ github.event.inputs.size_limit != '' &amp;&amp; format('{0}{1}', github.event.inputs.size_limit, '000000') || '1600000' }} . | . ",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 . | name: ESP32 Build with Size Budget on: push: branches: [main] pull_request: branches: [main] workflow_dispatch: inputs: size_limit: description: 'Size limit in MB' required: false default: '1.6' type: string jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools clean_build: false max_dec_total: ${{ github.event.inputs.size_limit != '' &amp;&amp; format('{0}{1}', github.event.inputs.size_limit, '000000') || '1600000' }} . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/build-workflow/#advanced-configuration-with-size-budget",
     
     "relUrl": "/docs/build-workflow/#advanced-configuration-with-size-budget"
@@ -330,7 +330,7 @@
   },"47": {
     "doc": "🏗️ ESP-IDF Build Workflow Guide",
     "title": "Debug Mode",
-    "content": "Enable verbose output for debugging: . | 1 2 3 4 5 6 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 clean_build: true # Bypass caches for debugging . | . Enable debug output by setting: . | 1 2 3 . | env: ACTIONS_STEP_DEBUG: true ACTIONS_RUNNER_DEBUG: true . | . ",
+    "content": "Enable verbose output for debugging: . | 1 2 3 4 5 6 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 clean_build: true # Bypass caches for debugging . | . Enable debug output by setting: . | 1 2 3 . | env: ACTIONS_STEP_DEBUG: true ACTIONS_RUNNER_DEBUG: true . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/build-workflow/#debug-mode",
     
     "relUrl": "/docs/build-workflow/#debug-mode"
@@ -400,42 +400,42 @@
   },"57": {
     "doc": "🚀 Example Workflows for Consumer Repositories",
     "title": "🏗️ Basic Workflow",
-    "content": "Use Case: Simple projects that need basic CI/CD with build and lint checks. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . | name: 🏗️ Basic ESP32 CI on: push: branches: [main, develop] pull_request: branches: [main] jobs: # Build firmware across multiple configurations build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 # Security audit security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scan_type: \"all\" run_codeql: true . | . ",
+    "content": "Use Case: Simple projects that need basic CI/CD with build and lint checks. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . | name: 🏗️ Basic ESP32 CI on: push: branches: [main, develop] pull_request: branches: [main] jobs: # Build firmware across multiple configurations build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 # Security audit security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scan_type: \"all\" run_codeql: true . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/example-workflows/#%EF%B8%8F-basic-workflow",
     
     "relUrl": "/docs/example-workflows/#️-basic-workflow"
   },"58": {
     "doc": "🚀 Example Workflows for Consumer Repositories",
     "title": "🚀 Advanced Parallel Workflow",
-    "content": "Use Case: Production projects requiring comprehensive CI/CD with all checks running in parallel. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 . | name: 🚀 Advanced ESP32 CI on: push: branches: [main, develop, release/*] pull_request: branches: [main, develop] workflow_dispatch: inputs: clean_build: description: 'Clean build (no cache)' required: false default: false type: boolean run_security: description: 'Run security checks' required: false default: true type: boolean env: PROJECT_DIR: examples/esp32 TOOLS_DIR: hf-espidf-project-tools jobs: # 🔍 Matrix generation and validation validate: runs-on: ubuntu-latest outputs: matrix: $ steps: - uses: actions/checkout@v4 with: submodules: recursive - name: Validate configuration run: | cd $ python3 $/generate_matrix.py --validate --verbose - name: Generate build matrix id: matrix run: | cd $ MATRIX=$(python3 $/generate_matrix.py) echo \"matrix=${MATRIX}\" &gt;&gt; \"$GITHUB_OUTPUT\" echo \"Generated matrix with $(echo \"$MATRIX\" | jq '.include | length') build combinations\" # 🏗️ Build firmware (parallel matrix) build: needs: validate uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: $ project_tools_dir: $ clean_build: $ # 🛡️ Security audit security: if: $ uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: $ project_tools_dir: $ scan_type: \"all\" run_codeql: true codeql_languages: \"cpp,python\" # 📊 Build summary and notifications summary: needs: [build, security] if: always() runs-on: ubuntu-latest steps: - name: Build Summary run: | echo \"## 🚀 Build Summary\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"| Job | Status |\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"|-----|--------|\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"| 🏗️ Build | $ |\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"| 🛡️ Security | $ |\" &gt;&gt; $GITHUB_STEP_SUMMARY . | . ",
+    "content": "Use Case: Production projects requiring comprehensive CI/CD with all checks running in parallel. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 . | name: 🚀 Advanced ESP32 CI on: push: branches: [main, develop, release/*] pull_request: branches: [main, develop] workflow_dispatch: inputs: clean_build: description: 'Clean build (no cache)' required: false default: false type: boolean run_security: description: 'Run security checks' required: false default: true type: boolean env: PROJECT_DIR: examples/esp32 TOOLS_DIR: hf-espidf-project-tools jobs: # 🔍 Matrix generation and validation validate: runs-on: ubuntu-latest outputs: matrix: $ steps: - uses: actions/checkout@v4 with: submodules: recursive - name: Validate configuration run: | cd $ python3 $/generate_matrix.py --validate --verbose - name: Generate build matrix id: matrix run: | cd $ MATRIX=$(python3 $/generate_matrix.py) echo \"matrix=${MATRIX}\" &gt;&gt; \"$GITHUB_OUTPUT\" echo \"Generated matrix with $(echo \"$MATRIX\" | jq '.include | length') build combinations\" # 🏗️ Build firmware (parallel matrix) build: needs: validate uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: $ project_tools_dir: $ clean_build: $ # 🛡️ Security audit security: if: $ uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: $ project_tools_dir: $ scan_type: \"all\" run_codeql: true codeql_languages: \"cpp,python\" # 📊 Build summary and notifications summary: needs: [build, security] if: always() runs-on: ubuntu-latest steps: - name: Build Summary run: | echo \"## 🚀 Build Summary\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"| Job | Status |\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"|-----|--------|\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"| 🏗️ Build | $ |\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"| 🛡️ Security | $ |\" &gt;&gt; $GITHUB_STEP_SUMMARY . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/example-workflows/#-advanced-parallel-workflow",
     
     "relUrl": "/docs/example-workflows/#-advanced-parallel-workflow"
   },"59": {
     "doc": "🚀 Example Workflows for Consumer Repositories",
     "title": "🔧 Development Workflow",
-    "content": "Use Case: Development branches with auto-fix and relaxed checks. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 . | name: 🔧 Development CI on: push: branches: [develop, feature/*, bugfix/*] pull_request: branches: [develop] jobs: # Quick build for development build-dev: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 clean_build: false # Use caches for faster builds # Security audit security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scan_type: \"dependencies\" # Quick dependency scan for dev run_codeql: false . | . ",
+    "content": "Use Case: Development branches with auto-fix and relaxed checks. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 . | name: 🔧 Development CI on: push: branches: [develop, feature/*, bugfix/*] pull_request: branches: [develop] jobs: # Quick build for development build-dev: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 clean_build: false # Use caches for faster builds # Security audit security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scan_type: \"dependencies\" # Quick dependency scan for dev run_codeql: false . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/example-workflows/#-development-workflow",
     
     "relUrl": "/docs/example-workflows/#-development-workflow"
   },"60": {
     "doc": "🚀 Example Workflows for Consumer Repositories",
     "title": "📦 Release Workflow",
-    "content": "Use Case: Release branches with comprehensive checks and artifact publishing. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 . | name: 📦 Release CI on: push: branches: [release/*, main] tags: ['v*'] workflow_dispatch: inputs: release_version: description: 'Release version (e.g., v1.0.0)' required: true type: string env: PROJECT_DIR: examples/esp32 RELEASE_VERSION: $ jobs: # Comprehensive build for release build-release: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: $ clean_build: true # Clean build for release # Full security audit security-release: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: $ scan_type: \"all\" run_codeql: true codeql_languages: \"cpp,python\" # Create release artifacts create-release: needs: [build-release, security-release] if: startsWith(github.ref, 'refs/tags/') runs-on: ubuntu-latest steps: - name: Download build artifacts uses: actions/download-artifact@v4 with: pattern: fw-* merge-multiple: true path: artifacts/ - name: Create Release uses: actions/create-release@v1 env: GITHUB_TOKEN: $ with: tag_name: $ release_name: Release $ body: | ## 🚀 HardFOC ESP32 Release $ ### 📦 Firmware Binaries - All firmware binaries are attached to this release - Built with ESP-IDF v5.5 - Target: ESP32-C6 ### 📚 Documentation - [Documentation](https://$.github.io/$/) ### 🛡️ Security - Full security audit completed - CodeQL analysis passed - No known vulnerabilities draft: false prerelease: false - name: Upload Release Assets uses: actions/upload-release-asset@v1 env: GITHUB_TOKEN: $ with: upload_url: $ asset_path: artifacts/ asset_name: firmware-$.zip asset_content_type: application/zip . | . ",
+    "content": "Use Case: Release branches with comprehensive checks and artifact publishing. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 . | name: 📦 Release CI on: push: branches: [release/*, main] tags: ['v*'] workflow_dispatch: inputs: release_version: description: 'Release version (e.g., v1.0.0)' required: true type: string env: PROJECT_DIR: examples/esp32 RELEASE_VERSION: $ jobs: # Comprehensive build for release build-release: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: $ clean_build: true # Clean build for release # Full security audit security-release: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: $ scan_type: \"all\" run_codeql: true codeql_languages: \"cpp,python\" # Create release artifacts create-release: needs: [build-release, security-release] if: startsWith(github.ref, 'refs/tags/') runs-on: ubuntu-latest steps: - name: Download build artifacts uses: actions/download-artifact@v4 with: pattern: fw-* merge-multiple: true path: artifacts/ - name: Create Release uses: actions/create-release@v1 env: GITHUB_TOKEN: $ with: tag_name: $ release_name: Release $ body: | ## 🚀 HardFOC ESP32 Release $ ### 📦 Firmware Binaries - All firmware binaries are attached to this release - Built with ESP-IDF v5.5 - Target: ESP32-C6 ### 📚 Documentation - [Documentation](https://$.github.io/$/) ### 🛡️ Security - Full security audit completed - CodeQL analysis passed - No known vulnerabilities draft: false prerelease: false - name: Upload Release Assets uses: actions/upload-release-asset@v1 env: GITHUB_TOKEN: $ with: upload_url: $ asset_path: artifacts/ asset_name: firmware-$.zip asset_content_type: application/zip . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/example-workflows/#-release-workflow",
     
     "relUrl": "/docs/example-workflows/#-release-workflow"
   },"61": {
     "doc": "🚀 Example Workflows for Consumer Repositories",
     "title": "🛡️ Security-First Workflow",
-    "content": "Use Case: Security-critical projects requiring comprehensive security checks. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 . | name: 🛡️ Security-First CI on: push: branches: [main, security/*] pull_request: branches: [main] schedule: - cron: '0 2 * * 1' # Weekly security scan jobs: # Security audit (runs first) security-audit: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scan_type: \"all\" run_codeql: true codeql_languages: \"cpp,python\" # Build only if security passes build-secure: needs: security-audit uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 clean_build: true # Additional security checks security-scan: needs: security-audit runs-on: ubuntu-latest steps: - uses: actions/checkout@v4 with: fetch-depth: 0 - name: Run Trivy vulnerability scanner uses: aquasecurity/trivy-action@master with: scan-type: 'fs' scan-ref: '.' format: 'sarif' output: 'trivy-results.sarif' - name: Upload Trivy scan results uses: github/codeql-action/upload-sarif@v2 with: sarif_file: 'trivy-results.sarif' . | . ",
+    "content": "Use Case: Security-critical projects requiring comprehensive security checks. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 . | name: 🛡️ Security-First CI on: push: branches: [main, security/*] pull_request: branches: [main] schedule: - cron: '0 2 * * 1' # Weekly security scan jobs: # Security audit (runs first) security-audit: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scan_type: \"all\" run_codeql: true codeql_languages: \"cpp,python\" # Build only if security passes build-secure: needs: security-audit uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 clean_build: true # Additional security checks security-scan: needs: security-audit runs-on: ubuntu-latest steps: - uses: actions/checkout@v4 with: fetch-depth: 0 - name: Run Trivy vulnerability scanner uses: aquasecurity/trivy-action@master with: scan-type: 'fs' scan-ref: '.' format: 'sarif' output: 'trivy-results.sarif' - name: Upload Trivy scan results uses: github/codeql-action/upload-sarif@v2 with: sarif_file: 'trivy-results.sarif' . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/example-workflows/#%EF%B8%8F-security-first-workflow",
     
     "relUrl": "/docs/example-workflows/#️-security-first-workflow"
   },"62": {
     "doc": "🚀 Example Workflows for Consumer Repositories",
     "title": "⚡ Performance Optimized",
-    "content": "Use Case: Large projects requiring maximum build performance and minimal resource usage. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 . | name: ⚡ Performance CI on: push: branches: [main, develop] pull_request: branches: [main] env: PROJECT_DIR: examples/esp32 CACHE_VERSION: v1 jobs: # Optimized build with aggressive caching build-fast: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: $ clean_build: false # Always use caches # Quick security scan security-quick: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: $ scan_type: \"dependencies\" # Only dependency scan for speed run_codeql: false # Performance monitoring performance-check: runs-on: ubuntu-latest steps: - name: Check build times run: | echo \"## ⚡ Performance Metrics\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"Build completed in: $\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"Cache hit rate: High (optimized configuration)\" &gt;&gt; $GITHUB_STEP_SUMMARY . | . ",
+    "content": "Use Case: Large projects requiring maximum build performance and minimal resource usage. | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 . | name: ⚡ Performance CI on: push: branches: [main, develop] pull_request: branches: [main] env: PROJECT_DIR: examples/esp32 CACHE_VERSION: v1 jobs: # Optimized build with aggressive caching build-fast: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: $ clean_build: false # Always use caches # Quick security scan security-quick: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: $ scan_type: \"dependencies\" # Only dependency scan for speed run_codeql: false # Performance monitoring performance-check: runs-on: ubuntu-latest steps: - name: Check build times run: | echo \"## ⚡ Performance Metrics\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"Build completed in: $\" &gt;&gt; $GITHUB_STEP_SUMMARY echo \"Cache hit rate: High (optimized configuration)\" &gt;&gt; $GITHUB_STEP_SUMMARY . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/example-workflows/#-performance-optimized",
     
     "relUrl": "/docs/example-workflows/#-performance-optimized"
@@ -498,7 +498,7 @@
   },"71": {
     "doc": "📚 Documentation",
     "title": "🚀 Quick Navigation",
-    "content": "| Workflow | Description | Quick Start | . | Build | ESP-IDF matrix builds with caching | → Build Guide | . | Security | Dependencies, secrets, CodeQL | → Security Guide | . ",
+    "content": "| Workflow | Description | Quick Start | . | Build | ESP-IDF matrix builds with caching | → Build Guide | . | Security | Dependencies, secrets, CodeQL | → Security Guide | . | Release | Firmware releases with build artifacts | → Release Guide | . ",
     "url": "/hf-espidf-ci-tools/development/docs/#-quick-navigation",
     
     "relUrl": "/docs/#-quick-navigation"
@@ -533,7 +533,7 @@
   },"76": {
     "doc": "📚 Documentation",
     "title": "2. Create Your First CI Workflow",
-    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . | # .github/workflows/ci.yml name: CI on: push: { branches: [ main ] } pull_request: { branches: [ main ] } jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools auto_clone_tools: true clean_build: false security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools scan_type: \"all\" run_codeql: true . | . ",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . | # .github/workflows/ci.yml name: CI on: push: { branches: [ main ] } pull_request: { branches: [ main ] } jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools auto_clone_tools: true clean_build: false security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools scan_type: \"all\" run_codeql: true . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/#2-create-your-first-ci-workflow",
     
     "relUrl": "/docs/#2-create-your-first-ci-workflow"
@@ -560,236 +560,467 @@
     "relUrl": "/docs/#security-workflow"
   },"80": {
     "doc": "📚 Documentation",
+    "title": "Release Workflow",
+    "content": ". | Purpose: Automated firmware releases with build artifacts | Key Features: GitHub releases, firmware binaries, auto-generated notes | Use Case: Version releases with ESP32 firmware artifacts | . → Full Release Guide . ",
+    "url": "/hf-espidf-ci-tools/development/docs/#release-workflow",
+    
+    "relUrl": "/docs/#release-workflow"
+  },"81": {
+    "doc": "📚 Documentation",
     "title": "🔄 Workflow Combinations",
     "content": " ",
     "url": "/hf-espidf-ci-tools/development/docs/#-workflow-combinations",
     
     "relUrl": "/docs/#-workflow-combinations"
-  },"81": {
+  },"82": {
     "doc": "📚 Documentation",
     "title": "Full CI Pipeline",
-    "content": "| 1 2 3 4 . | # Combines all workflows for comprehensive CI jobs: build: # Matrix builds security: # Security audit . | . ",
+    "content": "| 1 2 3 4 5 . | # Combines all workflows for comprehensive CI jobs: build: # Matrix builds security: # Security audit release: # Firmware release (on tags) . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/#full-ci-pipeline",
     
     "relUrl": "/docs/#full-ci-pipeline"
-  },"82": {
+  },"83": {
     "doc": "📚 Documentation",
     "title": "Security Pipeline",
     "content": "| 1 2 3 . | # Security-focused workflows jobs: security: # Full security audit . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/#security-pipeline",
     
     "relUrl": "/docs/#security-pipeline"
-  },"83": {
+  },"84": {
     "doc": "📚 Documentation",
     "title": "📖 Next Steps",
     "content": ". | Choose your workflows based on your project needs | Read the individual guides for detailed configuration | Customize inputs to match your project structure | Test with a simple workflow before adding complexity | . ",
     "url": "/hf-espidf-ci-tools/development/docs/#-next-steps",
     
     "relUrl": "/docs/#-next-steps"
-  },"84": {
+  },"85": {
     "doc": "📚 Documentation",
     "title": "🔗 Related Resources",
     "content": ". | Main Repository | Project Tools Repository | ESP-IDF Documentation | GitHub Actions Documentation | . | ← Previous:🏠Main README | Next: Build Workflow → | . ",
     "url": "/hf-espidf-ci-tools/development/docs/#-related-resources",
     
     "relUrl": "/docs/#-related-resources"
-  },"85": {
+  },"86": {
     "doc": "📚 Documentation",
     "title": "📚 Documentation",
     "content": " ",
     "url": "/hf-espidf-ci-tools/development/docs/",
     
     "relUrl": "/docs/"
-  },"86": {
+  },"87": {
+    "doc": "📦 Release Workflow",
+    "title": "📦 ESP32 Release Workflow",
+    "content": "Automated firmware releases with ru-release-with-artifacts.yml . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-esp32-release-workflow",
+    
+    "relUrl": "/docs/release-workflow.html#-esp32-release-workflow"
+  },"88": {
+    "doc": "📦 Release Workflow",
+    "title": "🎯 Overview",
+    "content": "The ru-release-with-artifacts.yml workflow provides automated GitHub releases with ESP32 firmware artifacts: . | ✅ Automatic artifact collection from build workflows | ✅ ESP32 firmware binaries included in releases | ✅ Auto-generated release notes from GitHub | ✅ Tag-based releases with version management | ✅ Build artifact validation before release | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-overview",
+    
+    "relUrl": "/docs/release-workflow.html#-overview"
+  },"89": {
+    "doc": "📦 Release Workflow",
+    "title": "🚀 Quick Start",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-quick-start",
+    
+    "relUrl": "/docs/release-workflow.html#-quick-start"
+  },"90": {
+    "doc": "📦 Release Workflow",
+    "title": "Basic Firmware Release",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 . | # .github/workflows/release.yml name: 📦 Release on: push: tags: ['v*'] jobs: # Build first (required for artifacts) build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 # Release with artifacts release: needs: [build] uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: build_workflow: \"esp32-examples-build-ci.yml\" artifact_pattern: \"fw-.*\" permissions: contents: write . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#basic-firmware-release",
+    
+    "relUrl": "/docs/release-workflow.html#basic-firmware-release"
+  },"91": {
+    "doc": "📦 Release Workflow",
+    "title": "Advanced Release Configuration",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 . | name: 📦 Advanced Release on: push: tags: ['v*'] jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 release: needs: [build] uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: build_workflow: \"esp32-examples-build-ci.yml\" artifact_pattern: \"fw-.*\" draft: $ prerelease: $ fail_on_no_artifacts: true permissions: contents: write . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#advanced-release-configuration",
+    
+    "relUrl": "/docs/release-workflow.html#advanced-release-configuration"
+  },"92": {
+    "doc": "📦 Release Workflow",
+    "title": "⚙️ Configuration",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#%EF%B8%8F-configuration",
+    
+    "relUrl": "/docs/release-workflow.html#️-configuration"
+  },"93": {
+    "doc": "📦 Release Workflow",
+    "title": "Inputs",
+    "content": "| Parameter | Type | Default | Description | . | build_workflow | string | 'esp32-examples-build-ci.yml' | Name of the ESP32 build workflow file | . | artifact_pattern | string | 'fw-.*' | Regex pattern for firmware artifacts to include | . | draft | boolean | false | Create as draft release | . | prerelease | boolean | false | Mark as pre-release | . | tag_name | string | github.ref_name | Custom tag name | . | fail_on_no_artifacts | boolean | false | Fail if no firmware artifacts found | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#inputs",
+    
+    "relUrl": "/docs/release-workflow.html#inputs"
+  },"94": {
+    "doc": "📦 Release Workflow",
+    "title": "Required Permissions",
+    "content": "| 1 2 . | permissions: contents: write # Required for creating releases and downloading artifacts . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#required-permissions",
+    
+    "relUrl": "/docs/release-workflow.html#required-permissions"
+  },"95": {
+    "doc": "📦 Release Workflow",
+    "title": "📋 Workflow Dependencies",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-workflow-dependencies",
+    
+    "relUrl": "/docs/release-workflow.html#-workflow-dependencies"
+  },"96": {
+    "doc": "📦 Release Workflow",
+    "title": "Build Workflow Integration",
+    "content": "The release workflow depends on a successful ESP32 build that produces firmware artifacts: . | 1 2 3 4 5 6 7 . | # Required: ESP32 build workflow that generates fw-* artifacts jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 # This creates artifacts like: fw-esp32c6-hf-interface-simple . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#build-workflow-integration",
+    
+    "relUrl": "/docs/release-workflow.html#build-workflow-integration"
+  },"97": {
+    "doc": "📦 Release Workflow",
+    "title": "Artifact Naming Convention",
+    "content": "Your ESP32 projects should produce artifacts following the pattern: . | fw-esp32c6-project-name (standard firmware) | fw-esp32s3-advanced-config (variant builds) | fw-* (any firmware artifact) | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#artifact-naming-convention",
+    
+    "relUrl": "/docs/release-workflow.html#artifact-naming-convention"
+  },"98": {
+    "doc": "📦 Release Workflow",
+    "title": "🔄 Release Process",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-release-process",
+    
+    "relUrl": "/docs/release-workflow.html#-release-process"
+  },"99": {
+    "doc": "📦 Release Workflow",
+    "title": "What Happens",
+    "content": ". | Code Checkout: Repository is checked out with full history | Artifact Download: Firmware artifacts are downloaded from the specified build workflow | Release Creation: GitHub release is created with: . | Firmware binaries attached as release assets | Source code archives (automatic) | Auto-generated notes from PRs and commits | Version tag from git tag or custom input | . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#what-happens",
+    
+    "relUrl": "/docs/release-workflow.html#what-happens"
+  },"100": {
+    "doc": "📦 Release Workflow",
+    "title": "Artifact Collection",
+    "content": "The workflow automatically finds and downloads: . | All artifacts matching the artifact_pattern | From the same commit SHA that triggered the release | Generated by the specified build_workflow | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#artifact-collection",
+    
+    "relUrl": "/docs/release-workflow.html#artifact-collection"
+  },"101": {
+    "doc": "📦 Release Workflow",
+    "title": "📦 Usage Patterns",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-usage-patterns",
+    
+    "relUrl": "/docs/release-workflow.html#-usage-patterns"
+  },"102": {
+    "doc": "📦 Release Workflow",
+    "title": "1. Standard Firmware Release",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 . | name: Firmware Release on: push: tags: ['v[0-9]+.[0-9]+.[0-9]+'] jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 release: needs: [build] uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: build_workflow: \"esp32-examples-build-ci.yml\" permissions: contents: write . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#1-standard-firmware-release",
+    
+    "relUrl": "/docs/release-workflow.html#1-standard-firmware-release"
+  },"103": {
+    "doc": "📦 Release Workflow",
+    "title": "2. Multi-Project Firmware",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 . | jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 release: needs: [build] uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: build_workflow: \"esp32-examples-build-ci.yml\" artifact_pattern: \"fw-(basic|advanced)-.*\" # Multiple variants permissions: contents: write . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#2-multi-project-firmware",
+    
+    "relUrl": "/docs/release-workflow.html#2-multi-project-firmware"
+  },"104": {
+    "doc": "📦 Release Workflow",
+    "title": "3. Pre-release Testing",
+    "content": "| 1 2 3 4 5 6 7 8 9 . | jobs: release: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: prerelease: true draft: $ fail_on_no_artifacts: true # Strict validation permissions: contents: write . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#3-pre-release-testing",
+    
+    "relUrl": "/docs/release-workflow.html#3-pre-release-testing"
+  },"105": {
+    "doc": "📦 Release Workflow",
+    "title": "4. Custom Build Workflow",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 . | jobs: custom-build: name: \"custom-esp32-ci.yml\" # Your custom workflow name uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 release: needs: [custom-build] uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: build_workflow: \"custom-esp32-ci.yml\" # Match your workflow file artifact_pattern: \"custom-fw-.*\" # Match your artifact names . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#4-custom-build-workflow",
+    
+    "relUrl": "/docs/release-workflow.html#4-custom-build-workflow"
+  },"106": {
+    "doc": "📦 Release Workflow",
+    "title": "🏗️ Build Integration",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#%EF%B8%8F-build-integration",
+    
+    "relUrl": "/docs/release-workflow.html#️-build-integration"
+  },"107": {
+    "doc": "📦 Release Workflow",
+    "title": "Required Build Setup",
+    "content": "Your ESP32 build workflow must: . | Generate firmware artifacts with consistent naming | Upload artifacts using actions/upload-artifact | Use recognizable names matching your artifact_pattern | . Example ESP32 build that works with releases: . | 1 2 3 4 5 6 7 8 . | # In your ESP32 build workflow - name: Upload Firmware uses: actions/upload-artifact@v3 with: name: fw-esp32c6-$ path: | examples/esp32/build/*.bin examples/esp32/build/*.elf . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#required-build-setup",
+    
+    "relUrl": "/docs/release-workflow.html#required-build-setup"
+  },"108": {
+    "doc": "📦 Release Workflow",
+    "title": "🎯 Real-World Examples",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-real-world-examples",
+    
+    "relUrl": "/docs/release-workflow.html#-real-world-examples"
+  },"109": {
+    "doc": "📦 Release Workflow",
+    "title": "HardFOC Interface Release",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 . | name: HardFOC Interface Release on: push: tags: ['v*'] jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 project_tools_dir: hf-espidf-project-tools test: needs: [build] uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ci-security.yml@v1 with: project_dir: examples/esp32 release: needs: [build, test] uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: build_workflow: \"esp32-examples-build-ci.yml\" artifact_pattern: \"fw-esp32c6-.*\" fail_on_no_artifacts: true permissions: contents: write . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#hardfoc-interface-release",
+    
+    "relUrl": "/docs/release-workflow.html#hardfoc-interface-release"
+  },"110": {
+    "doc": "📦 Release Workflow",
+    "title": "🛠️ Advanced Configuration",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#%EF%B8%8F-advanced-configuration",
+    
+    "relUrl": "/docs/release-workflow.html#️-advanced-configuration"
+  },"111": {
+    "doc": "📦 Release Workflow",
+    "title": "Dynamic Artifact Patterns",
+    "content": "| 1 2 3 4 5 6 . | # Use environment-based patterns jobs: release: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 with: artifact_pattern: $ . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#dynamic-artifact-patterns",
+    
+    "relUrl": "/docs/release-workflow.html#dynamic-artifact-patterns"
+  },"112": {
+    "doc": "📦 Release Workflow",
+    "title": "Conditional Releases",
+    "content": "| 1 2 3 4 . | jobs: release: if: startsWith(github.ref, 'refs/tags/') &amp;&amp; !contains(github.ref_name, 'dev') uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@v1 . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#conditional-releases",
+    
+    "relUrl": "/docs/release-workflow.html#conditional-releases"
+  },"113": {
+    "doc": "📦 Release Workflow",
+    "title": "🐛 Troubleshooting",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-troubleshooting",
+    
+    "relUrl": "/docs/release-workflow.html#-troubleshooting"
+  },"114": {
+    "doc": "📦 Release Workflow",
+    "title": "Common Issues",
+    "content": "| Issue | Solution | . | No artifacts found | Check build_workflow name matches your workflow file exactly | . | Wrong artifacts | Verify artifact_pattern regex matches your artifact names | . | Permission denied | Add permissions: contents: write to calling workflow | . | Build not found | Ensure build workflow ran successfully on the same commit | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#common-issues",
+    
+    "relUrl": "/docs/release-workflow.html#common-issues"
+  },"115": {
+    "doc": "📦 Release Workflow",
+    "title": "Debug Steps",
+    "content": ". | Check build workflow completed successfully | Verify artifact names in the Actions tab | Test artifact pattern with a regex tester | Review permissions in repository settings | Use fail_on_no_artifacts: true for strict validation | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#debug-steps",
+    
+    "relUrl": "/docs/release-workflow.html#debug-steps"
+  },"116": {
+    "doc": "📦 Release Workflow",
+    "title": "Artifact Pattern Examples",
+    "content": "| 1 2 3 4 5 6 7 8 9 10 11 . | # Single project artifact_pattern: \"fw-esp32c6-myproject\" # Multiple ESP32 variants artifact_pattern: \"fw-esp32(c6|s3)-.*\" # All firmware artifacts artifact_pattern: \"fw-.*\" # Specific configurations artifact_pattern: \"fw-.*-(debug|release)\" . | . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#artifact-pattern-examples",
+    
+    "relUrl": "/docs/release-workflow.html#artifact-pattern-examples"
+  },"117": {
+    "doc": "📦 Release Workflow",
+    "title": "🔗 Related Workflows",
+    "content": ". | ESP32 Build Workflow - Required for generating firmware artifacts | Security Workflow - Often run before releases | Basic Releases - For projects without build artifacts | . 📖 ← Back to Documentation Index . ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html#-related-workflows",
+    
+    "relUrl": "/docs/release-workflow.html#-related-workflows"
+  },"118": {
+    "doc": "📦 Release Workflow",
+    "title": "📦 Release Workflow",
+    "content": " ",
+    "url": "/hf-espidf-ci-tools/development/docs/release-workflow.html",
+    
+    "relUrl": "/docs/release-workflow.html"
+  },"119": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Security Workflow Guide",
     "content": "🛡️ Dependencies, Secrets, CodeQL . The Security workflow provides comprehensive security auditing including dependency scanning, secret detection, and optional CodeQL analysis. ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#security-workflow-guide",
     
     "relUrl": "/docs/security-workflow/#security-workflow-guide"
-  },"87": {
+  },"120": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "📋 Table of Contents",
     "content": ". | 🎯 Overview | 🔒 Security Features | ⚙️ Inputs | 📤 Outputs | 🚀 Usage Examples | ⚙️ Configuration | 🛡️ Security Best Practices | 🔧 Troubleshooting | 📚 Related Workflows | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#-table-of-contents",
     
     "relUrl": "/docs/security-workflow/#-table-of-contents"
-  },"88": {
+  },"121": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "🎯 Overview",
     "content": "Purpose: Comprehensive security auditing Key Features: . | Automatic Requirements Discovery: Finds all requirements.txt and requirements.in files automatically | Python dependency vulnerability scanning: Uses pip-audit and safety | Secret and credential detection: Uses gitleaks to find accidentally committed secrets | Optional CodeQL analysis: Static code analysis for C/C++ and other languages | Configurable scan types: Choose specific security checks to run | . Use Case: Security compliance and vulnerability detection for mixed-language projects . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#-overview",
     
     "relUrl": "/docs/security-workflow/#-overview"
-  },"89": {
+  },"122": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "🔒 Security Features",
     "content": " ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#-security-features",
     
     "relUrl": "/docs/security-workflow/#-security-features"
-  },"90": {
+  },"123": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Repository Security",
     "content": ". | Trusted Source Only: Tools are only cloned from the trusted N3b3x/hf-espidf-project-tools repository | No External URLs: Users cannot specify arbitrary repository URLs, preventing supply chain attacks | Main Branch Only: Always uses the main branch for consistency and stability | Shallow Cloning: Uses --depth 1 to minimize attack surface and reduce clone time | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#repository-security",
     
     "relUrl": "/docs/security-workflow/#repository-security"
-  },"91": {
+  },"124": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Input Validation",
     "content": ". | Path Sanitization: All file paths are validated and sanitized | Parameter Validation: Input parameters are validated before use | Error Handling: Secure error messages that don’t leak sensitive information | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#input-validation",
     
     "relUrl": "/docs/security-workflow/#input-validation"
-  },"92": {
+  },"125": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Automatic Discovery",
     "content": ". | Requirements Files: Automatically finds all requirements*.txt and requirements*.in files | No Manual Configuration: Scans entire repository without user input | Comprehensive Coverage: Covers all Python dependencies in the project | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#automatic-discovery",
     
     "relUrl": "/docs/security-workflow/#automatic-discovery"
-  },"93": {
+  },"126": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "⚙️ Inputs",
     "content": "| Input | Type | Required | Default | Description | . | project_dir | string | ✅ | - | Path to ESP-IDF project (contains CMakeLists.txt) | . | scripts_dir | string | ❌ | nt-espidf-tools | Path to nt-espidf-tools directory | . | scan_type | string | ❌ | all | all \\| dependencies \\| secrets \\| codeql | . | run_codeql | boolean | ❌ | true | Enable CodeQL analysis | . | codeql_languages | string | ❌ | cpp | Comma-separated languages | . | auto_clone_tools | boolean | ❌ | false | Auto-clone tools repo if missing | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#%EF%B8%8F-inputs",
     
     "relUrl": "/docs/security-workflow/#️-inputs"
-  },"94": {
+  },"127": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "📤 Outputs",
     "content": "| Output | Description | . | Dependency reports | pip-audit, safety, bandit results | . | Secret detection | gitleaks, truffleHog reports | . | CodeQL analysis | Security database and SARIF files | . | Artifacts | All security reports stored | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#-outputs",
     
     "relUrl": "/docs/security-workflow/#-outputs"
-  },"95": {
+  },"128": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "🚀 Usage Examples",
     "content": " ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#-usage-examples",
     
     "relUrl": "/docs/security-workflow/#-usage-examples"
-  },"96": {
+  },"129": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Full Security Audit",
     "content": "| 1 2 3 4 5 6 7 8 9 . | jobs: security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scripts_dir: nt-espidf-tools scan_type: \"all\" run_codeql: true codeql_languages: \"cpp,python\" . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#full-security-audit",
     
     "relUrl": "/docs/security-workflow/#full-security-audit"
-  },"97": {
+  },"130": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Dependencies Only",
     "content": "| 1 2 3 4 5 6 7 8 . | jobs: security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scripts_dir: nt-espidf-tools scan_type: \"dependencies\" run_codeql: false . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#dependencies-only",
     
     "relUrl": "/docs/security-workflow/#dependencies-only"
-  },"98": {
+  },"131": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "CodeQL with Auto-clone Tools",
     "content": "| 1 2 3 4 5 6 7 8 9 10 . | jobs: security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scripts_dir: nt-espidf-tools auto_clone_tools: true scan_type: \"codeql\" run_codeql: true codeql_languages: \"cpp\" . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#codeql-with-auto-clone-tools",
     
     "relUrl": "/docs/security-workflow/#codeql-with-auto-clone-tools"
-  },"99": {
+  },"132": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "⚙️ Configuration",
     "content": " ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#%EF%B8%8F-configuration",
     
     "relUrl": "/docs/security-workflow/#️-configuration"
-  },"100": {
+  },"133": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Scan Types",
     "content": ". | all: Run all security checks | dependencies: Python dependency scanning only | secrets: Secret detection only | codeql: CodeQL analysis only | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#scan-types",
     
     "relUrl": "/docs/security-workflow/#scan-types"
-  },"101": {
+  },"134": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "CodeQL Languages",
     "content": "Supported languages: cpp, python, javascript, go, java, csharp . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#codeql-languages",
     
     "relUrl": "/docs/security-workflow/#codeql-languages"
-  },"102": {
+  },"135": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Matrix-Based CodeQL Analysis",
-    "content": "The workflow automatically generates the same build matrix as your build workflow and analyzes all build configurations: . | Same matrix generation: Uses generate_matrix.py from your tools repo | Same build process: Calls build_app.sh with matrix parameters | Comprehensive coverage: Analyzes all ESP-IDF versions, build types, and targets | Build consistency: Each matrix job uses the exact same build configuration | . Matrix Parameters Used: . | matrix.app_name - Application name | matrix.build_type - Build type (debug/release) | matrix.idf_version - ESP-IDF version | matrix.target - Target chip (esp32, esp32c6, etc.) | . Example Integration: . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 . | # In your CI workflow, ensure consistency: jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1 with: project_dir: examples/esp32 scripts_dir: nt-espidf-tools # ... other inputs security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scripts_dir: nt-espidf-tools scan_type: \"codeql\" # CodeQL will analyze ALL matrix combinations automatically . | . ",
+    "content": "The workflow automatically generates the same build matrix as your build workflow and analyzes all build configurations: . | Same matrix generation: Uses generate_matrix.py from your tools repo | Same build process: Calls build_app.sh with matrix parameters | Comprehensive coverage: Analyzes all ESP-IDF versions, build types, and targets | Build consistency: Each matrix job uses the exact same build configuration | . Matrix Parameters Used: . | matrix.app_name - Application name | matrix.build_type - Build type (debug/release) | matrix.idf_version - ESP-IDF version | matrix.target - Target chip (esp32, esp32c6, etc.) | . Example Integration: . | 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 . | # In your CI workflow, ensure consistency: jobs: build: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1 with: project_dir: examples/esp32 scripts_dir: nt-espidf-tools # ... other inputs security: uses: N3b3x/hf-espidf-ci-tools/.github/workflows/security.yml@v1 with: project_dir: examples/esp32 scripts_dir: nt-espidf-tools scan_type: \"codeql\" # CodeQL will analyze ALL matrix combinations automatically . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#matrix-based-codeql-analysis",
     
     "relUrl": "/docs/security-workflow/#matrix-based-codeql-analysis"
-  },"103": {
+  },"136": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "🛡️ Security Best Practices",
     "content": " ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#%EF%B8%8F-security-best-practices",
     
     "relUrl": "/docs/security-workflow/#️-security-best-practices"
-  },"104": {
+  },"137": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "For Production Environments",
     "content": ". | Disable auto-clone: Set auto_clone_tools: false and include tools in your repository | Regular updates: Periodically update the tools in your repository after reviewing changes | Version control: Track tool versions in your project’s dependency management | Code review: Review all tool updates before applying them | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#for-production-environments",
     
     "relUrl": "/docs/security-workflow/#for-production-environments"
-  },"105": {
+  },"138": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "For Development Environments",
     "content": ". | Enable auto-clone: Set auto_clone_tools: true for convenience | Monitor changes: Keep track of tool updates and security advisories | Test updates: Verify tool updates don’t break your build process | Use staging: Test changes in staging before production | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#for-development-environments",
     
     "relUrl": "/docs/security-workflow/#for-development-environments"
-  },"106": {
+  },"139": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "For CI/CD Pipelines",
     "content": ". | Audit trail: Log which tools version is being used | Dependency scanning: Use tools like Dependabot to monitor for vulnerabilities | Access controls: Limit who can modify the tools repository | Regular updates: Keep tools up to date with security patches | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#for-cicd-pipelines",
     
     "relUrl": "/docs/security-workflow/#for-cicd-pipelines"
-  },"107": {
+  },"140": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Requirements File Management",
     "content": ". | Use specific versions: Pin dependencies to specific versions in requirements.txt | Regular updates: Update dependencies regularly and test thoroughly | Security scanning: Run the security workflow regularly to catch vulnerabilities | Separate environments: Use different requirements files for dev/staging/production | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#requirements-file-management",
     
     "relUrl": "/docs/security-workflow/#requirements-file-management"
-  },"108": {
+  },"141": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "🔧 Troubleshooting",
     "content": " ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#-troubleshooting",
     
     "relUrl": "/docs/security-workflow/#-troubleshooting"
-  },"109": {
+  },"142": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Common Issues",
     "content": "Dependency Scan Fails . | Check Python version compatibility | Verify requirements files exist | Review pip installation logs | . Secret Detection Issues . | Ensure full git history is available | Check gitleaks installation | Review false positive suppressions | . CodeQL Analysis Fails . | Verify project_dir and scripts_dir are correct | Check build_app.sh exists in scripts directory | Ensure matrix generation works (same as build workflow) | Check ESP-IDF version compatibility | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#common-issues",
     
     "relUrl": "/docs/security-workflow/#common-issues"
-  },"110": {
+  },"143": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "Debug Mode",
     "content": "Enable debug output: . | 1 2 3 . | env: ACTIONS_STEP_DEBUG: true ACTIONS_RUNNER_DEBUG: true . | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#debug-mode",
     
     "relUrl": "/docs/security-workflow/#debug-mode"
-  },"111": {
+  },"144": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "📚 Related Workflows",
     "content": ". | Build - ESP-IDF application builds (uses same matrix and build process) | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#-related-workflows",
     
     "relUrl": "/docs/security-workflow/#-related-workflows"
-  },"112": {
+  },"145": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "🔗 Related Resources",
     "content": ". | CodeQL Documentation | GitLeaks | pip-audit | Safety | . | ← Previous: Build Workflow | Next: Example Workflows → | . | 📚 All Documentation | 🏠 Main README | . ",
     "url": "/hf-espidf-ci-tools/development/docs/security-workflow/#-related-resources",
     
     "relUrl": "/docs/security-workflow/#-related-resources"
-  },"113": {
+  },"146": {
     "doc": "🛡️ Security Workflow Guide",
     "title": "🛡️ Security Workflow Guide",
     "content": " ",

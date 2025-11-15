@@ -155,7 +155,7 @@
   
     <ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/development/" class="nav-list-link">🔧 HardFOC ESP32 CI Tools</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in 📚 Documentation category" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
-      </button><a href="/hf-espidf-ci-tools/development/docs/" class="nav-list-link">📚 Documentation</a><ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/development/docs/build-workflow/" class="nav-list-link">🏗️ ESP-IDF Build Workflow Guide</a></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/development/docs/security-workflow/" class="nav-list-link">🛡️ Security Workflow Guide</a></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/development/docs/example-workflows/" class="nav-list-link">🚀 Example Workflows for Consumer Repositories</a></li></ul></li></ul>
+      </button><a href="/hf-espidf-ci-tools/development/docs/" class="nav-list-link">📚 Documentation</a><ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/development/docs/build-workflow/" class="nav-list-link">🏗️ ESP-IDF Build Workflow Guide</a></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/development/docs/security-workflow/" class="nav-list-link">🛡️ Security Workflow Guide</a></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/development/docs/example-workflows/" class="nav-list-link">🚀 Example Workflows for Consumer Repositories</a></li></ul></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/development/docs/release-workflow.html" class="nav-list-link">📦 Release Workflow</a></li></ul>
   
 </nav>
 
@@ -264,6 +264,11 @@
       <td><strong><a href="/hf-espidf-ci-tools/development/docs/security-workflow/">Security</a></strong></td>
       <td>Dependencies, secrets, CodeQL</td>
       <td><a href="/hf-espidf-ci-tools/development/docs/security-workflow/">→ Security Guide</a></td>
+    </tr>
+    <tr>
+      <td><strong><a href="/hf-espidf-ci-tools/development/docs/release-workflow.html">Release</a></strong></td>
+      <td>Firmware releases with build artifacts</td>
+      <td><a href="/hf-espidf-ci-tools/development/docs/release-workflow.html">→ Release Guide</a></td>
     </tr>
   </tbody>
 </table></div>
@@ -374,7 +379,7 @@
 
 <span class="na">jobs</span><span class="pi">:</span>
   <span class="na">build</span><span class="pi">:</span>
-    <span class="na">uses</span><span class="pi">:</span> <span class="s">N3b3x/hf-espidf-ci-tools/.github/workflows/build.yml@v1</span>
+    <span class="na">uses</span><span class="pi">:</span> <span class="s">N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1</span>
     <span class="na">with</span><span class="pi">:</span>
       <span class="na">project_dir</span><span class="pi">:</span> <span class="s">examples/esp32</span>
       <span class="na">project_tools_dir</span><span class="pi">:</span> <span class="s">hf-espidf-project-tools</span>
@@ -427,6 +432,21 @@
 </ul>
 
 <p><a href="/hf-espidf-ci-tools/development/docs/security-workflow/">→ Full Security Guide</a></p>
+<h3 id="release-workflow">
+  
+  
+    <a href="#release-workflow" class="anchor-heading" aria-labelledby="release-workflow"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Release Workflow
+  
+  
+</h3>
+    
+<ul>
+  <li><strong>Purpose</strong>: Automated firmware releases with build artifacts</li>
+  <li><strong>Key Features</strong>: GitHub releases, firmware binaries, auto-generated notes</li>
+  <li><strong>Use Case</strong>: Version releases with ESP32 firmware artifacts</li>
+</ul>
+
+<p><a href="/hf-espidf-ci-tools/development/docs/release-workflow.html">→ Full Release Guide</a></p>
 <h2 id="-workflow-combinations">
   
   
@@ -447,10 +467,12 @@
 2
 3
 4
+5
 </pre></td><td class="rouge-code"><pre><span class="c1"># Combines all workflows for comprehensive CI</span>
 <span class="na">jobs</span><span class="pi">:</span>
   <span class="na">build</span><span class="pi">:</span> <span class="c1"># Matrix builds</span>
   <span class="na">security</span><span class="pi">:</span> <span class="c1"># Security audit</span>
+  <span class="na">release</span><span class="pi">:</span> <span class="c1"># Firmware release (on tags)</span>
 </pre></td></tr></tbody></table></div></code></pre></div></div>
 <h3 id="security-pipeline">
   
