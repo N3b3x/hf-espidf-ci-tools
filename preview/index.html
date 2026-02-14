@@ -68,7 +68,10 @@
 <!-- End Jekyll SEO tag -->
 
 
-  
+  <!-- Custom head content for hf-espidf-ci-tools documentation -->
+<!-- Add any custom CSS, JS, or meta tags here -->
+
+
 
 </head>
 
@@ -139,13 +142,13 @@
 </svg>
 
   
-    <div class="side-bar">
-  <div class="site-header" role="banner">
+    <header class="side-bar">
+  <div class="site-header">
     <a href="/hf-espidf-ci-tools/preview/" class="site-title lh-tight">
   hf-espidf-ci-tools - preview
 
 </a>
-    <button id="menu-button" class="site-button btn-reset" aria-label="Toggle menu" aria-pressed="false">
+    <button id="menu-button" class="site-button btn-reset" aria-label="Menu" aria-expanded="false">
       <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
     </button>
   </div>
@@ -153,22 +156,20 @@
   <nav aria-label="Main" id="site-nav" class="site-nav">
   
   
-    <ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/" class="nav-list-link">🔧 HardFOC ESP32 CI Tools</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in 📚 Documentation category" aria-pressed="false">
+    <ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/" class="nav-list-link">🔧 HardFOC ESP32 CI Tools</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="📚 Documentation submenu" aria-expanded="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
       </button><a href="/hf-espidf-ci-tools/preview/docs/" class="nav-list-link">📚 Documentation</a><ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/docs/build-workflow/" class="nav-list-link">🏗️ ESP-IDF Build Workflow Guide</a></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/docs/security-workflow/" class="nav-list-link">🛡️ Security Workflow Guide</a></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/docs/example-workflows/" class="nav-list-link">🚀 Example Workflows for Consumer Repositories</a></li></ul></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/docs/release-workflow.html" class="nav-list-link">📦 Release Workflow</a></li></ul>
   
 </nav>
 
 
-
-
+<div class="d-md-block d-none site-footer">
   
   
-    <footer class="site-footer">
-      This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
-    </footer>
+    This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
   
-</div>
+  </div>
+</header>
 
   
   <div class="main" id="top">
@@ -178,8 +179,11 @@
 
 <div class="search" role="search">
   <div class="search-input-wrap">
-    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search hf-espidf-ci-tools - preview" aria-label="Search hf-espidf-ci-tools - preview" autocomplete="off">
-    <label for="search-input" class="search-label"><svg viewBox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search hf-espidf-ci-tools - preview" autocomplete="off">
+    <label for="search-input" class="search-label">
+      <span class="sr-only">Search hf-espidf-ci-tools - preview</span>
+      <svg viewBox="0 0 24 24" class="search-icon" aria-hidden="true"><use xlink:href="#svg-search"></use></svg>
+    </label>
   </div>
   <div id="search-results" class="search-results"></div>
 </div>
@@ -236,8 +240,7 @@
 
 <p><strong>🚀 Advanced CI/CD Tools for HardFOC ESP32 Projects</strong></p><hr />
 
-<p><a href="https://github.com/n3b3x/hf-espidf-ci-tools/actions/workflows/publish-docs.yml"><img src="https://github.com/n3b3x/hf-espidf-ci-tools/actions/workflows/publish-docs.yml/badge.svg" alt="Publish Docs" /></a>
-<a href="https://docs.espressif.com/projects/esp-idf/"><img src="https://img.shields.io/badge/ESP--IDF-Matrix%20Builds-green?logo=espressif" alt="ESP-IDF" /></a>
+<p><a href="https://docs.espressif.com/projects/esp-idf/"><img src="https://img.shields.io/badge/ESP--IDF-Matrix%20Builds-green?logo=espressif" alt="ESP-IDF" /></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a>
 <a href="https://n3b3x.github.io/hf-espidf-ci-tools"><img src="https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg" alt="GitHub Pages" /></a></p>
 
@@ -303,6 +306,7 @@
   
 </h3>
     
+
 <ul>
   <li>✅ <strong>Matrix-based ESP-IDF builds</strong> across multiple versions and configurations</li>
   <li>✅ <strong>Comprehensive security auditing</strong> with CodeQL and dependency scanning</li>
@@ -315,6 +319,7 @@
   
 </h3>
     
+
 <ul>
   <li>✅ <strong>Single composite action</strong> for project tools directory management</li>
   <li>✅ <strong>Automatic tool cloning</strong> with security validation</li>
@@ -329,6 +334,7 @@
   
 </h3>
     
+
 <ul>
   <li>✅ <strong>ESP32-C6 optimized</strong> for HardFOC interface projects</li>
   <li>✅ <strong>Multi-application support</strong> with YAML configuration</li>
@@ -461,6 +467,7 @@
     
 
 <p>CI combining build + security:</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -509,10 +516,6 @@
 
 <p>📖 <strong>Next</strong>: <a href="/hf-espidf-ci-tools/preview/docs/">Documentation Index</a> - Complete navigation and examples</p>
 
-<blockquote>
-  <p><strong>🧪 <a href="https://n3b3x.github.io/hf-espidf-ci-tools/nonexistent-page">Test 404 Page</a></strong> - (on live documentation) Click this link to test our custom 404 page!</p>
-</blockquote>
-
           
 
           
@@ -520,17 +523,22 @@
           
         </main>
         
+<hr>
+<footer>
+  
 
-  <hr>
-  <footer>
+  <!-- Custom footer content for hf-espidf-ci-tools documentation -->
+<!-- Add any custom footer content here -->
+
+
+
+  <div class="d-md-none mt-4 fs-2">
     
-
-    <p class="text-small text-grey-dk-100 mb-0">Built with ❤️ using <a href='https://just-the-docs.github.io/just-the-docs/'>Just the Docs</a> • <a href='https://github.com/n3b3x/hf-espidf-ci-tools/blob/main/LICENSE'>MIT License</a> • <a href='https://github.com/n3b3x/hf-espidf-ci-tools'>View on GitHub</a>
-</p>
-
     
-  </footer>
-
+      This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+    
+  </div>
+</footer>
 
       </div>
     </div>

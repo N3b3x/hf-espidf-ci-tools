@@ -71,7 +71,10 @@
 <!-- End Jekyll SEO tag -->
 
 
-  
+  <!-- Custom head content for hf-espidf-ci-tools documentation -->
+<!-- Add any custom CSS, JS, or meta tags here -->
+
+
 
 </head>
 
@@ -142,13 +145,13 @@
 </svg>
 
   
-    <div class="side-bar">
-  <div class="site-header" role="banner">
+    <header class="side-bar">
+  <div class="site-header">
     <a href="/hf-espidf-ci-tools/preview/" class="site-title lh-tight">
   hf-espidf-ci-tools - preview
 
 </a>
-    <button id="menu-button" class="site-button btn-reset" aria-label="Toggle menu" aria-pressed="false">
+    <button id="menu-button" class="site-button btn-reset" aria-label="Menu" aria-expanded="false">
       <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
     </button>
   </div>
@@ -156,22 +159,20 @@
   <nav aria-label="Main" id="site-nav" class="site-nav">
   
   
-    <ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/" class="nav-list-link">🔧 HardFOC ESP32 CI Tools</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="toggle items in 📚 Documentation category" aria-pressed="false">
+    <ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/" class="nav-list-link">🔧 HardFOC ESP32 CI Tools</a></li><li class="nav-list-item"><button class="nav-list-expander btn-reset" aria-label="📚 Documentation submenu" aria-expanded="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#svg-arrow-right"></use></svg>
       </button><a href="/hf-espidf-ci-tools/preview/docs/" class="nav-list-link">📚 Documentation</a><ul class="nav-list"><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/docs/build-workflow/" class="nav-list-link">🏗️ ESP-IDF Build Workflow Guide</a></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/docs/security-workflow/" class="nav-list-link">🛡️ Security Workflow Guide</a></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/docs/example-workflows/" class="nav-list-link">🚀 Example Workflows for Consumer Repositories</a></li></ul></li><li class="nav-list-item"><a href="/hf-espidf-ci-tools/preview/docs/release-workflow.html" class="nav-list-link">📦 Release Workflow</a></li></ul>
   
 </nav>
 
 
-
-
+<div class="d-md-block d-none site-footer">
   
   
-    <footer class="site-footer">
-      This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
-    </footer>
+    This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
   
-</div>
+  </div>
+</header>
 
   
   <div class="main" id="top">
@@ -181,8 +182,11 @@
 
 <div class="search" role="search">
   <div class="search-input-wrap">
-    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search hf-espidf-ci-tools - preview" aria-label="Search hf-espidf-ci-tools - preview" autocomplete="off">
-    <label for="search-input" class="search-label"><svg viewBox="0 0 24 24" class="search-icon"><use xlink:href="#svg-search"></use></svg></label>
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search hf-espidf-ci-tools - preview" autocomplete="off">
+    <label for="search-input" class="search-label">
+      <span class="sr-only">Search hf-espidf-ci-tools - preview</span>
+      <svg viewBox="0 0 24 24" class="search-icon" aria-hidden="true"><use xlink:href="#svg-search"></use></svg>
+    </label>
   </div>
   <div id="search-results" class="search-results"></div>
 </div>
@@ -275,7 +279,9 @@
 </h2>
     
 
-<p>These example workflows demonstrate how to use the HardFOC ESP32 CI tools in your consumer repositories. Each workflow is designed for different use cases and can be customized to fit your project’s needs.</p>
+<p>These example workflows demonstrate how to use the HardFOC ESP32 CI tools in your consumer
+repositories. Each workflow is designed for different use cases and can be customized to fit your
+project’s needs.</p>
 <h3 id="key-features">
   
   
@@ -284,6 +290,7 @@
   
 </h3>
     
+
 <ul>
   <li>🔄 <strong>Parallel Execution</strong> - Multiple jobs run simultaneously for maximum efficiency</li>
   <li>🛡️ <strong>Comprehensive Coverage</strong> - Build, lint, test, security, and documentation</li>
@@ -1016,6 +1023,7 @@
   
 </h3>
     
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1035,6 +1043,7 @@
   
 </h3>
     
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1060,6 +1069,7 @@
   
 </h3>
     
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1075,6 +1085,7 @@
   
 </h3>
     
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -1104,6 +1115,7 @@
 </ol>
 
 <p>For more detailed information, see the individual workflow documentation:</p>
+
 <ul>
   <li><a href="/hf-espidf-ci-tools/preview/docs/build-workflow/">Build Workflow</a></li>
   <li><a href="/hf-espidf-ci-tools/preview/docs/security-workflow/">Security Workflow</a></li>
@@ -1134,17 +1146,22 @@
           
         </main>
         
+<hr>
+<footer>
+  
 
-  <hr>
-  <footer>
+  <!-- Custom footer content for hf-espidf-ci-tools documentation -->
+<!-- Add any custom footer content here -->
+
+
+
+  <div class="d-md-none mt-4 fs-2">
     
-
-    <p class="text-small text-grey-dk-100 mb-0">Built with ❤️ using <a href='https://just-the-docs.github.io/just-the-docs/'>Just the Docs</a> • <a href='https://github.com/n3b3x/hf-espidf-ci-tools/blob/main/LICENSE'>MIT License</a> • <a href='https://github.com/n3b3x/hf-espidf-ci-tools'>View on GitHub</a>
-</p>
-
     
-  </footer>
-
+      This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+    
+  </div>
+</footer>
 
       </div>
     </div>
